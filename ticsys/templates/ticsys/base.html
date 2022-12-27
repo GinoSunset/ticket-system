@@ -1,0 +1,13 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <link rel="stylesheet" href="{% static 'ticsys/semantic.min.css' %}">
+    <script src="{% static 'ticsys/semantic.min.js' %}"></script>
+    <title>{% block title %}TicSys{% endblock %}</title>
+</head>
+
+<body>
+        {% block content %}{% endblock %}
+</body>
+</html>
