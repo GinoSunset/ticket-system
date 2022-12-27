@@ -3,13 +3,15 @@
 <html lang="ru">
 <head>
     <link rel="stylesheet" href="{% static 'semantic.min.css' %}">
+    <script type="text/javascript" src="{% static 'jquery-3.6.3.min.js' %}"></script>
     <script src="{% static 'semantic.min.js' %}"></script>
+    {% block header_style %}{% endblock %}
     <title>{% block title %}TicSys{% endblock %}</title>
 </head>
 
 <body>
     
         {% block common_content %}{% endblock %}
-    
+        {% block script %}{% endblock script %}
 </body>
 </html>

@@ -1,9 +1,17 @@
 {% extends 'ticsys/index.html' %}
+{% load static %}
+{% block header_style %}
+<link rel="stylesheet" type="text/css" href="{% static 'DataTables/DataTables-1.13.1/css/dataTables.semanticui.min.css' %}"/> 
+<script type="text/javascript" src="{% static 'DataTables/DataTables-1.13.1/js/jquery.dataTables.min.js' %}"></script>
+<script type="text/javascript" src="{% static 'DataTables/DataTables-1.13.1/js/dataTables.semanticui.min.js' %}"></script>
+{% endblock %}
+
+
 {% block content %}
-<h1>Tickets</h1>
+<h1>Заявки</h1>
 
 
-<table class="ui celled table">
+<table id="tableTickets"class="ui celled table">
     <thead>
       <tr><th>Дата создания</th>
       <th>SAP</th>
@@ -19,14 +27,14 @@
       <tr>
         {% for ticket in object_list %}
         <td data-label="date_create">{{ticket.date_create|date}}</td>
-        <td data-label="sap_id">{{ticket.sap_id}}</td>
-        <td data-label="type_ticket">{{ticket.type_ticket}}</td>
-        <td data-label="description">{{ticket.description}}</td>
-        <td data-label="creator">{{ticket.creator}}</td>
-        <td data-label="customer">{{ticket.customer}}</td>
-        <td data-label="contractor">{{ticket.contractor}}</td>
-        <td data-label="status">{{ticket.status}}</td>
-        <td data-label="address">{{ticket.address}}</td>
+        <td data-label="sap_id">{% firstof ticket.sap_id %}</td>
+        <td data-label="type_ticket">{% firstof ticket.type_ticket %}</td>
+        <td data-label="description">{% firstof ticket.description %}</td>
+        <td data-label="creator">{% firstof ticket.creator %}</td>
+        <td data-label="customer">{% firstof ticket.customer %}</td>
+        <td data-label="contractor">{% firstof ticket.contractor %}</td>
+        <td data-label="status">{% firstof ticket.status %}</td>
+        <td data-label="address">{% firstof ticket.address %}</td>
         {% empty %}
         No tickets yet.
         {% endfor %}
@@ -34,3 +42,13 @@
   </table>
 
 {% endblock content %}
+{% block script %}
+<script>
+
+    $('#tableTickets').DataTable({
+        language: {
+            url: "{% static 'DataTables/ru.json'%}"
+        }
+    });
+</script>
+{% endblock script %}
