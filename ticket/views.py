@@ -1,3 +1,8 @@
-from django.shortcuts import render
+from django.views.generic import ListView
 
-# Create your views here.
+from .models import Ticket
+
+
+class TicketsListView(ListView):
+    model = Ticket
+    ordering = "-date_create"

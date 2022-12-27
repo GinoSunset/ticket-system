@@ -1,20 +1,18 @@
 {% extends "ticsys/base.html" %}
 
-{% block content%}
-
-<form class="ui form" method="post">
-    {{ form.non_field_errors }}
-    {% csrf_token %}
-    {% for field in form %}
-    <div class="field">
-        {{ field.errors }}
-        {{ field.label_tag }} 
-        {{ field }}
-    </div>
-    {% endfor %}
-    
-
-
+{% block common_content%}
+<div class="ui container">
+  <form class="ui form" method="post">
+      {{ form.non_field_errors }}
+      {% csrf_token %}
+      {% for field in form %}
+      <div class="field">
+          {{ field.errors }}
+          {{ field.label_tag }} 
+          {{ field }}
+      </div>
+      {% endfor %}
     <button class="ui button" type="submit">Submit</button>
   </form>
+</div>
 {% endblock %}
