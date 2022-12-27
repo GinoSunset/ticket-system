@@ -1,6 +1,6 @@
 from django.contrib import admin
 
-from .models import Dictionary, DictionaryType, Click
+from .models import Dictionary, DictionaryType
 
 
 class DictionaryAdmin(admin.ModelAdmin):
