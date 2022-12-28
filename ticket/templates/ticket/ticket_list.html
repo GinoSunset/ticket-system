@@ -33,22 +33,27 @@
         <td data-label="creator">{% firstof ticket.creator %}</td>
         <td data-label="customer">{% firstof ticket.customer %}</td>
         <td data-label="contractor">{% firstof ticket.contractor %}</td>
-        <td data-label="status">{% firstof ticket.status %}</td>
+        <td data-label="status">{% if ticket.status %} <div class="ui {{ticket.get_color_status}} label">{{ticket.status}}</div>{% endif %}</td>
         <td data-label="address">{% firstof ticket.address %}</td>
+      
         {% empty %}
-        No tickets yet.
+        <td>No tickets yet.</td>
         {% endfor %}
+      </tr>
     </tbody>
   </table>
 
 {% endblock content %}
 {% block script %}
 <script>
+    {% if  object_list%}
 
     $('#tableTickets').DataTable({
         language: {
             url: "{% static 'DataTables/ru.json'%}"
         }
     });
+    {% endif %}
+
 </script>
 {% endblock script %}

@@ -62,6 +62,16 @@ class Ticket(models.Model):
     def __str__(self):
         return f"{self.pk} - {self.type_ticket}, {self.customer=}"
 
+    def get_color_status(self):
+        color = {
+            "work": "blue",
+            "search_contractor": "orange",
+            "consideration": "teal",
+            "revision": "yellow",
+            "done": "green",
+        }
+        return color.get(self.status.code, "detail")
+
 
 class Comment(models.Model):
     LEN_SHORT_TEXT = 10
