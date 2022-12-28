@@ -52,6 +52,18 @@ class User(AbstractUser):
             self.role = self.base_role
         return super().save(*args, **kwargs)
 
+    @property
+    def is_operator(self):
+        return self.role == self.Role.OPERATOR
+
+    def get_role_user(self):
+        type_user = {
+            "OPERATOR": Operator,
+            "CUSTOMER": Customer,
+            "CONTRACTOR": Contractor,
+        }
+        return type_user.get(self.role, User).objects.get(pk=self.pk)
+
     class Meta:
         db_table = "user"
 
@@ -61,6 +73,14 @@ class User(AbstractUser):
         return f"{settings.MEDIA_URL}/{self.avatar.name}"
 
 
+class Customer(User):
+    class Meta:
+        proxy = True
+
+    base_role = User.Role.CUSTOMER
+    objects = CustomerManager()
+
+
 class Operator(User):
     class Meta:
         proxy = True
@@ -68,13 +88,10 @@ class Operator(User):
     base_role = User.Role.OPERATOR
     objects = OperatorManager()
 
-
-class Customer(User):
-    class Meta:
-        proxy = True
-
-    base_role = User.Role.CUSTOMER
-    objects = CustomerManager()
+    def get_customers(self) -> models.QuerySet[Customer]:
+        return Customer.objects.filter(
+            pk__in=self.customers.values_list("user_id", flat=True)
+        )
 
 
 class Contractor(User):

@@ -17,13 +17,13 @@ class Ticket(models.Model):
     sap_id = models.CharField("ID SAP заявки", max_length=30, null=True, blank=True)
     type_ticket = models.ForeignKey(
         Dictionary,
-        verbose_name="Type_ticket -> Dictionary",
+        verbose_name="Тип заявки",
         related_name="type_ticket",
         on_delete=models.SET_NULL,
         null=True,
         blank=True,
     )
-    description = models.TextField()
+    description = models.TextField(verbose_name="Описание")
     creator = models.ForeignKey(
         User,
         related_name="create_user",
@@ -43,22 +43,24 @@ class Ticket(models.Model):
     contractor = models.ForeignKey(
         User,
         related_name="contractor_user",
-        verbose_name="Заказчик",
+        verbose_name="Исполнитель",
         on_delete=models.PROTECT,
         null=True,
         blank=True,
     )
     status = models.ForeignKey(
         Dictionary,
-        verbose_name="Status -> Dictionary",
+        verbose_name="Статус",
         help_text="В ожидании, в работе ...",
         related_name="status",
         on_delete=models.SET_NULL,
         null=True,
         blank=True,
     )
-    city = models.CharField(max_length=100, blank=True, null=True)
-    address = models.CharField(max_length=100, blank=True, null=True)
+    city = models.CharField(max_length=100, blank=True, null=True, verbose_name="Город")
+    address = models.CharField(
+        max_length=100, blank=True, null=True, verbose_name="Адрес"
+    )
 
     def __str__(self):
         return f"{self.pk} - {self.type_ticket}, {self.customer=}"

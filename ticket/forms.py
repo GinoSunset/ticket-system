@@ -1,6 +1,7 @@
 from django.forms import ModelForm
 from additionally.models import Dictionary, DictionaryType
 from .models import Ticket
+from users.models import Operator, Contractor, Customer
 
 
 class TicketsForm(ModelForm):
@@ -28,3 +29,5 @@ class TicketsForm(ModelForm):
         self.fields["status"].queryset = Dictionary.objects.filter(
             type_dict=type_status
         )
+        self.fields["contractor"].queryset = Contractor.objects.all()
+        self.fields["customer"].queryset = kwargs["initial"].get("customer")

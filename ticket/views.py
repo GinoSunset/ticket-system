@@ -4,6 +4,7 @@ from django.views.generic.edit import CreateView
 
 from django.contrib.auth.mixins import LoginRequiredMixin
 
+from users.models import Operator, Customer, User
 from .models import Ticket
 from .forms import TicketsForm
 
@@ -22,6 +23,14 @@ class TicketsListView(LoginRequiredMixin, ListView):
 class TicketFormView(LoginRequiredMixin, CreateView):
     form_class = TicketsForm
     template_name = "ticket/ticket_form.html"
+
+    def get_initial(self):
+        customer = Customer.objects.all()
+        if self.request.user.is_operator:
+            operator = self.request.user.get_role_user()
+            customer = operator.get_customers()
+        self.initial.update({"creator": self.request.user, "customer": customer})
+        return self.initial
 
 
 class TicketDetailView(LoginRequiredMixin, DetailView):

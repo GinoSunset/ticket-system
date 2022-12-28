@@ -25,8 +25,8 @@
       <th>Детальная информация</th>
     </tr></thead>
     <tbody>
+      {% for ticket in object_list %}
       <tr>
-        {% for ticket in object_list %}
         <td data-label="date_create">{{ticket.date_create|date}}</td>
         <td data-label="sap_id">{% firstof ticket.sap_id %}</td>
         <td data-label="type_ticket">{% firstof ticket.type_ticket %}</td>
@@ -37,9 +37,12 @@
         <td data-label="status">{% if ticket.status %} <div class="ui {{ticket.get_color_status}} label">{{ticket.status}}</div>{% endif %}</td>
         <td data-label="address">{% firstof ticket.address %}</td>
         <td><a class="ui button info" href={% url 'ticket-detail' ticket.pk %}>Просмотр</a></td>
+      </tr>
       
         {% empty %}
-        <td>No tickets yet.</td>
+        <tr>
+          <td>No tickets yet.</td>
+        <tr>
         {% endfor %}
       </tr>
     </tbody>
