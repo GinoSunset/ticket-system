@@ -1,4 +1,5 @@
 from django.db import models
+from django.urls import reverse
 from django.contrib.auth import get_user_model
 
 from additionally.models import Dictionary
@@ -71,6 +72,9 @@ class Ticket(models.Model):
             "done": "green",
         }
         return color.get(self.status.code, "detail")
+
+    def get_absolute_url(self):
+        return reverse("ticket-detail", kwargs={"pk": self.pk})
 
 
 class Comment(models.Model):
