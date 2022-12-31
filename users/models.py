@@ -72,6 +72,9 @@ class User(AbstractUser):
             return f"{settings.MEDIA_URL}/avatar.jpg"
         return f"{settings.MEDIA_URL}/{self.avatar.name}"
 
+    def get_ticket_filter(self):
+        return
+
 
 class Customer(User):
     class Meta:
@@ -88,10 +91,15 @@ class Operator(User):
     base_role = User.Role.OPERATOR
     objects = OperatorManager()
 
+    def get_customers_id(self):
+        return self.customers.values_list("user_id", flat=True)
+
     def get_customers(self) -> models.QuerySet[Customer]:
-        return Customer.objects.filter(
-            pk__in=self.customers.values_list("user_id", flat=True)
-        )
+        return Customer.objects.filter(pk__in=self.get_customers_id())
+
+    def get_ticket_filter(self) -> dict:
+        customers_id = self.get_customers_id()
+        return {"customer__in": customers_id}
 
 
 class Contractor(User):

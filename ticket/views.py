@@ -1,10 +1,12 @@
+from typing import Union
+
 from django.db.models import QuerySet
 from django.views.generic import ListView, DetailView
 from django.views.generic.edit import CreateView
 
 from django.contrib.auth.mixins import LoginRequiredMixin
 
-from users.models import Operator, Customer, User
+from users.models import Operator, Customer, User, Contractor
 from .models import Ticket
 from .forms import TicketsForm
 
@@ -15,9 +17,11 @@ class TicketsListView(LoginRequiredMixin, ListView):
 
     def get_queryset(self) -> QuerySet[Ticket]:
         queryset = super().get_queryset()
-        if self.request.user.is_staff:
+        user: Union[Customer, Contractor, Operator] = self.request.user.get_role_user()
+        if user.is_staff:
             return queryset
-        return queryset.filter(creator=self.request.user)
+        filter_from_user: dict = user.get_ticket_filter() or {}
+        return queryset.filter(**filter_from_user)
 
 
 class TicketFormView(LoginRequiredMixin, CreateView):
