@@ -153,7 +153,7 @@ class Migration(migrations.Migration):
                 "db_table": "user",
             },
             managers=[
-                ("objects", users.models.MyUserManager()),
+                ("objects", users.models.UserManager()),
             ],
         ),
         migrations.CreateModel(

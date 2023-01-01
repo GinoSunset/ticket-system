@@ -7,7 +7,7 @@ def avatar_directory_path(instance, filename):
     return f"user_{instance.id}/{filename}"
 
 
-class MyUserManager(UserManager):
+class UserManager(UserManager):
     def get_by_natural_key(self, username):
         return self.get(**{f"{self.model.USERNAME_FIELD}__iexact": username})
 
@@ -42,10 +42,10 @@ class User(AbstractUser):
     date_of_create = models.DateTimeField(auto_now_add=True)
     last_connect = models.DateField(help_text="Последний вход", null=True, blank=True)
     phone = models.CharField(max_length=18, blank=True, null=True)
-    role = models.CharField(max_length=50, choices=Role.choices, default=Role.OTHER)
+    role = models.CharField(max_length=50, choices=Role.choices)
 
     base_role = Role.OTHER
-    objects = MyUserManager()
+    objects = UserManager()
 
     def save(self, *args, **kwargs):
         if not self.pk and not self.role:
@@ -73,7 +73,7 @@ class User(AbstractUser):
         return f"{settings.MEDIA_URL}/{self.avatar.name}"
 
     def get_ticket_filter(self):
-        return
+        return {"creator": self.pk}
 
 
 class Customer(User):
@@ -82,6 +82,9 @@ class Customer(User):
 
     base_role = User.Role.CUSTOMER
     objects = CustomerManager()
+
+    def get_ticket_filter(self):
+        return {"customer_id": self.pk}
 
 
 class Operator(User):
@@ -108,6 +111,9 @@ class Contractor(User):
 
     base_role = User.Role.CONTRACTOR
     objects = ContractorManager()
+
+    def get_ticket_filter(self):
+        return {"contractor_id": self.pk}
 
 
 class CustomerProfile(models.Model):

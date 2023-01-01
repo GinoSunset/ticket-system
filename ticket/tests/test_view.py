@@ -2,7 +2,7 @@ import pytest
 from pytest_django.asserts import assertQuerysetEqual
 from django.urls import reverse
 from ticket.models import Ticket
-from users.models import User
+from users.models import User, Customer, Contractor
 
 
 @pytest.mark.django_db
@@ -16,20 +16,47 @@ def test_user_see_ticket_their_customer(
     operator.customers.add(their_customer.profile)
     ticket: Ticket = ticket_factory(customer=their_customer)
     ticket_another = ticket_factory(customer=other_customer)
+
     client.force_login(user=operator)
     response = client.get(reverse("tickets-list"))
+
     assert len(response.context_data["ticket_list"]) == 1
     assert response.context_data["ticket_list"][0] == ticket
 
 
 @pytest.mark.django_db
-def test_customer_see_only_self_ticket():
-    assert False
+def test_customer_see_only_self_ticket(
+    ticket_factory, user_factory, client, customer_factory
+):
+    operator = user_factory(role=User.Role.OPERATOR)
+    customer: Customer = customer_factory()
+    other_customer = customer_factory()
+    ticket_another: Ticket = ticket_factory(customer=other_customer, creator=operator)
+    ticket: Ticket = ticket_factory(customer=customer, creator=operator)
+
+    client.force_login(user=customer)
+    response = client.get(reverse("tickets-list"))
+
+    assert len(response.context_data["ticket_list"]) == 1
+    assert response.context_data["ticket_list"][0] == ticket
 
 
 @pytest.mark.django_db
-def test_contractor_see():
-    assert False
+def test_contractor_see(ticket_factory, user_factory, client, customer_factory):
+    operator = user_factory(role=User.Role.OPERATOR)
+    customer: Customer = customer_factory()
+    contractor: Contractor = user_factory(role=User.Role.CONTRACTOR)
+    other_customer = customer_factory()
+    ticket_another: Ticket = ticket_factory(customer=other_customer, creator=operator)
+    ticket: Ticket = ticket_factory(
+        customer=customer, creator=operator, contractor=contractor
+    )
+
+    client.force_login(user=contractor)
+    response = client.get(reverse("tickets-list"))
+
+    assert len(response.context_data["ticket_list"]) == 1
+    assert response.context_data["ticket_list"][0] == ticket
 
 
 @pytest.mark.django_db

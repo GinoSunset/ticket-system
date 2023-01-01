@@ -21,10 +21,3 @@ class CustomerFactory(factory.django.DjangoModelFactory):
 
     username = factory.Sequence(lambda n: "customer%03d" % n)
     email = factory.Sequence(lambda n: "customer%03d@mail.com" % n)
-
-    @factory.post_generation
-    def profiler(obj, create, extracted, **kwargs):
-        if not create:
-            return
-
-        CustomerProfile.objects.create(user=obj)
