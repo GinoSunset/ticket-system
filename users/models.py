@@ -41,7 +41,8 @@ class User(AbstractUser):
     avatar = models.FileField(upload_to=avatar_directory_path, null=True, blank=True)
     date_of_create = models.DateTimeField(auto_now_add=True)
     last_connect = models.DateField(help_text="Последний вход", null=True, blank=True)
-    phone = models.CharField(max_length=18, blank=True, null=True)
+    phone = models.CharField("Телефон",
+        max_length=18, blank=True, null=True)
     role = models.CharField(max_length=50, choices=Role.choices)
 
     base_role = Role.OTHER

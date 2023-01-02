@@ -1,0 +1,18 @@
+{% extends 'ticsys/index.html' %}
+{% block content %}
+<h1>Создание заказчика</h1>
+<div class="ui container">
+    <form class="ui form" method="post">
+        {{ form.non_field_errors }}
+        {% csrf_token %}
+        {% for field in form %}
+        <div class="field">
+            {{ field.errors }}
+            {{ field.label_tag }} 
+            {{ field }}
+        </div>
+        {% endfor %}
+      <button class="ui button" type="submit">Создать</button>
+    </form>
+  </div>
+{% endblock content %}
