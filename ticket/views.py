@@ -36,6 +36,11 @@ class TicketFormView(LoginRequiredMixin, CreateView):
         self.initial.update({"creator": operator, "customer_qs": customer})
         return self.initial
 
+    def form_valid(self, form):
+        self.object: Ticket = form.save(commit=False)
+        self.object.creator = self.request.user
+        return super().form_valid(form)
+
 
 class TicketUpdateView(LoginRequiredMixin, UpdateView):
     model = Ticket
