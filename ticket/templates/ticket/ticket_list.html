@@ -36,7 +36,7 @@
         <td data-label="contractor">{% firstof ticket.contractor %}</td>
         <td data-label="status">{% if ticket.status %} <div class="ui {{ticket.get_color_status}} label">{{ticket.status}}</div>{% endif %}</td>
         <td data-label="address">{% firstof ticket.address %}</td>
-        <td><a class="ui button info" href={% url 'ticket-detail' ticket.pk %}>Просмотр</a></td>
+        <td><a class="ui button info" href={% url 'ticket-update' ticket.pk %}>Просмотр</a></td>
       </tr>
       
         {% empty %}

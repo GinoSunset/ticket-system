@@ -76,7 +76,7 @@ class Ticket(models.Model):
         return color.get(self.status.code, "detail")
 
     def get_absolute_url(self):
-        return reverse("ticket-detail", kwargs={"pk": self.pk})
+        return reverse("ticket-update", kwargs={"pk": self.pk})
 
 
 class Comment(models.Model):

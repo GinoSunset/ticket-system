@@ -1,7 +1,7 @@
 from typing import Union
 
 from django.db.models import QuerySet
-from django.views.generic import ListView, DetailView
+from django.views.generic import ListView, UpdateView
 from django.views.generic.edit import CreateView
 
 from django.contrib.auth.mixins import LoginRequiredMixin
@@ -33,9 +33,19 @@ class TicketFormView(LoginRequiredMixin, CreateView):
         if self.request.user.is_operator:
             operator = self.request.user.get_role_user()
             customer = operator.get_customers()
-        self.initial.update({"creator": self.request.user, "customer": customer})
+        self.initial.update({"creator": operator, "customer_qs": customer})
         return self.initial
 
 
-class TicketDetailView(LoginRequiredMixin, DetailView):
+class TicketUpdateView(LoginRequiredMixin, UpdateView):
     model = Ticket
+    form_class = TicketsForm
+    template_name = "ticket/ticket_update.html"
+
+    def get_initial(self):
+        customer = Customer.objects.all()
+        if self.request.user.is_operator:
+            operator = self.request.user.get_role_user()
+            customer = operator.get_customers()
+        self.initial.update({"creator": operator, "customer_qs": customer})
+        return self.initial
