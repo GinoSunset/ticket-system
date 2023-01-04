@@ -1,6 +1,6 @@
 from django.forms import ModelForm
 from additionally.models import Dictionary, DictionaryType
-from .models import Ticket
+from .models import Ticket, Comment
 from users.models import CustomerProfile, Operator, Contractor, Customer
 
 
@@ -31,3 +31,9 @@ class TicketsForm(ModelForm):
         self.fields["contractor"].queryset = Contractor.objects.all()
         if kwargs["initial"].get("customer_qs"):
             self.fields["customer"].queryset = kwargs["initial"].get("customer_qs")
+
+
+class CommentForm(ModelForm):
+    class Meta:
+        model = Comment
+        fields = ["text", "file"]

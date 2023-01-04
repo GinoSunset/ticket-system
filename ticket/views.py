@@ -7,8 +7,8 @@ from django.views.generic.edit import CreateView
 from django.contrib.auth.mixins import LoginRequiredMixin
 
 from users.models import Operator, Customer, User, Contractor
-from .models import Ticket
-from .forms import TicketsForm
+from .models import Ticket, Comment
+from .forms import TicketsForm, CommentForm
 
 
 class TicketsListView(LoginRequiredMixin, ListView):
@@ -54,3 +54,16 @@ class TicketUpdateView(LoginRequiredMixin, UpdateView):
 
         self.initial.update({"creator": user, "customer_qs": customer})
         return self.initial
+
+
+class CommentCreateView(LoginRequiredMixin, CreateView):
+    model = Comment
+    form_class = CommentForm
+    template_name = "ticket/comment_form.html"
+
+    def form_valid(self, form):
+        ticket: Ticket = Ticket.objects.get(pk=self.kwargs.get("ticket_pk"))
+        self.object: Comment = form.save(commit=False)
+        self.object.ticket = ticket
+        self.object.author = self.request.user
+        return super().form_valid(form)

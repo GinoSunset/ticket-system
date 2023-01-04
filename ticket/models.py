@@ -82,11 +82,18 @@ class Ticket(models.Model):
 class Comment(models.Model):
     LEN_SHORT_TEXT = 10
 
+    date_create = models.DateTimeField(auto_now_add=True)
+    date_update = models.DateTimeField(auto_now=True)
     ticket = models.ForeignKey(
         Ticket, related_name="comments", on_delete=models.PROTECT
     )
-    text = models.TextField(null=True, blank=True)
-    file = models.FileField(upload_to=ticket_directory_path, null=True, blank=True)
+    text = models.TextField("Текст комментария", null=True, blank=True)
+    file = models.FileField(
+        "Файл", upload_to=ticket_directory_path, null=True, blank=True
+    )
+    author = models.ForeignKey(
+        User, related_name="comments", on_delete=models.PROTECT, blank=True, null=True
+    )
 
     def __str__(self) -> str:
         content = ""
@@ -104,3 +111,6 @@ class Comment(models.Model):
                 return f"{self.text[:self.LEN_SHORT_TEXT]}... "
             return self.text
         return ""
+
+    def get_absolute_url(self):
+        return reverse("ticket-update", kwargs={"pk": self.ticket.pk})
