@@ -9,8 +9,8 @@ class DictionaryTypeManager(models.Manager):
 class DictionaryType(models.Model):
     date_create = models.DateTimeField(auto_now_add=True)
     date_update = models.DateTimeField(auto_now=True)
-    code = models.CharField(max_length=50, verbose_name='Код типа словаря', unique=True)
-    description = models.CharField(max_length=150, verbose_name='Описание типа словаря')
+    code = models.CharField(max_length=50, verbose_name="Код типа словаря", unique=True)
+    description = models.CharField(max_length=150, verbose_name="Описание типа словаря")
     objects = DictionaryTypeManager()
 
     def __str__(self):
@@ -25,8 +25,8 @@ class Dictionary(models.Model):
         DictionaryType, verbose_name="Тип словаря", on_delete=models.CASCADE, null=True
     )
 
-    code = models.CharField(max_length=50, verbose_name='Код словаря', unique=True)
-    description = models.CharField(max_length=150, verbose_name='Описание словаря')
+    code = models.CharField(max_length=50, verbose_name="Код словаря", unique=True)
+    description = models.CharField(max_length=150, verbose_name="Описание словаря")
 
     def __str__(self):
-        return self.code
+        return self.description
