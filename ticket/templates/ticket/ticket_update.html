@@ -1,7 +1,53 @@
 {% extends 'ticsys/index.html' %}
 {% block content %}
-<h1>Обновление заявки №{{ticket.pk}}</h1>
-<div class="ui container">
+<h1>Заявка №{{ticket.pk}}</h1>
+<div class="ui  container segment">
+  <div class="ui horizontal list">    
+    <div class="item"> 
+      <div class="header"> SAP</div> 
+      {{ticket.sap_id}}
+    </div>
+    <div class="item"> 
+      <div class="header"> Тип</div> 
+      {{ticket.type_ticket}}
+    </div>
+    <div class="item"> 
+      <div class="header"> Заказчик</div> 
+      {{ticket.contractor}}
+    </div>
+    <div class="item"> 
+      <div class="header"> Исполнитель</div> 
+      {{ticket.customer}}
+    </div>
+    <div class="item"> 
+      <div class="header"> Статус</div> 
+      {% if ticket.status %} <div class="ui {{ticket.get_color_status}} label">{{ticket.status}}</div>{% endif %}
+    </div>
+    <div class="item"> 
+      <div class="header"> Город</div> 
+      {{ticket.city}}
+    </div>
+    <div class="item"> 
+      <div class="header"> Адрес</div> 
+      {{ticket.address}}
+    </div>
+  </div>
+  <div class=" ui list ">
+    <div class="item"> 
+      <div class="header"> Описание</div> 
+      {{ticket.description}}
+    </div>
+  </div>        
+  {% if user.is_operator %}
+  <div id="run_modal" class="ui right floated button ">Изменить</div>
+  {% endif %}
+  <div id="create_comment" class="ui right floated info button ">Добавить комментарий</div>
+</div>
+
+<div class="ui modal">
+  <i class="close icon"></i>
+  <div class="header">Изменить заявку</div>
+  <div class="content">
     <form class="ui form" method="post">
         {{ form.non_field_errors }}
         {% csrf_token %}
@@ -12,7 +58,14 @@
             {{ field }}
         </div>
         {% endfor %}
-      <button class="ui button" type="submit">Создать</button>
+        <button class="ui button" type="submit">Изменить</button>
     </form>
   </div>
+</div>
 {% endblock content %}
+{% block script %}
+<script>
+  $('.ui.modal')
+  .modal('attach events', '#run_modal', 'show');
+</script>
+{% endblock script %}

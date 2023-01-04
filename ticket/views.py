@@ -30,10 +30,10 @@ class TicketFormView(LoginRequiredMixin, CreateView):
 
     def get_initial(self):
         customer = Customer.objects.all()
-        if self.request.user.is_operator:
-            operator = self.request.user.get_role_user()
-            customer = operator.get_customers()
-        self.initial.update({"creator": operator, "customer_qs": customer})
+        user: Union[Customer, Operator, Contractor] = self.request.user.get_role_user()
+        customer = user.get_customers()
+
+        self.initial.update({"creator": user, "customer_qs": customer})
         return self.initial
 
     def form_valid(self, form):
@@ -49,8 +49,8 @@ class TicketUpdateView(LoginRequiredMixin, UpdateView):
 
     def get_initial(self):
         customer = Customer.objects.all()
-        if self.request.user.is_operator:
-            operator = self.request.user.get_role_user()
-            customer = operator.get_customers()
-        self.initial.update({"creator": operator, "customer_qs": customer})
+        user: Union[Customer, Operator, Contractor] = self.request.user.get_role_user()
+        customer = user.get_customers()
+
+        self.initial.update({"creator": user, "customer_qs": customer})
         return self.initial
