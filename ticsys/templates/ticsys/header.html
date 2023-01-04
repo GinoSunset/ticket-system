@@ -1,14 +1,14 @@
 {% load static %}
-
+{% with url_name=request.resolver_match.url_name %}
 <div class="ui secondary pointing menu">
-    <a class="item active" href="{% url 'tickets-list' %}">
+    <a class="item {% if url_name == 'tickets-list' %}active{% endif %}" href="{% url 'tickets-list' %}">
       Заявки
     </a>
-    <a class="item " href="{% url 'tickets-new' %}">
+    <a class="item {% if url_name == 'tickets-new' %}active{% endif %}" href="{% url 'tickets-new' %}">
       Новая заявка
     </a>
     {% if user.is_operator %}
-    <a class="item" href="{% url 'create-customer' %}">
+    <a class="item {% if url_name == 'create-customer' %}active{% endif %}" href="{% url 'create-customer' %}">
       Создать заказчика
     </a>
     {% endif%}
@@ -18,4 +18,4 @@
       </a>
     </div>
   </div>
- 
+{% endwith %} 
