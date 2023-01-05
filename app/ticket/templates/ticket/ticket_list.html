@@ -12,21 +12,24 @@
 
 <table id="tableTickets"class="ui celled table">
     <thead>
-      <tr><th>Дата создания</th>
-      <th>SAP</th>
-      <th>Тип заявки</th>
-      <th>Описание</th>
-      <th>Автор</th>
-      <th>Заказчик</th>
-      <th>Иполнитель</th>
-      <th>Статус</th>
-      <th>Город</th>
-      <th>Адрес</th>
-      <th>Детальная информация</th>
+      <tr>
+        <th>ID</th>
+        <th>Дата создания</th>
+        <th>SAP</th>
+        <th>Тип заявки</th>
+        <th>Описание</th>
+        <th>Автор</th>
+        <th>Заказчик</th>
+        <th>Иполнитель</th>
+        <th>Статус</th>
+        <th>Город</th>
+        <th>Адрес</th>
+        <th>Детальная информация</th>
     </tr></thead>
     <tbody>
       {% for ticket in object_list %}
       <tr>
+        <td data-label="id">{{ticket.pk}}</td>
         <td data-label="date_create">{{ticket.date_create|date}}</td>
         <td data-label="sap_id">{% firstof ticket.sap_id %}</td>
         <td data-label="type_ticket">{% firstof ticket.type_ticket %}</td>
