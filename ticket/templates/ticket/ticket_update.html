@@ -44,6 +44,45 @@
   <a href="{% url 'comment-update' ticket.pk %}" class="ui right floated info button ">Добавить комментарий</a>
 </div>
 
+<div class="ui comments">
+{% for comment in ticket.comments.all %}
+<div class="comment">
+  <a class="avatar">
+    <img src="{{comment.author.get_avatar}}">
+  </a>
+  <div class="content">
+    <a class="author">{{comment.author}}</a>
+    <div class="metadata">
+      <span class="date">{{comment.date_create|date}}</span>
+    </div>
+    <div class="text">
+    {% if comment.text %}
+      {{comment.text}}
+    {% else %}
+      <i>No text</i>
+      {% endif %}
+    </div>
+    
+    {% if comment.file %}
+    <div class="text">
+      <div class="ui list">
+        <div class="item">
+          <i class="file icon"></i>
+          <div class="content">
+            <a href="{{comment.file.url}}"> {{comment.file.name}}</a>
+          </div>
+        </div>
+      </div>
+      
+    </div>
+    
+    {% endif %}
+    
+  </div>
+</div>
+{% endfor %}
+</div>
+
 <div class="ui modal">
   <i class="close icon"></i>
   <div class="header">Изменить заявку</div>

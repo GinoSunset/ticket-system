@@ -69,8 +69,8 @@ class User(AbstractUser):
 
     def get_avatar(self):
         if not self.avatar.name:
-            return f"{settings.MEDIA_URL}/avatar.jpg"
-        return f"{settings.MEDIA_URL}/{self.avatar.name}"
+            return f"{settings.MEDIA_URL}avatar.jpg"
+        return f"{settings.MEDIA_URL}{self.avatar.name}"
 
     def get_ticket_filter(self):
         return {"creator": self.pk}
