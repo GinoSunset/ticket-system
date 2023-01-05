@@ -23,7 +23,7 @@
         <th>Иполнитель</th>
         <th>Статус</th>
         <th>Город</th>
-        <th>Адрес</th>
+        {% comment %} <th>Адрес</th> {% endcomment %}
         <th>Детальная информация</th>
     </tr></thead>
     <tbody>
@@ -39,7 +39,7 @@
         <td data-label="contractor">{% firstof ticket.contractor %}</td>
         <td data-label="status">{% if ticket.status %} <div class="ui {{ticket.get_color_status}} label">{{ticket.status}}</div>{% endif %}</td>
         <td data-label="address">{% firstof ticket.city %}</td>
-        <td data-label="address">{% firstof ticket.address %}</td>
+        {% comment %} <td data-label="address">{% firstof ticket.address %}</td> {% endcomment %}
         <td><a class="ui button info" href={% url 'ticket-update' ticket.pk %}>Просмотр</a></td>
       </tr>
       
