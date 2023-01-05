@@ -10,7 +10,7 @@ DEBUG = env("DEBUG")
 SECRET_KEY = env("SECRET_KEY")
 
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = env("DJANGO_ALLOWED_HOSTS").split(" ")
 
 INSTALLED_APPS = [
     "django.contrib.admin",
