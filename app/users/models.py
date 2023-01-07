@@ -52,6 +52,11 @@ class User(AbstractUser):
             self.role = self.base_role
         return super().save(*args, **kwargs)
 
+    def get_customers(self):
+        if self.is_staff:
+            return Customer.objects.all
+        return None
+
     @property
     def is_operator(self):
         return self.role == self.Role.OPERATOR

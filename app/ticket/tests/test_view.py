@@ -69,3 +69,54 @@ def test_admin_see_all_ticket(ticket_factory, user_factory, client):
     client.force_login(user=admin_user)
     response = client.get(reverse("tickets-list"))
     assert list(response.context_data["ticket_list"]), list(Ticket.objects.all())
+
+
+@pytest.mark.django_db
+def test_access_page_generate_task_customer(customer_factory, client):
+    customer = customer_factory()
+    client.force_login(user=customer)
+    res = client.get(reverse("tickets-new"))
+    assert res.status_code == 200
+
+
+@pytest.mark.django_db
+def test_access_page_generate_task_contractor(user_factory, client):
+    contractor = user_factory(role=User.Role.CONTRACTOR)
+    client.force_login(user=contractor)
+    res = client.get(reverse("tickets-new"))
+    assert res.status_code == 200
+
+
+@pytest.mark.django_db
+def test_access_page_update_task_contractor(ticket_factory, user_factory, client):
+    contractor = user_factory(role=User.Role.CONTRACTOR)
+    ticket = ticket_factory(contractor=contractor)
+    client.force_login(user=contractor)
+    res = client.get(reverse("ticket-update", kwargs={"pk": ticket.pk}))
+    assert res.status_code == 200
+
+
+@pytest.mark.django_db
+def test_access_page_update_task_customer(ticket_factory, customer_factory, client):
+    customer = customer_factory()
+    ticket = ticket_factory(customer=customer)
+    client.force_login(user=customer)
+    res = client.get(reverse("ticket-update", kwargs={"pk": ticket.pk}))
+    assert res.status_code == 200
+
+
+@pytest.mark.django_db
+def test_access_page_update_task_other(ticket_factory, user_factory, client):
+    user = user_factory(role=User.Role.OTHER)
+    ticket: Ticket = ticket_factory(creator=user)
+    client.force_login(user=user)
+    res = client.get(reverse("ticket-update", kwargs={"pk": ticket.pk}))
+    assert res.status_code == 200
+
+
+@pytest.mark.django_db
+def test_access_page_create_task_other(user_factory, client):
+    user = user_factory(role=User.Role.OTHER)
+    client.force_login(user=user)
+    res = client.get(reverse("tickets-new"))
+    assert res.status_code == 200
