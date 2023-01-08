@@ -54,7 +54,7 @@ class User(AbstractUser):
 
     def get_customers(self):
         if self.is_staff:
-            return Customer.objects.all
+            return Customer.objects.all()
         return None
 
     @property
