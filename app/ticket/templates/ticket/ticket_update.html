@@ -13,11 +13,11 @@
     </div>
     <div class="item"> 
       <div class="header"> Заказчик</div> 
-      {{ticket.contractor}}
+      {{ticket.customer}}
     </div>
     <div class="item"> 
       <div class="header"> Исполнитель</div> 
-      {{ticket.customer}}
+      {% firstof ticket.contractor "Не назначен" %}
     </div>
     <div class="item"> 
       <div class="header"> Статус</div> 
