@@ -61,6 +61,13 @@ class Ticket(models.Model):
     address = models.CharField(
         max_length=100, blank=True, null=True, verbose_name="Адрес"
     )
+    metadata = models.CharField(
+        "Метадата",
+        help_text="Дополнительная информация о заявке. Например номер магазина",
+        max_length=255,
+        blank=True,
+        null=True,
+    )
 
     def __str__(self):
         return f"{self.pk} - {self.type_ticket}, {self.customer=}"

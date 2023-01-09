@@ -8,8 +8,6 @@
 
 {% block content %}
 <h1>Заявки</h1>
-
-
 <table id="tableTickets"class="ui celled table">
     <thead>
       <tr>
@@ -23,7 +21,9 @@
         {% endif %}
         <th>Статус</th>
         <th>Город</th>
-        <th>Детальная информация</th>
+        <th>Доп информация</th>
+        <th>Подробнее</th>
+
     </tr></thead>
     <tbody>
       {% for ticket in object_list %}
@@ -38,6 +38,7 @@
         {% endif %}
         <td data-label="status">{% if ticket.status %} <div class="ui {{ticket.get_color_status}} label">{{ticket.status}}</div>{% endif %}</td>
         <td data-label="address">{% firstof ticket.city %}</td>
+        <td data-label="metadata">{% firstof ticket.metadata %}</td>
         <td><a class="ui button info" href={% url 'ticket-update' ticket.pk %}>Просмотр</a></td>
       </tr>
       

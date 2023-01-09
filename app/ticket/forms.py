@@ -1,7 +1,7 @@
 from django import forms
 from additionally.models import Dictionary, DictionaryType
-from .models import Ticket, Comment, CommentFile
-from users.models import CustomerProfile, Operator, Contractor, Customer
+from .models import Ticket, Comment
+from users.models import Contractor
 
 
 class TicketsForm(forms.ModelForm):
@@ -16,6 +16,7 @@ class TicketsForm(forms.ModelForm):
             "status",
             "city",
             "address",
+            "metadata",
         ]
 
     def __init__(self, *args, **kwargs):
@@ -36,7 +37,15 @@ class TicketsForm(forms.ModelForm):
 class TicketsFormOperator(forms.ModelForm):
     class Meta:
         model = Ticket
-        fields = ["sap_id", "type_ticket", "description", "city", "address", "status"]
+        fields = [
+            "sap_id",
+            "type_ticket",
+            "description",
+            "city",
+            "address",
+            "status",
+            "metadata",
+        ]
         widgets = {
             "status": forms.TextInput(attrs={"type": "hidden"}),
         }

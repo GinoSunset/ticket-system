@@ -8,10 +8,17 @@
         {% for field in form %}
         <div class="field">
             {{ field.errors }}
-            {% if not field.is_hidden%}
-            {{ field.label_tag }} 
+            {% if  field.is_hidden%}
+              {{ field }}
+            {% else %}
+              {{ field.label_tag }} 
+              {{ field }}
+              {% if field.help_text %}
+              <span class="ui small grey text">
+                {{field.help_text}}
+              </span>
+              {% endif %}
             {% endif %}
-            {{ field }}
         </div>
         {% endfor %}
       <button class="ui button" type="submit">Создать</button>
