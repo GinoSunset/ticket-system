@@ -63,15 +63,17 @@
       {% endif %}
     </div>
     
-    {% if comment.file %}
+    {% if comment.files %}
     <div class="text">
       <div class="ui list">
+        {% for file in comment.files.all %}
         <div class="item">
           <i class="file icon"></i>
           <div class="content">
-            <a href="{{comment.file.url}}"> {{comment.file.name}}</a>
+            <a href="{{file.file.url}}"> {{file.file_name}}</a>
           </div>
         </div>
+        {% endfor %}
       </div>
       
     </div>

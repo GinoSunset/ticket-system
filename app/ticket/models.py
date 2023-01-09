@@ -8,7 +8,7 @@ User = get_user_model()
 
 
 def ticket_directory_path(instance, filename):
-    return f"ticket_{instance.ticket.pk}/{filename}"
+    return f"ticket_{instance.comment.ticket.pk}/{filename}"
 
 
 class Ticket(models.Model):
@@ -88,9 +88,6 @@ class Comment(models.Model):
         Ticket, related_name="comments", on_delete=models.PROTECT
     )
     text = models.TextField("Текст комментария", null=True, blank=True)
-    file = models.FileField(
-        "Файл", upload_to=ticket_directory_path, null=True, blank=True
-    )
     author = models.ForeignKey(
         User, related_name="comments", on_delete=models.PROTECT, blank=True, null=True
     )
@@ -99,10 +96,10 @@ class Comment(models.Model):
         content = ""
         if self.text:
             content = self.get_short_text()
-        if self.file:
+        if self.files:
             if content:
                 content += " "
-            content += f"[File: {self.file.name}]"
+            content += f"[{self.files.count()} file(s)]"
         return f"[{self.ticket.pk}] {content}"
 
     def get_short_text(self) -> str:
@@ -114,3 +111,14 @@ class Comment(models.Model):
 
     def get_absolute_url(self):
         return reverse("ticket-update", kwargs={"pk": self.ticket.pk})
+
+
+class CommentFile(models.Model):
+    comment = models.ForeignKey(Comment, related_name="files", on_delete=models.PROTECT)
+    file = models.FileField(
+        "Файл", upload_to=ticket_directory_path, null=True, blank=True
+    )
+
+    @property
+    def file_name(self):
+        return self.file.name.split("/")[-1]

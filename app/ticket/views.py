@@ -8,7 +8,7 @@ from django.contrib.auth.mixins import LoginRequiredMixin
 
 from users.models import Operator, Customer, User, Contractor
 from additionally.models import Dictionary
-from .models import Ticket, Comment
+from .models import Ticket, Comment, CommentFile
 from .forms import TicketsForm, CommentForm, TicketsFormOperator
 
 
@@ -81,6 +81,11 @@ class CommentCreateView(LoginRequiredMixin, CreateView):
     def form_valid(self, form):
         ticket: Ticket = Ticket.objects.get(pk=self.kwargs.get("ticket_pk"))
         self.object: Comment = form.save(commit=False)
+        files = self.request.FILES.getlist("files")
+
         self.object.ticket = ticket
         self.object.author = self.request.user
+        self.object: Comment = form.save()
+        for file in files:
+            CommentFile.objects.create(file=file, comment=self.object)
         return super().form_valid(form)
