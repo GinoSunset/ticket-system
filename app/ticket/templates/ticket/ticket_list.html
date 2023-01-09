@@ -17,7 +17,6 @@
         <th>Дата создания</th>
         <th>SAP</th>
         <th>Тип заявки</th>
-        <th>Описание</th>
         <th>Заказчик</th>
         <th>Иполнитель</th>
         <th>Статус</th>
@@ -31,7 +30,6 @@
         <td data-label="date_create">{{ticket.date_create|date}}</td>
         <td data-label="sap_id">{% firstof ticket.sap_id %}</td>
         <td data-label="type_ticket">{% firstof ticket.type_ticket %}</td>
-        <td data-label="description">{% firstof ticket.description|truncatechars:20 %}</td>
         <td data-label="customer">{% firstof ticket.customer %}</td>
         <td data-label="contractor">{% firstof ticket.contractor %}</td>
         <td data-label="status">{% if ticket.status %} <div class="ui {{ticket.get_color_status}} label">{{ticket.status}}</div>{% endif %}</td>
