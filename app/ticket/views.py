@@ -7,8 +7,9 @@ from django.views.generic.edit import CreateView
 from django.contrib.auth.mixins import LoginRequiredMixin
 
 from users.models import Operator, Customer, User, Contractor
+from additionally.models import Dictionary
 from .models import Ticket, Comment
-from .forms import TicketsForm, CommentForm
+from .forms import TicketsForm, CommentForm, TicketsFormOperator
 
 
 class TicketsListView(LoginRequiredMixin, ListView):
@@ -33,12 +34,28 @@ class TicketFormView(LoginRequiredMixin, CreateView):
         user: Union[Customer, Operator, Contractor] = self.request.user.get_role_user()
         customer = user.get_customers()
 
-        self.initial.update({"creator": user, "customer_qs": customer})
+        self.initial.update(
+            {
+                "creator": user,
+                "customer_qs": customer,
+                "status": Dictionary.get_status_ticket("work"),
+            }
+        )
         return self.initial
 
+    def get_form_class(self):
+        if self.request.user.is_customer:
+            return TicketsFormOperator
+        return self.form_class
+
     def form_valid(self, form):
+        user = self.request.user
         self.object: Ticket = form.save(commit=False)
-        self.object.creator = self.request.user
+        self.object.creator = user
+        if user.is_customer:
+            self.object.customer = user
+        if self.object.status is None:
+            self.object.status = Dictionary.objects.get(code="work")
         return super().form_valid(form)
 
 

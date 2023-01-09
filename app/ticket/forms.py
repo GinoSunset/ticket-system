@@ -1,4 +1,4 @@
-from django.forms import ModelForm
+from django.forms import ModelForm, TextInput
 from additionally.models import Dictionary, DictionaryType
 from .models import Ticket, Comment
 from users.models import CustomerProfile, Operator, Contractor, Customer
@@ -37,3 +37,19 @@ class CommentForm(ModelForm):
     class Meta:
         model = Comment
         fields = ["text", "file"]
+
+
+class TicketsFormOperator(ModelForm):
+    class Meta:
+        model = Ticket
+        fields = ["sap_id", "type_ticket", "description", "city", "address", "status"]
+        widgets = {
+            "status": TextInput(attrs={"type": "hidden"}),
+        }
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        type_ticket = DictionaryType.objects.get(code="type_ticket")
+        self.fields["type_ticket"].queryset = Dictionary.objects.filter(
+            type_dict=type_ticket
+        )

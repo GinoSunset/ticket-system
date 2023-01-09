@@ -30,3 +30,13 @@ class Dictionary(models.Model):
 
     def __str__(self):
         return self.description
+
+    @classmethod
+    def status_tickets(cls):
+        dt = DictionaryType.objects.get(code="status_ticket")
+        return cls.objects.filter(type_dict=dt)
+
+    @classmethod
+    def get_status_ticket(cls, code):
+        dt = DictionaryType.objects.get(code="status_ticket")
+        return cls.objects.get(type_dict=dt, code=code)
