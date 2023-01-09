@@ -18,7 +18,9 @@
         <th>SAP</th>
         <th>Тип заявки</th>
         <th>Заказчик</th>
+        {% if not user.is_customer %}
         <th>Иполнитель</th>
+        {% endif %}
         <th>Статус</th>
         <th>Город</th>
         <th>Детальная информация</th>
@@ -31,7 +33,9 @@
         <td data-label="sap_id">{% firstof ticket.sap_id %}</td>
         <td data-label="type_ticket">{% firstof ticket.type_ticket %}</td>
         <td data-label="customer">{% firstof ticket.customer %}</td>
+        {% if not user.is_customer %}
         <td data-label="contractor">{% firstof ticket.contractor %}</td>
+        {% endif %}
         <td data-label="status">{% if ticket.status %} <div class="ui {{ticket.get_color_status}} label">{{ticket.status}}</div>{% endif %}</td>
         <td data-label="address">{% firstof ticket.city %}</td>
         <td><a class="ui button info" href={% url 'ticket-update' ticket.pk %}>Просмотр</a></td>
