@@ -18,12 +18,10 @@
         <th>SAP</th>
         <th>Тип заявки</th>
         <th>Описание</th>
-        <th>Автор</th>
         <th>Заказчик</th>
         <th>Иполнитель</th>
         <th>Статус</th>
         <th>Город</th>
-        {% comment %} <th>Адрес</th> {% endcomment %}
         <th>Детальная информация</th>
     </tr></thead>
     <tbody>
@@ -34,12 +32,10 @@
         <td data-label="sap_id">{% firstof ticket.sap_id %}</td>
         <td data-label="type_ticket">{% firstof ticket.type_ticket %}</td>
         <td data-label="description">{% firstof ticket.description|truncatechars:20 %}</td>
-        <td data-label="creator">{% firstof ticket.creator %}</td>
         <td data-label="customer">{% firstof ticket.customer %}</td>
         <td data-label="contractor">{% firstof ticket.contractor %}</td>
         <td data-label="status">{% if ticket.status %} <div class="ui {{ticket.get_color_status}} label">{{ticket.status}}</div>{% endif %}</td>
         <td data-label="address">{% firstof ticket.city %}</td>
-        {% comment %} <td data-label="address">{% firstof ticket.address %}</td> {% endcomment %}
         <td><a class="ui button info" href={% url 'ticket-update' ticket.pk %}>Просмотр</a></td>
       </tr>
       
