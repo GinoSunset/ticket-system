@@ -27,6 +27,7 @@
         {% if not user.is_customer %}
         <th>Иполнитель</th>
         {% endif %}
+        <th> Плановая дата выезда/исполнения</th>
         <th>Статус</th>
         <th>Город</th>
         <th>Доп информация</th>
@@ -44,6 +45,7 @@
         {% if not user.is_customer %}
         <td data-label="contractor">{% firstof ticket.contractor %}</td>
         {% endif %}
+        <td data-label="planned_execution_date">{% firstof ticket.planned_execution_date %}</td>
         <td data-label="status">{% if ticket.status %} <div class="ui {{ticket.get_color_status}} label">{{ticket.status}}</div>{% endif %}</td>
         <td data-label="address">{% firstof ticket.city %}</td>
         <td data-label="metadata">{% firstof ticket.metadata %}</td>

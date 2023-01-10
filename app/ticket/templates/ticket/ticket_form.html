@@ -8,7 +8,7 @@
         {% for field in form %}
         <div class="field">
             {{ field.errors }}
-            {% if  field.is_hidden%}
+            {% if  field.is_hidden %}
               {{ field }}
             {% else %}
               {{ field.label_tag }} 
@@ -25,3 +25,21 @@
     </form>
   </div>
 {% endblock content %}
+
+{% block script %}
+<script>
+  $('#date_calendar').calendar({
+    type: "date", 
+    firstDayOfWeek: 1,
+    text: {
+    days: ['В', 'П', 'В', 'С', 'Ч', 'П', 'С'],
+      today: 'Сегодня',
+      months: ["Январь", "Февраль", "Март", "Апрель", "Май", "Июнь", "Июль", "Август", "Сентябрь", "Октябрь", "Ноябрь", "Декабрь"],
+      monthsShort: ["Янв", "Фев", "Мар", "Апр", "Май", "Июн", "Июл", "Авг", "Сен", "Окт", "Ноя", "Дек"],
+    },
+    formatter: {
+      date: 'DD.MM.YYYY'
+    }
+  });
+</script>
+{% endblock script %}
