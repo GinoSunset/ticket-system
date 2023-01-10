@@ -17,6 +17,7 @@ class TicketsForm(forms.ModelForm):
             "city",
             "address",
             "metadata",
+            "planned_execution_date",
         ]
 
     def __init__(self, *args, **kwargs):

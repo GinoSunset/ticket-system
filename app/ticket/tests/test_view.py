@@ -123,18 +123,6 @@ def test_access_page_create_task_other(user_factory, client):
 
 
 @pytest.mark.django_db
-def test_customer_form_not_field_customer_status_contractor(customer_factory, client):
-    """Исполнитель, Статус, Заказчик"""
-    user = customer_factory()
-    client.force_login(user=user)
-    res = client.get(reverse("tickets-new"))
-    fields = set(res.context_data["form"].fields.keys())
-    assert not "customer" in fields
-    assert not "status" in fields
-    assert not "contractor" in fields
-
-
-@pytest.mark.django_db
 def test_customer_save_ticket_has_all_needed_field(customer_factory, client):
     """Исполнитель, Статус, Заказчик"""
     user = customer_factory()

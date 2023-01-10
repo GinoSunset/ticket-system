@@ -40,6 +40,9 @@ class Ticket(models.Model):
         null=True,
         blank=True,
     )
+    planned_execution_date = models.DateField(
+        "Плановую дата выезда/исполнения", null=True, blank=True
+    )
     contractor = models.ForeignKey(
         User,
         related_name="contractor_user",
