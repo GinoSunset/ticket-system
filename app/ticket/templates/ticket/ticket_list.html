@@ -13,7 +13,7 @@
   <i class="wrench icon"></i>
   <div class="menu">
     <div class="header">Настройка отображения</div>
-    <div class="item" onclick="toogle_hidden_done()">Скрыть завершенные</div>
+    <div class="item" onclick="toogle_hidden_done()"><i id="icon_hide_show" class="hide icon"></i><span id="hide_text">Скрыть завершенные</span></div>
   </div>
 </div>
 <table id="tableTickets"class="ui celled table">
@@ -87,6 +87,11 @@
     function toogle_hidden_done(){
       hidden_done = !hidden_done;
       table.draw();
+      $("#icon_hide_show").toggleClass("hide eye");
+      var text = $('#hide_text').text();
+      $('#hide_text').text(
+        text == "Скрыть завершенные" ? "Показать завершенные" : "Скрыть завершенные");
+
     }
     {% endif %}
 
