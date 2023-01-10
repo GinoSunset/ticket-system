@@ -8,6 +8,14 @@
 
 {% block content %}
 <h1>Заявки</h1>
+
+<div class="ui icon right floated pointing dropdown button ">
+  <i class="wrench icon"></i>
+  <div class="menu">
+    <div class="header">Настройка отображения</div>
+    <div class="item" onclick="toogle_hidden_done()">Скрыть завершенные</div>
+  </div>
+</div>
 <table id="tableTickets"class="ui celled table">
     <thead>
       <tr>
@@ -55,13 +63,33 @@
 {% block script %}
 <script>
     {% if  object_list%}
+    var hidden_done = false;
 
-    $('#tableTickets').DataTable({
+    $.fn.dataTable.ext.search.push(function (settings, data, dataIndex) {
+      var status = data[6]
+
+      if (status.indexOf("Выполнено") >= 0 && hidden_done ) {
+          return false;
+      }
+      return true;
+    });
+
+    var table = $('#tableTickets').DataTable({
         language: {
             url: "{% static 'DataTables/ru.json'%}"
         }
+        
     });
+
+
+    $(".pointing.dropdown.button").dropdown()
+
+    function toogle_hidden_done(){
+      hidden_done = !hidden_done;
+      table.draw();
+    }
     {% endif %}
+
 
 </script>
 {% endblock script %}
