@@ -1,7 +1,14 @@
 import environ
 from pathlib import Path
 
-env = environ.Env(DEBUG=(bool, False))
+env = environ.Env(
+    DEBUG=(bool, False),
+    EMAIL_HOST=(str, "localhost"),
+    EMAIL_PORT=(int, 25),
+    EMAIL_USE_TLS=(bool, False),
+    EMAIL_IMAP_PORT=(int, 993),
+    EMAIL_IMAP_HOST=(str, "localhost"),
+)
 BASE_DIR = Path(__file__).resolve().parent.parent
 
 environ.Env.read_env(BASE_DIR / ".env")
@@ -94,3 +101,14 @@ DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 AUTH_USER_MODEL = "users.User"
 LOGIN_REDIRECT_URL = "/"
 LOGOUT_REDIRECT_URL = "/"
+
+# Ticket email
+
+EMAIL_HOST_PASSWORD = env("EMAIL_HOST_PASSWORD")
+EMAIL_HOST = env("EMAIL_HOST")
+EMAIL_PORT = env("EMAIL_PORT")
+EMAIL_HOST_USER = env("EMAIL_HOST_USER")
+EMAIL_USE_TLS = env("EMAIL_USE_TLS")
+EMAIL_IMAP_PORT = env("EMAIL_IMAP_PORT")
+EMAIL_IMAP_HOST = env("EMAIL_IMAP_HOST")
+EMAIL_TO_TICKET = env("EMAIL_TO_TICKET")
