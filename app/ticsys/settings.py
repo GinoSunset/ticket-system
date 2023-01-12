@@ -17,7 +17,6 @@ environ.Env.read_env(BASE_DIR / ".env")
 DEBUG = env("DEBUG")
 SECRET_KEY = env("SECRET_KEY")
 
-
 ALLOWED_HOSTS = env("DJANGO_ALLOWED_HOSTS").split(" ")
 CSRF_TRUSTED_ORIGINS = env("CSRF_TRUSTED_ORIGINS").split(" ")
 INSTALLED_APPS = [
@@ -81,7 +80,6 @@ AUTH_PASSWORD_VALIDATORS = [
     },
 ]
 
-
 LANGUAGE_CODE = "ru-RU"
 
 USE_I18N = True
@@ -98,11 +96,11 @@ MEDIA_URL = "/media/"
 
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 
-
 AUTH_USER_MODEL = "users.User"
 LOGIN_REDIRECT_URL = "/"
 LOGOUT_REDIRECT_URL = "/"
 
+TICKET_CREATOR_USERNAME = "email_robot"
 # Ticket email
 
 EMAIL_HOST_PASSWORD = env("EMAIL_HOST_PASSWORD")
