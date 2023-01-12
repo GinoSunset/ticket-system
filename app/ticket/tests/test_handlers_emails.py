@@ -12,6 +12,7 @@ def test_creating_ticket_form_emails(email_ticket):
 
 @pytest.mark.django_db
 def test_failed():
+    """"""
     mails = get_new_emails()
     for i in mails:
         print(i.to)

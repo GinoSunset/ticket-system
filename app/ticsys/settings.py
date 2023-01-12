@@ -8,6 +8,7 @@ env = environ.Env(
     EMAIL_USE_TLS=(bool, False),
     EMAIL_IMAP_PORT=(int, 993),
     EMAIL_IMAP_HOST=(str, "localhost"),
+    SUBJECT_TO_TICKET=(str, "ticket"),
 )
 BASE_DIR = Path(__file__).resolve().parent.parent
 
@@ -111,4 +112,4 @@ EMAIL_HOST_USER = env("EMAIL_HOST_USER")
 EMAIL_USE_TLS = env("EMAIL_USE_TLS")
 EMAIL_IMAP_PORT = env("EMAIL_IMAP_PORT")
 EMAIL_IMAP_HOST = env("EMAIL_IMAP_HOST")
-EMAIL_TO_TICKET = env("EMAIL_TO_TICKET")
+SUBJECT_TO_TICKET = env("SUBJECT_TO_TICKET")
