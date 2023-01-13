@@ -3,8 +3,9 @@ from imap_tools import MailBox, AND
 from imap_tools.message import MailMessage
 import logging
 
-from .models import Ticket
 from users.models import Customer, User
+from additionally.models import Dictionary
+from .models import Ticket
 
 
 def save_tickets_from_emails() -> int:
@@ -41,5 +42,8 @@ def create_ticket_from_email(email: MailMessage) -> bool:
         return False
 
     creator = User.objects.get(username=settings.TICKET_CREATOR_USERNAME)
-    Ticket.objects.create(customer=customer, description=message, creator=creator)
+    status = Dictionary.get_status_ticket("work")
+    Ticket.objects.create(
+        customer=customer, description=message, creator=creator, status=status
+    )
     return True

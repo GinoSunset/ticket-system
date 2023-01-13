@@ -12,3 +12,4 @@ def test_creating_ticket_form_emails(email_ticket, customer_factory):
     assert ticket.creator.username == "email_robot"
     assert ticket.customer.email == email_ticket.from_
     assert ticket.description == email_ticket.text
+    assert ticket.status.code == "work"
