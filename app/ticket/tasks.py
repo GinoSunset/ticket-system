@@ -6,14 +6,13 @@ import logging
 from django.conf import settings
 
 
-@celery_app.on_after_configure.connect
+@celery_app.on_after_finalize.connect
 def setup_periodic_tasks(sender, **kwargs):
-    logging.info("Setup periodic tasks")
+    logging.info("Setup periodic tasks check email")
     period_check_email = settings.PERIOD_CHECK_EMAIL
     sender.add_periodic_task(
         period_check_email, add_new_tickets_in_email.s(), name=f"check email every"
     )
-    logging.info(f"Add periodic task check email every {period_check_email} seconds")
 
 
 @celery_app.task

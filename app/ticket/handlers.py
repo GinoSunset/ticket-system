@@ -11,7 +11,7 @@ def save_tickets_from_emails() -> int:
     emails = get_new_emails()
     count = 0
     for email in emails:
-        logging.info(f"Create ticket  from {email.from_}")
+        logging.info(f"Processing ticket from {email.from_}")
         status = create_ticket_from_email(email)
         if status:
             count += 1
@@ -20,9 +20,11 @@ def save_tickets_from_emails() -> int:
 
 def get_new_emails():
     with MailBox(host=settings.EMAIL_IMAP_HOST, port=settings.EMAIL_IMAP_PORT).login(
-            username=settings.EMAIL_HOST_USER, password=settings.EMAIL_HOST_PASSWORD
+        username=settings.EMAIL_HOST_USER, password=settings.EMAIL_HOST_PASSWORD
     ) as mailbox:
-        for mail in mailbox.fetch(AND(subject=settings.SUBJECT_TO_TICKET), charset='utf8'):
+        for mail in mailbox.fetch(
+            AND(subject=settings.SUBJECT_TO_TICKET, seen=False), charset="utf8"
+        ):
             yield mail
 
 
@@ -33,7 +35,9 @@ def create_ticket_from_email(email: MailMessage) -> bool:
     try:
         customer = Customer.objects.get(email=email_customer)
     except Customer.DoesNotExist:
-        logging.info(f"Customer with email {email_customer} not found. Ticket not created")
+        logging.info(
+            f"Customer with email {email_customer} not found. Ticket not created"
+        )
         return False
 
     creator = User.objects.get(username=settings.TICKET_CREATOR_USERNAME)
