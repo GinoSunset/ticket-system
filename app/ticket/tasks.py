@@ -8,6 +8,7 @@ from django.conf import settings
 
 @celery_app.on_after_configure.connect
 def setup_periodic_tasks(sender, **kwargs):
+    logging.info("Setup periodic tasks")
     period_check_email = settings.PERIOD_CHECK_EMAIL
     sender.add_periodic_task(
         period_check_email, add_new_tickets_in_email.s(), name=f"check email every"
