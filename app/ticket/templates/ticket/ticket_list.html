@@ -68,7 +68,7 @@
     var hidden_done = false;
 
     $.fn.dataTable.ext.search.push(function (settings, data, dataIndex) {
-      var status = data[6]
+      var status = data
 
       if (status.indexOf("Выполнено") >= 0 && hidden_done ) {
           return false;
