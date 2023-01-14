@@ -1,14 +1,26 @@
 import environ
 from pathlib import Path
 
-env = environ.Env(DEBUG=(bool, False))
+env = environ.Env(
+    DEBUG=(bool, False),
+    EMAIL_HOST=(str, "localhost"),
+    EMAIL_PORT=(int, 25),
+    EMAIL_USE_TLS=(bool, False),
+    EMAIL_IMAP_PORT=(int, 993),
+    EMAIL_IMAP_HOST=(str, "localhost"),
+    PERIOD_CHECK_EMAIL=(float, 60.0),  # seconds
+    SUBJECT_TO_TICKET=(str, "ticket"),
+    RABBIT_HOST=(str, "localhost"),
+    RABBIT_LOGIN=(str, "guest"),
+    RABBIT_PASSWORD=(str, "guest"),
+    RABBIT_VHOST=(str, "/"),
+)
 BASE_DIR = Path(__file__).resolve().parent.parent
 
 environ.Env.read_env(BASE_DIR / ".env")
 
 DEBUG = env("DEBUG")
 SECRET_KEY = env("SECRET_KEY")
-
 
 ALLOWED_HOSTS = env("DJANGO_ALLOWED_HOSTS").split(" ")
 CSRF_TRUSTED_ORIGINS = env("CSRF_TRUSTED_ORIGINS").split(" ")
@@ -73,7 +85,6 @@ AUTH_PASSWORD_VALIDATORS = [
     },
 ]
 
-
 LANGUAGE_CODE = "ru-RU"
 
 USE_I18N = True
@@ -90,7 +101,32 @@ MEDIA_URL = "/media/"
 
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 
-
 AUTH_USER_MODEL = "users.User"
 LOGIN_REDIRECT_URL = "/"
 LOGOUT_REDIRECT_URL = "/"
+
+TICKET_CREATOR_USERNAME = "email_robot"
+# Ticket email
+
+EMAIL_HOST_PASSWORD = env("EMAIL_HOST_PASSWORD")
+EMAIL_HOST = env("EMAIL_HOST")
+EMAIL_PORT = env("EMAIL_PORT")
+EMAIL_HOST_USER = env("EMAIL_HOST_USER")
+EMAIL_USE_TLS = env("EMAIL_USE_TLS")
+EMAIL_IMAP_PORT = env("EMAIL_IMAP_PORT")
+EMAIL_IMAP_HOST = env("EMAIL_IMAP_HOST")
+SUBJECT_TO_TICKET = env("SUBJECT_TO_TICKET")
+
+PERIOD_CHECK_EMAIL = env("PERIOD_CHECK_EMAIL")
+
+RABBIT_HOST = env("RABBIT_HOST")
+RABBIT_LOGIN = env("RABBIT_LOGIN")
+RABBIT_PASSWORD = env("RABBIT_PASSWORD")
+RABBIT_VHOST = env("RABBIT_VHOST")
+
+CELERY_BROKER_URL = (
+    f"amqp://{RABBIT_LOGIN}:{RABBIT_PASSWORD}@{RABBIT_HOST}/{RABBIT_VHOST}"
+)
+CELERY_ACCEPT_CONTENT = ("application/json",)
+CELERY_RESULT_SERIALIZER = "json"
+CELERY_TASK_SERIALIZER = "json"
