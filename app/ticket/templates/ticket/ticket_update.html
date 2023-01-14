@@ -43,7 +43,7 @@
   <div class=" ui list ">
     <div class="item"> 
       <div class="header"> Описание</div> 
-      {{ticket.description}}
+      {{ticket.description|safe }}
     </div>
   </div>        
   {% if user.is_operator %}

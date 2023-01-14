@@ -31,7 +31,7 @@ def get_new_emails():
 
 def create_ticket_from_email(email: MailMessage) -> bool:
     email_customer = email.from_
-    message = email.text
+    message = email.text or email.html
 
     try:
         customer = Customer.objects.get(email=email_customer)
