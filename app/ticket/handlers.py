@@ -6,6 +6,7 @@ import logging
 from users.models import Customer, User
 from additionally.models import Dictionary
 from .models import Ticket
+from .parsers import BaseParser
 
 
 def save_tickets_from_emails() -> int:
@@ -36,14 +37,23 @@ def create_ticket_from_email(email: MailMessage) -> bool:
     try:
         customer = Customer.objects.get(email=email_customer)
     except Customer.DoesNotExist:
-        logging.info(
-            f"Customer with email {email_customer} not found. Ticket not created"
-        )
+        logging.info(f"Customer with email {email_customer} not found")
         return False
-
+    ticket_info = get_info_from_message(message, customer)
     creator = User.objects.get(username=settings.TICKET_CREATOR_USERNAME)
     status = Dictionary.get_status_ticket("work")
     Ticket.objects.create(
-        customer=customer, description=message, creator=creator, status=status
+        customer=customer, creator=creator, status=status, **ticket_info
     )
     return True
+
+
+def get_info_from_message(message: str, customer: Customer) -> dict:
+    parser_name = customer.get_parser()
+    parser = BaseParser.get_parser(parser_name)
+    try:
+        info = parser.parse(message)
+    except Exception as e:
+        logging.error(f"Error parsing with: {type(e)} {str(e)}. Try default parser")
+        return BaseParser().parse(message)
+    return info

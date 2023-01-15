@@ -1,0 +1,14 @@
+from ticket.parsers import DMParser
+
+
+def test_parser_DM(
+    email_ticket, marked_up_text_DM_ticket, shop_id, shop_address, sap_number
+):
+    descriptor, info, added_descriptor, sign = marked_up_text_DM_ticket
+
+    message_info = DMParser().parse(email_ticket.text)
+
+    assert message_info["description"] == (descriptor + added_descriptor).strip()
+    assert message_info["metadata"] == shop_id
+    assert message_info["address"] == shop_address
+    assert message_info["sap_id"] == sap_number

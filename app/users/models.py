@@ -98,6 +98,9 @@ class Customer(User):
     def get_customers(self) -> models.QuerySet:
         return Customer.objects.filter(pk=self.pk)
 
+    def get_parser(self):
+        return self.profile.parser
+
 
 class Operator(User):
     class Meta:
@@ -147,6 +150,7 @@ class CustomerProfile(models.Model):
         null=True,
         blank=True,
     )
+    parser = models.CharField(verbose_name="Парсер", max_length=50, default="base")
 
     def __str__(self) -> str:
         return str(self.user)

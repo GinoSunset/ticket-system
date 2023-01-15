@@ -13,3 +13,29 @@ def test_creating_ticket_form_emails(email_ticket, customer_factory):
     assert ticket.customer.email == email_ticket.from_
     assert ticket.description == email_ticket.text
     assert ticket.status.code == "work"
+
+
+@pytest.mark.django_db
+def test_create_DM_ticket(
+    email_ticket,
+    marked_up_text_DM_ticket,
+    customer_factory,
+    shop_id,
+    shop_address,
+    sap_number,
+):
+    descriptor, _, added_descriptor, _ = marked_up_text_DM_ticket
+
+    user = customer_factory(email=email_ticket.from_)
+    user.profile.parser = "DM"
+    user.profile.save()
+
+    create_ticket_from_email(email_ticket)
+
+    ticket = Ticket.objects.first()
+    assert ticket.description == (descriptor + added_descriptor).strip()
+    assert ticket.metadata == shop_id
+
+    assert ticket.address == shop_address
+
+    assert ticket.sap_id == sap_number
