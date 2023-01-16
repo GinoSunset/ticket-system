@@ -30,7 +30,7 @@
         <th> Плановая дата выезда/исполнения</th>
         <th>Статус</th>
         <th>Город</th>
-        <th>Доп информация</th>
+        <th>Магазин</th>
         <th>Подробнее</th>
 
     </tr></thead>
@@ -48,7 +48,7 @@
         <td data-label="planned_execution_date">{% firstof ticket.planned_execution_date %}</td>
         <td data-label="status">{% if ticket.status %} <div class="ui {{ticket.get_color_status}} label">{{ticket.status}}</div>{% endif %}</td>
         <td data-label="address">{% firstof ticket.city %}</td>
-        <td data-label="metadata">{% firstof ticket.metadata %}</td>
+        <td data-label="shop_id">{% firstof ticket.shop_id %}</td>
         <td><a class="ui button info" href={% url 'ticket-update' ticket.pk %}>Просмотр</a></td>
       </tr>
       
