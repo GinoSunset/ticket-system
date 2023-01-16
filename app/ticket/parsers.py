@@ -46,9 +46,11 @@ class DMParser(BaseParser):
         info = text[text.find("Телефон:") : text.find("SAP:")]
 
         index_start_sap_line = text.find("SAP:")
-        index_end_sap_line = (
-            text[index_start_sap_line:].find("\n") + index_start_sap_line
-        )
+
+        index_end_sap_line = text[index_start_sap_line:].find("\n")
+        if index_end_sap_line == -1:
+            index_end_sap_line = text[index_start_sap_line:].find("</p>")
+        index_end_sap_line = index_end_sap_line + index_start_sap_line
 
         sap = text[index_start_sap_line:index_end_sap_line]
         sap = sap.split(":")[1].strip()
@@ -67,11 +69,13 @@ class DMParser(BaseParser):
 
     def get_metadata(self, info: str) -> dict:
         lines = info.splitlines()
+        if len(lines) == 1:
+            lines = info.split("</p>")
 
         shop_lines = self.return_str_in_list_with_str(lines, "Магазин/Департамент:")
         address_lines = self.return_str_in_list_with_str(lines, "Регион:")
-        shop_id = shop_lines.split(":")[1].strip()
-        address = address_lines.split(":")[1].strip()
+        shop_id = shop_lines.split(":")[-1].strip()
+        address = address_lines.split(":")[-1].strip()
         return shop_id, address
 
     def return_str_in_list_with_str(self, list_str: list, str: str) -> str:

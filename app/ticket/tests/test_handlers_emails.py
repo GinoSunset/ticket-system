@@ -39,3 +39,16 @@ def test_create_DM_ticket(
     assert ticket.address == shop_address
 
     assert ticket.sap_id == sap_number
+
+
+@pytest.mark.skip
+@pytest.mark.django_db
+def test_load_ticket(customer_factory):
+    from ticket.handlers import save_tickets_from_emails
+
+    user = customer_factory(email="ginosunset@yandex.ru")
+    user.profile.parser = "DM"
+    user.profile.save()
+
+    save_tickets_from_emails()
+    assert False
