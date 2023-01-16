@@ -13,7 +13,7 @@ def save_tickets_from_emails() -> int:
     emails = get_new_emails()
     count = 0
     for email in emails:
-        if settings.SUBJECT_TICKET not in email.subject:
+        if settings.SUBJECT_TO_TICKET not in email.subject:
             continue
         logging.info(f"Processing ticket from {email.from_}")
         status = create_ticket_from_email(email)
