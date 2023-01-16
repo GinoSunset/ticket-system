@@ -35,7 +35,8 @@ def create_ticket_from_email(email: MailMessage) -> bool:
     message = email.text or email.html
 
     try:
-        customer = Customer.objects.get(email=email_customer)
+        customer = Customer.objects.get(email__iregex=email_customer)
+
     except Customer.DoesNotExist:
         logging.info(f"Customer with email {email_customer} not found")
         return False

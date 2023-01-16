@@ -50,5 +50,5 @@ def test_load_ticket(customer_factory):
     user.profile.parser = "DM"
     user.profile.save()
 
-    save_tickets_from_emails()
-    assert False
+    result = save_tickets_from_emails()
+    assert result == 1

@@ -1,3 +1,6 @@
+from collections import defaultdict
+
+
 class BaseParser:
     def parse(self, text) -> dict:
         return {"description": text}
@@ -45,38 +48,63 @@ class DMParser(BaseParser):
         descriptor = text[: text.find("Телефон:")]
         info = text[text.find("Телефон:") : text.find("SAP:")]
 
+        index_start_sap_line, index_end_sap_line = self.get_indexes_sap(text)
+
+        sap = self.get_sap(text, index_start_sap_line, index_end_sap_line)
+
+        index_sign = text.find("С уважением")
+
+        additional_text = text[index_end_sap_line:index_sign]
+
+        meta_data = self.get_metadata(info)
+        result = {
+            "description": (descriptor + additional_text).strip(),
+            "sap_id": sap,
+        }
+        result.update(meta_data)
+        return result
+
+    def get_sap(self, text, index_start_sap_line, index_end_sap_line):
+        sap = text[index_start_sap_line:index_end_sap_line]
+        sap = sap.split(":")[1].strip()
+        return sap
+
+    def get_indexes_sap(self, text):
         index_start_sap_line = text.find("SAP:")
 
         index_end_sap_line = text[index_start_sap_line:].find("\n")
         if index_end_sap_line == -1:
             index_end_sap_line = text[index_start_sap_line:].find("</p>")
         index_end_sap_line = index_end_sap_line + index_start_sap_line
-
-        sap = text[index_start_sap_line:index_end_sap_line]
-        sap = sap.split(":")[1].strip()
-
-        index_sign = text.find("С уважением")
-
-        additional_text = text[index_end_sap_line:index_sign]
-
-        shop_id, address = self.get_metadata(info)
-        return {
-            "description": (descriptor + additional_text).strip(),
-            "metadata": shop_id,
-            "address": address,
-            "sap_id": sap,
-        }
+        return index_start_sap_line, index_end_sap_line
 
     def get_metadata(self, info: str) -> dict:
+        meta_data_map = {
+            "Магазин/Департамент": "shop_id",
+            "Регион": "address",
+            "Должность": "position",
+            "Ф.И.О.": "full_name",
+            "Телефон": "phone",
+            "SAP": "sap_id",
+        }
         lines = info.splitlines()
         if len(lines) == 1:
             lines = info.split("</p>")
 
-        shop_lines = self.return_str_in_list_with_str(lines, "Магазин/Департамент:")
-        address_lines = self.return_str_in_list_with_str(lines, "Регион:")
-        shop_id = shop_lines.split(":")[-1].strip()
-        address = address_lines.split(":")[-1].strip()
-        return shop_id, address
+        result = defaultdict(str)
+        for line in lines:
+            if not line:
+                continue
+            if ":" in line:
+                key, value = line.split(":")
+            else:
+                key, value = line.split(" ", maxsplit=1)
+            if key in meta_data_map:
+                result[meta_data_map[key]] = value.strip()
+                continue
+
+            result["other_meta_info"] += line
+        return result
 
     def return_str_in_list_with_str(self, list_str: list, str: str) -> str:
         return list(filter(lambda x: str in x, list_str))[0]

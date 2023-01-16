@@ -64,12 +64,25 @@ class Ticket(models.Model):
     address = models.CharField(
         max_length=100, blank=True, null=True, verbose_name="Адрес"
     )
+
+    shop_id = models.CharField(
+        null=True, blank=True, max_length=50, verbose_name="ID магазина"
+    )
+    position = models.CharField(
+        null=True, blank=True, max_length=50, verbose_name="Должность заказчика"
+    )
+    full_name = models.CharField(
+        null=True, blank=True, max_length=50, verbose_name="Ф.И.О заказчика"
+    )
+    phone = models.CharField(
+        null=True, blank=True, max_length=50, verbose_name="Телефон заказчика"
+    )
     metadata = models.CharField(
-        "Метадата",
-        help_text="Дополнительная информация о заявке. Например номер магазина",
-        max_length=255,
-        blank=True,
         null=True,
+        blank=True,
+        max_length=100,
+        verbose_name="Другая информация",
+        help_text="Дополнительная информация о заявке. Которая не вошла в другие поля",
     )
 
     def __str__(self):
