@@ -55,7 +55,7 @@ class DMParser(BaseParser):
         sap = text[index_start_sap_line:index_end_sap_line]
         sap = sap.split(":")[1].strip()
 
-        index_sign = text.find("С уважением,")
+        index_sign = text.find("С уважением")
 
         additional_text = text[index_end_sap_line:index_sign]
 
