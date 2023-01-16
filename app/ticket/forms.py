@@ -17,8 +17,12 @@ class TicketsForm(forms.ModelForm):
             "status",
             "city",
             "address",
-            "metadata",
             "planned_execution_date",
+            "shop_id",
+            "position",
+            "full_name",
+            "phone",
+            "metadata",
         ]
         widgets = {"planned_execution_date": CalendarInput()}
 
@@ -47,6 +51,10 @@ class TicketsFormOperator(forms.ModelForm):
             "city",
             "address",
             "status",
+            "shop_id",
+            "position",
+            "full_name",
+            "phone",
             "metadata",
         ]
         widgets = {

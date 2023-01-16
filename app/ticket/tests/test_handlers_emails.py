@@ -20,7 +20,6 @@ def test_create_DM_ticket(
     email_ticket,
     marked_up_text_DM_ticket,
     customer_factory,
-    shop_id,
     shop_address,
     sap_number,
 ):
@@ -34,7 +33,6 @@ def test_create_DM_ticket(
 
     ticket = Ticket.objects.first()
     assert ticket.description == (descriptor + added_descriptor).strip()
-    assert ticket.metadata == shop_id
 
     assert ticket.address == shop_address
 
