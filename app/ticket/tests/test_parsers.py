@@ -1,3 +1,5 @@
+import pytest
+
 from ticket.parsers import DMParser
 
 
@@ -22,7 +24,22 @@ class TestDMParser:
             "full_name": "Корпатов Иван Иванович",
             "phone": "8-888-999-99-99",
             "sap_id": "800111258011",
+            "city": "Рыбинск",
         }
 
         meta_data = DMParser().get_metadata(info)
         assert meta_data == meta_expected
+
+    @pytest.mark.parametrize(
+        "address, expected",
+        [
+            ("Поволжье Елабуга, Окружное шоссе, д.37А (Татарстан)", "Елабуга"),
+            (
+                "Центр Рыбинск, ул. Кирилла Николаева, д.11 (Ярославская обл.)",
+                "Рыбинск",
+            ),
+        ],
+    )
+    def test_city_extractor(self, address, expected):
+        city = DMParser().get_city_from_address(address)
+        assert city == expected

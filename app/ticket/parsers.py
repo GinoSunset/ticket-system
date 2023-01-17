@@ -1,4 +1,5 @@
 from collections import defaultdict
+from natasha import AddrExtractor, MorphVocab
 
 
 class BaseParser:
@@ -104,7 +105,21 @@ class DMParser(BaseParser):
                 continue
 
             result["other_meta_info"] += line
+        if result["address"]:
+            result["city"] = self.get_city_from_address(result["address"])
         return result
 
     def return_str_in_list_with_str(self, list_str: list, str: str) -> str:
         return list(filter(lambda x: str in x, list_str))[0]
+
+    def get_city_from_address(self, address):
+        morph_vocab = MorphVocab()
+        extractor = AddrExtractor(morph_vocab)
+        matches = extractor(address)
+        tokens = list(matches)
+        for token in tokens:
+            if token.fact.type == "city":
+                return token.fact.value
+        city_with_district = address.split(",")[0]
+        city = city_with_district.split(" ", maxsplit=1)[1]
+        return city
