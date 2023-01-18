@@ -1,3 +1,5 @@
+import re
+
 from django.conf import settings
 from imap_tools import MailBox, AND
 from imap_tools.message import MailMessage
@@ -93,6 +95,7 @@ def create_ticket_from_email(email: MailMessage) -> bool:
         return False
     customer = user.get_role_user()
     message = email.text or email.html
+    message = remove_duplicate_new_lines(message)
     id_email_message = email.headers.get("message-id")[0].strip()
     ticket_info = get_info_from_message(message, customer)
     creator = User.objects.get(username=settings.TICKET_CREATOR_USERNAME)
@@ -128,4 +131,10 @@ def cleanup_comment_text(text: str) -> str:
         if line.startswith(">"):
             continue
         new_lines.append(line)
-    return "\n".join(new_lines).strip()
+    return remove_duplicate_new_lines("\n".join(new_lines).strip())
+
+
+def remove_duplicate_new_lines(text: str) -> str:
+    text = re.sub(r"\n{2,}", "\n", text)
+    text = re.sub(r"\n\r{2,}", "\n\r", text)
+    return text

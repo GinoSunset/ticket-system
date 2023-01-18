@@ -97,7 +97,7 @@
         <div class="item"> 
           <div class="header"> Описание</div> 
           <div class="ui large text">
-          {{ticket.description|safe }}
+          {{ticket.description|safe|linebreaksbr|urlize }}
           </div>
         </div>
       </div>        
@@ -120,7 +120,7 @@
     </div>
     <div class="text">
     {% if comment.text %}
-      {{comment.text|safe }}}}
+      {{comment.text|safe|linebreaksbr|urlize }}}}
     {% else %}
       <i>No text</i>
       {% endif %}
