@@ -118,8 +118,9 @@ class DMParser(BaseParser):
         matches = extractor(address)
         tokens = list(matches)
         for token in tokens:
-            if token.fact.type == "city":
+            if token.fact.type == "город":
                 return token.fact.value
         city_with_district = address.split(",")[0]
         city = city_with_district.split(" ", maxsplit=1)[1]
+        city = city.removeprefix("г.").strip()
         return city
