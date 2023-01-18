@@ -14,7 +14,9 @@ def save_tickets_from_emails() -> int:
     count = 0
     for email in emails:
         if not is_email_for_processing(email):
-            logging.info("Email is not for processing. Skip")
+            logging.info(
+                f"Email with subject {email.subject} is not for processing. Skip"
+            )
             continue
         logging.info(f"Processing ticket from {email.from_}")
         if is_reply_message(email):
