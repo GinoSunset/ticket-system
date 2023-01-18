@@ -85,6 +85,10 @@ class Ticket(models.Model):
         help_text="Дополнительная информация о заявке. Которая не вошла в другие поля",
     )
 
+    id_email_message = models.CharField(
+        verbose_name="ID письма в почте", null=True, blank=True, max_length=100
+    )
+
     def __str__(self):
         return f"{self.pk} - {self.type_ticket}, {self.customer=}"
 
@@ -113,6 +117,9 @@ class Comment(models.Model):
     text = models.TextField("Текст комментария", null=True, blank=True)
     author = models.ForeignKey(
         User, related_name="comments", on_delete=models.PROTECT, blank=True, null=True
+    )
+    id_email_message = models.CharField(
+        verbose_name="ID письма в почте", null=True, blank=True, max_length=100
     )
 
     def __str__(self) -> str:

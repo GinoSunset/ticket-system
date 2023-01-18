@@ -1,5 +1,9 @@
 import pytest
-from ticket.handlers import create_ticket_from_email
+from ticket.handlers import (
+    create_ticket_from_email,
+    create_comment_from_email,
+    cleanup_comment_text,
+)
 from ticket.models import Ticket
 
 
@@ -37,6 +41,20 @@ def test_create_DM_ticket(
     assert ticket.address == shop_address
 
     assert ticket.sap_id == sap_number
+
+
+@pytest.mark.django_db
+def test_create_comment_from_email(email_ticket, customer_factory, ticket_factory):
+    customer_factory(email=email_ticket.from_)
+    ticket: Ticket = ticket_factory(id_email_message="<asdfasdfasdf@vim.ru>")
+    st = create_comment_from_email(email_ticket)
+    assert st
+    assert ticket.comments.count() == 1
+
+
+def test_cleanup_comment(text_reply):
+
+    assert cleanup_comment_text(text_reply) == "Вот так"
 
 
 @pytest.mark.skip
