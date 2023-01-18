@@ -112,11 +112,11 @@ class Comment(models.Model):
     date_create = models.DateTimeField(auto_now_add=True)
     date_update = models.DateTimeField(auto_now=True)
     ticket = models.ForeignKey(
-        Ticket, related_name="comments", on_delete=models.PROTECT
+        Ticket, related_name="comments", on_delete=models.CASCADE
     )
     text = models.TextField("Текст комментария", null=True, blank=True)
     author = models.ForeignKey(
-        User, related_name="comments", on_delete=models.PROTECT, blank=True, null=True
+        User, related_name="comments", on_delete=models.SET_NULL, blank=True, null=True
     )
     id_email_message = models.CharField(
         verbose_name="ID письма в почте", null=True, blank=True, max_length=100
@@ -144,7 +144,7 @@ class Comment(models.Model):
 
 
 class CommentFile(models.Model):
-    comment = models.ForeignKey(Comment, related_name="files", on_delete=models.PROTECT)
+    comment = models.ForeignKey(Comment, related_name="files", on_delete=models.CASCADE)
     file = models.FileField(
         "Файл", upload_to=ticket_directory_path, null=True, blank=True
     )
