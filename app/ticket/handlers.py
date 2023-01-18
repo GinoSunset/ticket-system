@@ -136,5 +136,5 @@ def cleanup_comment_text(text: str) -> str:
 
 def remove_duplicate_new_lines(text: str) -> str:
     text = re.sub(r"\n{2,}", "\n", text)
-    text = re.sub(r"\n\r{2,}", "\n\r", text)
+    text = re.sub(r"(\r\n){2,}", "\r\n", text)
     return text
