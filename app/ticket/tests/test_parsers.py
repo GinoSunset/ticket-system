@@ -38,8 +38,19 @@ class TestDMParser:
                 "Центр Рыбинск, ул. Кирилла Николаева, д.11 (Ярославская обл.)",
                 "Рыбинск",
             ),
+            (
+                "Юг г. Ростов-на-Дону, проспект М. Нагибина, д. 32/2",
+                "Ростов-на-Дону",
+            ),
+            ("МО, Серпухов, б-р 65 лет Победы, д.4", "Серпухов"),
+            ("Юг Сунжа ул. Суворова д. 2/2Б", "Сунжа"),
+            ("Москва, ул. Святоозёрская, д.5", "Москва"),
         ],
     )
     def test_city_extractor(self, address, expected):
         city = DMParser().get_city_from_address(address)
         assert city == expected
+
+    def test_parser_dm2(self, text_dm_2):
+        message_info = DMParser().parse(text_dm_2)
+        assert message_info

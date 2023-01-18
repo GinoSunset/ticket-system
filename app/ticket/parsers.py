@@ -1,5 +1,6 @@
 from collections import defaultdict
 from natasha import AddrExtractor, MorphVocab
+import logging
 
 
 class BaseParser:
@@ -96,6 +97,7 @@ class DMParser(BaseParser):
         for line in lines:
             if not line:
                 continue
+            line = line.strip()
             if ":" in line:
                 key, value = line.split(":")
             else:
@@ -106,13 +108,19 @@ class DMParser(BaseParser):
 
             result["other_meta_info"] += line
         if result["address"]:
-            result["city"] = self.get_city_from_address(result["address"])
+            try:
+                result["city"] = self.get_city_from_address(result["address"])
+            except Exception as e:
+                logging.error(f"Error in get city from address: {e}")
         return result
 
     def return_str_in_list_with_str(self, list_str: list, str: str) -> str:
         return list(filter(lambda x: str in x, list_str))[0]
 
     def get_city_from_address(self, address):
+        if "г." not in address and "город " not in address:
+            district, address_2 = address.split(" ", maxsplit=1)
+            address = f"{district} г. {address_2}"
         morph_vocab = MorphVocab()
         extractor = AddrExtractor(morph_vocab)
         matches = extractor(address)
@@ -120,7 +128,4 @@ class DMParser(BaseParser):
         for token in tokens:
             if token.fact.type == "город":
                 return token.fact.value
-        city_with_district = address.split(",")[0]
-        city = city_with_district.split(" ", maxsplit=1)[1]
-        city = city.removeprefix("г.").strip()
-        return city
+        return None
