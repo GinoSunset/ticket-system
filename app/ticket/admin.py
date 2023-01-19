@@ -5,6 +5,7 @@ from .models import Ticket, Comment
 
 class TicketAdmin(admin.ModelAdmin):
     list_display = (
+        "pk",
         "date_create",
         "sap_id",
         "customer",
