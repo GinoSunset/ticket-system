@@ -1,6 +1,8 @@
 import re
 
 from django.conf import settings
+from django.core.files.base import ContentFile
+
 from imap_tools import MailBox, AND
 from imap_tools.message import MailMessage
 import logging
@@ -63,20 +65,25 @@ def create_comment_from_email(email: MailMessage) -> bool:
         )
         return False
     message = cleanup_comment_text(message)
-    ticket.comments.create(
+    comment = ticket.comments.create(
         text=message,
         author=user,
         id_email_message=id_email_message,
     )
+    save_attachment(email, ticket, user, comment)
     return True
 
 
 def get_ticket_by_message_id_reply(id_email_message_in_reply_to):
-    try:
-        comment = Comment.objects.get(id_email_message=id_email_message_in_reply_to)
-    except Comment.DoesNotExist:
-        return Ticket.objects.get(id_email_message=id_email_message_in_reply_to)
-    return comment.ticket
+    comment = Comment.objects.filter(
+        id_email_message=id_email_message_in_reply_to
+    ).last()
+    if comment:
+        return comment.ticket
+    ticket = Ticket.objects.filter(id_email_message=id_email_message_in_reply_to).last()
+    if not ticket:
+        raise Ticket.DoesNotExist
+    return ticket
 
 
 def get_new_emails():
@@ -100,13 +107,14 @@ def create_ticket_from_email(email: MailMessage) -> bool:
     ticket_info = get_info_from_message(message, customer)
     creator = User.objects.get(username=settings.TICKET_CREATOR_USERNAME)
     status = Dictionary.get_status_ticket("work")
-    Ticket.objects.create(
+    ticket = Ticket.objects.create(
         customer=customer,
         creator=creator,
         status=status,
         id_email_message=id_email_message,
         **ticket_info,
     )
+    save_attachment(email, ticket, customer)
     return True
 
 
@@ -138,3 +146,13 @@ def remove_duplicate_new_lines(text: str) -> str:
     text = re.sub(r"$\n{3,}", "\n\n", text)
     text = re.sub(r"$(\r\n){3,}", "\r\n\r\n", text)
     return text
+
+
+def save_attachment(email: MailBox, ticket: Ticket, user, comment: Comment = None):
+    if not email.attachments:
+        return
+    if not comment:
+        comment = ticket.comments.create(author=user, text="Вложение из письма")
+    for file in email.attachments:
+        comment.files.create(file=ContentFile(content=file.payload, name=file.filename))
+        logging.info(f"Saving files attach from {email.from_} named {file.filename}")
