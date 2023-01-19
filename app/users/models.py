@@ -38,11 +38,13 @@ class User(AbstractUser):
         CONTRACTOR = "CONTRACTOR", "Исполнитель"
         OTHER = "OTHER", "Не назначен"
 
-    avatar = models.FileField(upload_to=avatar_directory_path, null=True, blank=True)
+    avatar = models.FileField(
+        upload_to=avatar_directory_path, null=True, blank=True, verbose_name="Аватар"
+    )
     date_of_create = models.DateTimeField(auto_now_add=True)
     last_connect = models.DateField(help_text="Последний вход", null=True, blank=True)
     phone = models.CharField("Телефон", max_length=18, blank=True, null=True)
-    role = models.CharField(max_length=50, choices=Role.choices)
+    role = models.CharField(max_length=50, choices=Role.choices, verbose_name="Роль")
 
     base_role = Role.OTHER
     objects = UserManager()
