@@ -56,7 +56,7 @@ class DMParser(BaseParser):
 
         index_sign = text.find("С уважением")
 
-        additional_text = text[index_end_sap_line:index_sign]
+        additional_text = self.get_additional_text(text, index_end_sap_line, index_sign)
 
         meta_data = self.get_metadata(info)
         result = {
@@ -65,6 +65,15 @@ class DMParser(BaseParser):
         }
         result.update(meta_data)
         return result
+
+    def get_additional_text(self, text, index_end_sap_line, index_sign):
+        additional_text = text[index_end_sap_line:index_sign]
+        return self.remove_cid_lines(additional_text)
+
+    def remove_cid_lines(self, text):
+        lines = text.splitlines()
+        lines = [line for line in lines if "[cid:" not in line]
+        return "\n".join(lines)
 
     def get_sap(self, text, index_start_sap_line, index_end_sap_line):
         sap = text[index_start_sap_line:index_end_sap_line]
