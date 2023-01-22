@@ -10,6 +10,7 @@ from users.models import Operator, Customer, User, Contractor
 from additionally.models import Dictionary
 from .models import Ticket, Comment, CommentFile
 from .forms import TicketsForm, CommentForm, TicketsFormOperator
+from .mixin import AccessTicketMixin
 
 
 class TicketsListView(LoginRequiredMixin, ListView):
@@ -59,7 +60,7 @@ class TicketFormView(LoginRequiredMixin, CreateView):
         return super().form_valid(form)
 
 
-class TicketUpdateView(LoginRequiredMixin, UpdateView):
+class TicketUpdateView(LoginRequiredMixin, AccessTicketMixin, UpdateView):
     model = Ticket
     form_class = TicketsForm
     template_name = "ticket/ticket_update.html"

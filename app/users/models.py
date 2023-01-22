@@ -67,6 +67,10 @@ class User(AbstractUser):
     def is_customer(self):
         return self.role == self.Role.CUSTOMER
 
+    @property
+    def is_contractor(self):
+        return self.role == self.Role.CONTRACTOR
+
     def get_role_user(self):
         type_user = {
             "OPERATOR": Operator,
