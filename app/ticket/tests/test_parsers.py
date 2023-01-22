@@ -46,6 +46,7 @@ class TestDMParser:
             ("Юг Сунжа ул. Суворова д. 2/2Б", "Сунжа"),
             ("Москва, ул. Святоозёрская, д.5", "Москва"),
             ("МО, п. Малаховка, Михневское ш.,3", "Малаховка"),
+            ("МО го Солнечногорск, д.Голубое пр-д Тверецкий стр. 18А", "Голубое"),
         ],
     )
     def test_city_extractor(self, address, expected):
@@ -55,3 +56,7 @@ class TestDMParser:
     def test_parser_dm2(self, text_dm_2):
         message_info = DMParser().parse(text_dm_2)
         assert message_info
+
+    def test_parser_dm2_not_sign_img(self, text_dm_2):
+        message_info = DMParser().parse(text_dm_2)
+        assert "[cid:image004.png@01D92A6D.90491210]" not in message_info["description"]

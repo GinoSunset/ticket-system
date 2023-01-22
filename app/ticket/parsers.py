@@ -128,6 +128,6 @@ class DMParser(BaseParser):
         matches = extractor(address)
         tokens = list(matches)
         for token in tokens:
-            if token.fact.type in ("город", "посёлок"):
+            if token.fact.type in ("город", "посёлок", "деревня"):
                 return token.fact.value
         return None
