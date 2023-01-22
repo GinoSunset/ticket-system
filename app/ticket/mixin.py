@@ -15,5 +15,4 @@ class AccessTicketMixin(UserPassesTestMixin):
         if user.is_operator:
             operator: Operator = user.get_role_user()
             return ticket.customer in operator.get_customers()
-
-        return False
+        return ticket.creator == user

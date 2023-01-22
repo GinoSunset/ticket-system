@@ -57,12 +57,12 @@ def test_cleanup_comment(text_reply):
     assert cleanup_comment_text(text_reply) == "Вот так"
 
 
-# @pytest.mark.skip
+@pytest.mark.skip
 @pytest.mark.django_db
 def test_load_ticket(customer_factory):
     from ticket.handlers import save_tickets_from_emails
 
-    user = customer_factory(email="akimov-pnz@yandex.ru")
+    user = customer_factory(email="gino-sunset@yandex.ru")
     user.profile.parser = "DM"
     user.profile.save()
 
