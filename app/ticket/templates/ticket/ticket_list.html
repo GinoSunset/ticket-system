@@ -65,7 +65,11 @@
 {% block script %}
 <script>
     {% if  object_list%}
-    var hidden_done = false;
+    var hidden_done = JSON.parse(localStorage.hidden_done || null) || false;
+    if (hidden_done){
+      $("#icon_hide_show").toggleClass("hide eye");
+      $('#hide_text').text("Показать завершенные");
+    }
 
     $.fn.dataTable.ext.search.push(function (settings, data, dataIndex) {
       var status = data
@@ -76,6 +80,7 @@
       return true;
     });
     var table = $('#tableTickets').DataTable({
+      stateSave: true,
       columnDefs: [
             {
                 targets: 1,
@@ -94,6 +99,7 @@
 
     function toogle_hidden_done(){
       hidden_done = !hidden_done;
+      localStorage.setItem('hidden_done', JSON.stringify(hidden_done));
       table.draw();
       $("#icon_hide_show").toggleClass("hide eye");
       var text = $('#hide_text').text();
