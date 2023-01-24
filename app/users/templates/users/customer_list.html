@@ -1,0 +1,46 @@
+{% extends 'ticsys/index.html' %}
+{% load static %}
+{% block header_style %}
+<link rel="stylesheet" type="text/css" href="{% static 'DataTables/DataTables-1.13.1/css/dataTables.semanticui.min.css' %}"/> 
+<script type="text/javascript" src="{% static 'DataTables/DataTables-1.13.1/js/jquery.dataTables.min.js' %}"></script>
+<script type="text/javascript" src="{% static 'DataTables/DataTables-1.13.1/js/dataTables.semanticui.min.js' %}"></script>
+{% endblock %}
+{% block content %}
+<h1>Заказчики</h1>
+<div class="ui container">
+    <table id="tableCastomers" class="ui table">
+        <thead>
+            <tr>
+                <th>Имя</th>
+                <th>Телефон</th>
+                <th>Email</th>
+                <th>Тип парсера</th>
+                <th>Изменить</th>
+            </tr>
+        </thead>
+        <tbody>
+    {% for customer in customer_list  %}
+        <tr>
+            <td>{{ customer.username }}</td>
+            <td>{% firstof customer.phone %}</td>
+            <td>{{ customer.email }}</td>
+            <td>{{ customer.profile.parser }}</td>
+            <td><a target="_blank" class="ui button info"  href="{% url 'customer_edit' customer.id %}">Изменить</a></td>
+        </tr>
+    {% endfor %}
+        </tbody>
+  </div>
+{% endblock content %}
+
+{% block script %}
+<script>
+var table = $('#tableCastomers').DataTable({
+    stateSave: true,
+    
+    language: {
+        url: "{% static 'DataTables/ru.json'%}"
+    }
+      
+  });
+</script>
+{% endblock script %}

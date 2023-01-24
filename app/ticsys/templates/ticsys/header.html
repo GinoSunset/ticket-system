@@ -7,9 +7,14 @@
     <a class="item {% if url_name == 'tickets-new' %}active{% endif %}" href="{% url 'tickets-new' %}">
       Новая заявка
     </a>
-    {% if user.is_operator %}
+    {% if user.is_operator or user.is_staff %}
     <a class="item {% if url_name == 'create-customer' %}active{% endif %}" href="{% url 'create-customer' %}">
       Создать заказчика
+    </a>
+    {% endif%}
+    {% if user.is_operator  or user.is_staff %}
+    <a class="item {% if url_name == 'list-customers' %}active{% endif %}" href="{% url 'list-customers' %}">
+      Заказчики
     </a>
     {% endif%}
     <div class="right menu">

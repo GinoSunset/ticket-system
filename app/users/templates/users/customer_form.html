@@ -1,6 +1,6 @@
 {% extends 'ticsys/index.html' %}
 {% block content %}
-<h1>Создание заказчика</h1>
+<h1>{% firstof name_page 'Создание заказчика' %}</h1>
 <div class="ui container">
     <form class="ui form" method="post">
         {{ form.non_field_errors }}
@@ -12,7 +12,7 @@
             {{ field }}
         </div>
         {% endfor %}
-      <button class="ui button" type="submit">Создать</button>
+      <button class="ui button" type="submit">{% firstof name_btn 'Создать' %}</button>
     </form>
   </div>
 {% endblock content %}
