@@ -104,7 +104,7 @@
       {% if user.is_operator %}
       <div id="run_modal" class="ui right floated button ">Изменить</div>
       {% endif %}
-      <a href="{% url 'comment-update' ticket.pk %}" class="ui right floated info button ">Добавить комментарий</a>
+      <a href="{% url 'comment-create' ticket.pk %}" class="ui right floated info button ">Добавить комментарий</a>
     </div>
   </div>
 <div class="ui comments">
@@ -117,15 +117,18 @@
     <a class="author">{{comment.author}}</a>
     <div class="metadata">
       <span class="date">{{comment.date_create|date}}</span>
+      {% if comment.is_changed %}
+      <i class="pen icon"></i>
+      {% endif %}
     </div>
     <div class="text">
     {% if comment.text %}
       {{comment.text|safe|linebreaksbr|urlize }}
     {% else %}
       <i>No text</i>
-      {% endif %}
+    {% endif %}
     </div>
-    
+
     {% if comment.files %}
     <div class="text">
       <div class="ui list">
@@ -135,6 +138,7 @@
           <div class="content">
             <a href="{{file.file.url}}"> {{file.file_name}}</a>
           </div>
+          
         </div>
         {% endfor %}
       </div>
@@ -142,7 +146,11 @@
     </div>
     
     {% endif %}
-    
+    {% if comment.author == user %}
+    <div class="actions">
+        <a href={% url 'comment-update' ticket.pk comment.pk %} >Изменить</a>
+    </div>
+    {% endif %}
   </div>
 </div>
 {% endfor %}

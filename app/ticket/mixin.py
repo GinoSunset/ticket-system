@@ -1,6 +1,8 @@
 from django.contrib.auth.mixins import UserPassesTestMixin
 from users.models import User, Operator
 
+from .models import Comment
+
 
 class AccessTicketMixin(UserPassesTestMixin):
     def test_func(self):
@@ -16,3 +18,15 @@ class AccessTicketMixin(UserPassesTestMixin):
             operator: Operator = user.get_role_user()
             return ticket.customer in operator.get_customers()
         return ticket.creator == user
+
+
+class AccessAuthorMixin(UserPassesTestMixin):
+    def test_func(self):
+        user: User = self.request.user
+        if user.is_staff:
+            return True
+        object_ = self.get_object()
+        author = getattr(object_, self.author_field, None)
+        if author is None:
+            return False
+        return author == user

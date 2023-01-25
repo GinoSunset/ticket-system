@@ -121,6 +121,7 @@ class Comment(models.Model):
     id_email_message = models.CharField(
         verbose_name="ID письма в почте", null=True, blank=True, max_length=100
     )
+    is_changed = models.BooleanField(default=False)
 
     def __str__(self) -> str:
         content = ""

@@ -10,7 +10,7 @@ from users.models import Operator, Customer, User, Contractor
 from additionally.models import Dictionary
 from .models import Ticket, Comment, CommentFile
 from .forms import TicketsForm, CommentForm, TicketsFormOperator
-from .mixin import AccessTicketMixin
+from .mixin import AccessTicketMixin, AccessAuthorMixin
 
 
 class TicketsListView(LoginRequiredMixin, ListView):
@@ -87,6 +87,32 @@ class CommentCreateView(LoginRequiredMixin, CreateView):
         self.object.ticket = ticket
         self.object.author = self.request.user
         self.object: Comment = form.save()
+        for file in files:
+            CommentFile.objects.create(file=file, comment=self.object)
+        return super().form_valid(form)
+
+
+class CommentUpdateView(LoginRequiredMixin, AccessAuthorMixin, UpdateView):
+    model = Comment
+    form_class = CommentForm
+    template_name = "ticket/comment_form.html"
+    author_field = "author"
+
+    def get_initial(self):
+        self.initial.update({"author": self.request.user})
+        return self.initial
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context["name_page"] = "Изменить комментарий"
+        context["name_btn"] = "Изменить"
+        return context
+
+    def form_valid(self, form):
+        files = self.request.FILES.getlist("files")
+        self.object: Comment = form.save(commit=False)
+        self.object.is_changed = form.has_changed()
+        self.object = form.save()
         for file in files:
             CommentFile.objects.create(file=file, comment=self.object)
         return super().form_valid(form)
