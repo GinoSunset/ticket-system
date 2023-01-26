@@ -129,17 +129,26 @@
     {% endif %}
     </div>
 
-    {% if comment.files %}
+    {% if comment.images.count %}
+    <div class="text">
+      <div class="ui small images">
+        {% for image in comment.images.all %}
+          <a href="{{image.image.url}}"> {{image.image_name}}
+            <img class="ui image" src={{image.image.url}}>
+          </a>
+        {% endfor %}
+      </div>
+    {% endif %}
+    {% if comment.files.count %}
     <div class="text">
       <div class="ui list">
         {% for file in comment.files.all %}
-        <div class="item">
-          <i class="file icon"></i>
-          <div class="content">
-            <a href="{{file.file.url}}"> {{file.file_name}}</a>
+          <div class="item">
+            <i class="file icon"></i>
+            <div class="content">
+              <a href="{{file.file.url}}"> {{file.file_name}}</a>
+            </div>
           </div>
-          
-        </div>
         {% endfor %}
       </div>
       

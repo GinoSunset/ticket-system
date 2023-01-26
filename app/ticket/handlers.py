@@ -11,6 +11,7 @@ from users.models import Customer, User
 from additionally.models import Dictionary
 from .models import Ticket, Comment
 from .parsers import BaseParser
+from .utils import is_image
 
 
 def save_tickets_from_emails() -> int:
@@ -154,5 +155,10 @@ def save_attachment(email: MailBox, ticket: Ticket, user, comment: Comment = Non
     if not comment:
         comment = ticket.comments.create(author=user, text="Вложение из письма")
     for file in email.attachments:
-        comment.files.create(file=ContentFile(content=file.payload, name=file.filename))
-        logging.info(f"Saving files attach from {email.from_} named {file.filename}")
+        file_obj = ContentFile(content=file.payload, name=file.filename)
+        if is_image(file=file_obj):
+            comment.images.create(image=file_obj)
+            logging.info(f"Saving image {file.filename} from {email.from_}")
+            continue
+        comment.files.create(file=file_obj)
+        logging.info(f"Saving file {file.filename} from {email.from_} ")

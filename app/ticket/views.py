@@ -8,9 +8,10 @@ from django.contrib.auth.mixins import LoginRequiredMixin
 
 from users.models import Operator, Customer, User, Contractor
 from additionally.models import Dictionary
-from .models import Ticket, Comment, CommentFile
+from .models import Ticket, Comment, CommentFile, CommentImage
 from .forms import TicketsForm, CommentForm, TicketsFormOperator
 from .mixin import AccessTicketMixin, AccessAuthorMixin
+from .utils import is_image
 
 
 class TicketsListView(LoginRequiredMixin, ListView):
@@ -114,5 +115,8 @@ class CommentUpdateView(LoginRequiredMixin, AccessAuthorMixin, UpdateView):
         self.object.is_changed = form.has_changed()
         self.object = form.save()
         for file in files:
+            if is_image(file):
+                CommentImage.objects.create(image=file, comment=self.object)
+                continue
             CommentFile.objects.create(file=file, comment=self.object)
         return super().form_valid(form)

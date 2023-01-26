@@ -131,6 +131,10 @@ class Comment(models.Model):
             if content:
                 content += " "
             content += f"[{self.files.count()} file(s)]"
+        if self.images:
+            if content:
+                content += " "
+            content += f"[{self.images.count()} image(s)]"
         return f"[{self.ticket.pk}] {content}"
 
     def get_short_text(self) -> str:
@@ -153,3 +157,16 @@ class CommentFile(models.Model):
     @property
     def file_name(self):
         return self.file.name.split("/")[-1]
+
+
+class CommentImage(models.Model):
+    comment = models.ForeignKey(
+        Comment, related_name="images", on_delete=models.CASCADE
+    )
+    image = models.ImageField(
+        "Изображение", upload_to=ticket_directory_path, null=True, blank=True
+    )
+
+    @property
+    def image_name(self):
+        return self.image.name.split("/")[-1]
