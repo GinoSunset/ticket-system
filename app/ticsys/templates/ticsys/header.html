@@ -11,10 +11,16 @@
     <a class="item {% if url_name == 'create-customer' %}active{% endif %}" href="{% url 'create-customer' %}">
       Создать заказчика
     </a>
+    <a class="item {% if url_name == 'create-contractor' %}active{% endif %}" href="{% url 'create-contractor' %}">
+      Создать исполнителя
+    </a>
     {% endif%}
     {% if user.is_operator  or user.is_staff %}
     <a class="item {% if url_name == 'list-customers' %}active{% endif %}" href="{% url 'list-customers' %}">
       Заказчики
+    </a>
+    <a class="item {% if url_name == 'list-contractors' %}active{% endif %}" href="{% url 'list-contractors' %}">
+      Исполнители
     </a>
     {% endif%}
     <div class="right menu">
