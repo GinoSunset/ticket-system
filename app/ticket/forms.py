@@ -33,12 +33,17 @@ class TicketsForm(forms.ModelForm):
         self.fields["type_ticket"].queryset = Dictionary.objects.filter(
             type_dict=type_ticket
         )
+        self.fields["type_ticket"].initial = kwargs.get("initial").get("type_ticket")
+
         self.fields["status"].queryset = Dictionary.objects.filter(
             type_dict=type_status
         )
+        self.fields["status"].initial = kwargs.get("initial").get("status")
+
         self.fields["contractor"].queryset = Contractor.objects.all()
         if kwargs["initial"].get("customer_qs"):
             self.fields["customer"].queryset = kwargs["initial"].get("customer_qs")
+            self.fields["customer"].initial = kwargs["initial"].get("customer")
 
 
 class TicketsFormOperator(forms.ModelForm):
