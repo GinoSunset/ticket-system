@@ -3,6 +3,7 @@ version: '3.8'
 services:
   web:
     build: ./app
+    restart: always
     command: python manage.py runserver 0.0.0.0:8000
     volumes:
       - ./app/:/usr/src/app/
@@ -13,6 +14,7 @@ services:
 
   beat:
     build: ./app
+    restart: always
     command: celery -A ticsys beat -l info
     volumes:
       - ./app/:/usr/src/app/
@@ -25,6 +27,7 @@ services:
 
   worker:
     build: ./app
+    restart: always
     command: celery -A ticsys worker -l info
     volumes:
       - ./app/:/usr/src/app/
@@ -37,6 +40,7 @@ services:
 
   rabbitmq:
     image: rabbitmq:3-management
+    restart: always
     ports:
       - 5672:5672
       - 15672:15672
