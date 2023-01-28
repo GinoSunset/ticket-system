@@ -2,6 +2,7 @@ version: '3.8'
 
 services:
   web:
+    user: "1000:1000"
     build: ./app
     restart: always
     command: python manage.py runserver 0.0.0.0:8000
@@ -15,6 +16,7 @@ services:
   beat:
     build: ./app
     restart: always
+    user: "1000:1000"
     command: celery -A ticsys beat -l info
     volumes:
       - ./app/:/usr/src/app/
@@ -28,6 +30,7 @@ services:
   worker:
     build: ./app
     restart: always
+    user: "1000:1000"
     command: celery -A ticsys worker -l info
     volumes:
       - ./app/:/usr/src/app/
