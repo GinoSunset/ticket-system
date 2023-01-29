@@ -160,3 +160,20 @@ class CustomerProfile(models.Model):
 
     def __str__(self) -> str:
         return str(self.user)
+
+
+class ContractorProfile(models.Model):
+    """
+    create in signals
+    """
+
+    user = models.OneToOneField(
+        Contractor, on_delete=models.CASCADE, related_name="profile_contractor"
+    )
+    city = models.CharField(verbose_name="Город", max_length=50, null=True, blank=True)
+    region = models.CharField(
+        verbose_name="Область", max_length=100, null=True, blank=True
+    )
+
+    def __str__(self) -> str:
+        return str(self.user)
