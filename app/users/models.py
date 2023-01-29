@@ -174,6 +174,7 @@ class ContractorProfile(models.Model):
     region = models.CharField(
         verbose_name="Область", max_length=100, null=True, blank=True
     )
+    note = models.TextField(verbose_name="Примечание", null=True, blank=True)
 
     def __str__(self) -> str:
         return str(self.user)
