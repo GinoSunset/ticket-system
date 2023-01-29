@@ -128,10 +128,10 @@ class DMParser(BaseParser):
 
     def get_city_from_address(self, address):
         if "г." not in address and "город " not in address:
-            district, address_2 = address.split(" ", maxsplit=1)
-            if "москва" in district.lower():
+            region, address_2 = address.split(" ", maxsplit=1)
+            if "москва" in region.lower():
                 return "Москва"
-            address = f"{district} г. {address_2}"
+            address = f"{region} г. {address_2}"
         morph_vocab = MorphVocab()
         extractor = AddrExtractor(morph_vocab)
         matches = extractor(address)
