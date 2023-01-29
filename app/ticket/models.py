@@ -107,6 +107,9 @@ class Ticket(models.Model):
 
 
 class Comment(models.Model):
+    class Meta:
+        ordering = ("-date_create",)
+
     LEN_SHORT_TEXT = 10
 
     date_create = models.DateTimeField(auto_now_add=True)
