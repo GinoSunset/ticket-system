@@ -3,7 +3,7 @@ from django.views.generic import ListView, CreateView, UpdateView
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.http import Http404
 from .forms import CustomerForm, ContractorForm
-from .models import Customer, Contractor
+from .models import Customer, Contractor, ContractorProfile
 
 
 class CreateCustomerView(LoginRequiredMixin, CreateView):
@@ -24,6 +24,9 @@ class CreateContractorView(LoginRequiredMixin, CreateView):
 
     def form_valid(self, form):
         self.object: Contractor = form.save()
+        self.object.profile_contractor.city = form.cleaned_data["city"]
+        self.object.profile_contractor.region = form.cleaned_data["region"]
+        self.object.profile_contractor.save()
         return super().form_valid(form)
 
     def get_context_data(self, **kwargs):
@@ -86,7 +89,21 @@ class UpdateContractorView(LoginRequiredMixin, UpdateView):
 
     def form_valid(self, form):
         self.object: Customer = form.save()
+        if not hasattr(self.object, "profile_contractor"):
+            self.object.profile_contractor = ContractorProfile.objects.create(
+                user=self.object
+            )
+        self.object.profile_contractor.city = form.cleaned_data["city"]
+        self.object.profile_contractor.region = form.cleaned_data["region"]
+        self.object.profile_contractor.save()
         return super().form_valid(form)
+
+    def get_initial(self):
+        initial = super().get_initial()
+        if hasattr(self.object, "profile_contractor"):
+            initial["city"] = self.object.profile_contractor.city
+            initial["region"] = self.object.profile_contractor.region
+        return initial
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)

@@ -14,6 +14,8 @@
                 <th>Имя</th>
                 <th>Телефон</th>
                 <th>Email</th>
+                <th>Город</th>
+                <th>Область</th>
                 <th>Изменить</th>
             </tr>
         </thead>
@@ -23,6 +25,8 @@
             <td>{{ contractor.username }}</td>
             <td>{% firstof contractor.phone %}</td>
             <td>{{ contractor.email }}</td>
+            <td>{{ contractor.profile_contractor.city }}</td>
+            <td>{{ contractor.profile_contractor.region }}</td>
             <td><a target="_blank" class="ui button info"  href="{% url 'contractor_edit' contractor.id %}">Изменить</a></td>
         </tr>
     {% endfor %}

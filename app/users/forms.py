@@ -1,9 +1,9 @@
-from django.forms import ModelForm
+from django import forms
 
-from .models import Customer, Contractor
+from .models import Customer, Contractor, ContractorProfile
 
 
-class CustomerForm(ModelForm):
+class CustomerForm(forms.ModelForm):
     class Meta:
         model = Customer
         fields = [
@@ -15,7 +15,10 @@ class CustomerForm(ModelForm):
         ]
 
 
-class ContractorForm(ModelForm):
+class ContractorForm(forms.ModelForm):
+    city = forms.CharField(label="Город", max_length=50, required=False)
+    region = forms.CharField(label="Область", max_length=100, required=False)
+
     class Meta:
         model = Contractor
         fields = [
