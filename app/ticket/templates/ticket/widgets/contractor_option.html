@@ -1,0 +1,11 @@
+ <div class="item"
+     {% include "django/forms/widgets/attrs.html" %}
+     data-value="{{ widget.value|stringformat:'s' }}">
+        {{ widget.label|stringformat:'s' }} 
+        {% if option.city %}
+        <span class="ui grey text">{{ option.city }} </span>
+        {% endif %}
+        {% if option.region %}
+        <span class="ui grey text">({{ option.region }})</span>
+        {% endif %}
+</div>

@@ -1,0 +1,12 @@
+<div class="ui fluid search selection dropdown">
+    <input type="hidden"  name="{{ widget.name }}" value="{{widget.value|first}}" {% include "django/forms/widgets/attrs.html" %}>
+    <i class="dropdown icon"></i>
+    <div class="default text">Выбрать исполнителя</div>
+    <div class="menu">
+        {% for group_name, group_choices, group_index in widget.optgroups %}
+        {% for option in group_choices %}
+            {% include option.template_name with widget=option %}
+        {% endfor %}
+        {% endfor %}
+    </div>
+</div>

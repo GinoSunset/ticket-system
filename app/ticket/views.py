@@ -67,11 +67,17 @@ class TicketUpdateView(LoginRequiredMixin, AccessTicketMixin, UpdateView):
     template_name = "ticket/ticket_update.html"
 
     def get_initial(self):
+        self.initial = super().get_initial()
         customer = Customer.objects.all()
         user: Union[Customer, Operator, Contractor] = self.request.user.get_role_user()
         customer = user.get_customers()
 
-        self.initial.update({"creator": user, "customer_qs": customer})
+        self.initial.update(
+            {
+                "creator": user,
+                "customer_qs": customer,
+            }
+        )
         return self.initial
 
 

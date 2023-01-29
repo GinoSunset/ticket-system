@@ -1,7 +1,7 @@
 from django import forms
 from additionally.models import Dictionary, DictionaryType
 from .models import Ticket, Comment
-from .widgets import CalendarInput
+from .widgets import CalendarInput, ContractorSelect
 from users.models import Contractor
 
 
@@ -24,7 +24,10 @@ class TicketsForm(forms.ModelForm):
             "phone",
             "metadata",
         ]
-        widgets = {"planned_execution_date": CalendarInput()}
+        widgets = {
+            "planned_execution_date": CalendarInput(),
+            "contractor": ContractorSelect(),
+        }
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)

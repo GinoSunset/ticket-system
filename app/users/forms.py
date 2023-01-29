@@ -1,6 +1,6 @@
 from django import forms
 
-from .models import Customer, Contractor, ContractorProfile
+from .models import Customer, Contractor
 
 
 class CustomerForm(forms.ModelForm):
