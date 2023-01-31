@@ -44,7 +44,7 @@ class TicketsForm(forms.ModelForm):
         self.fields["status"].initial = kwargs.get("initial").get("status")
 
         self.fields["contractor"].queryset = Contractor.objects.all()
-        if kwargs["initial"].get("customer_qs"):
+        if "customer_qs" in kwargs["initial"]:
             self.fields["customer"].queryset = kwargs["initial"].get("customer_qs")
             self.fields["customer"].initial = kwargs["initial"].get("customer")
 

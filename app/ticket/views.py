@@ -95,6 +95,9 @@ class CommentCreateView(LoginRequiredMixin, CreateView):
         self.object.author = self.request.user
         self.object: Comment = form.save()
         for file in files:
+            if is_image(file):
+                CommentImage.objects.create(image=file, comment=self.object)
+                continue
             CommentFile.objects.create(file=file, comment=self.object)
         return super().form_valid(form)
 
