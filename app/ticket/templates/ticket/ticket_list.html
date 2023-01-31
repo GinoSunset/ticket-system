@@ -19,18 +19,18 @@
 <table id="tableTickets"class="ui celled table">
     <thead>
       <tr>
-        <th>ID</th>
-        <th>Дата создания</th>
-        <th>SAP</th>
-        <th>Тип заявки</th>
-        <th>Заказчик</th>
+        <th id="id">ID</th>
+        <th id="date_create">Дата создания</th>
+        <th id="sap_id">SAP</th>
+        <th id="type_ticket">Тип заявки</th>
+        <th id="customer">Заказчик</th>
         {% if not user.is_customer %}
-        <th>Иполнитель</th>
+        <th id="contractor">Иполнитель</th>
         {% endif %}
-        <th> Плановая дата выезда/исполнения</th>
-        <th>Статус</th>
-        <th>Город</th>
-        <th>Магазин</th>
+        <th id="planned_execution_date"> Плановая дата выезда/исполнения</th>
+        <th id="status">Статус</th>
+        <th id="address">Город</th>
+        <th id="shop_id">Магазин</th>
         <th>Подробнее</th>
 
     </tr></thead>
@@ -38,14 +38,14 @@
       {% for ticket in object_list %}
       <tr>
         <td data-label="id">{{ticket.pk}}</td>
-        <td data-label="date_create">{{ticket.date_create| date:"Y m d"}}</td>
+        <td data-label="date_create">{{ticket.date_create| date:"Y-m-d"}}</td>
         <td data-label="sap_id">{% firstof ticket.sap_id %}</td>
         <td data-label="type_ticket">{% firstof ticket.type_ticket %}</td>
         <td data-label="customer">{% firstof ticket.customer %}</td>
         {% if not user.is_customer %}
         <td data-label="contractor">{% firstof ticket.contractor %}</td>
         {% endif %}
-        <td data-label="planned_execution_date">{% firstof ticket.planned_execution_date %}</td>
+        <td data-label="planned_execution_date">{{ticket.planned_execution_date|date:"Y-m-d"}}</td>
         <td data-label="status">{% if ticket.status %} <div class="ui {{ticket.get_color_status}} label">{{ticket.status}}</div>{% endif %}</td>
         <td data-label="address">{% firstof ticket.city %}</td>
         <td data-label="shop_id">{% firstof ticket.shop_id %}</td>
@@ -84,6 +84,10 @@
       columnDefs: [
             {
                 targets: 1,
+                render: DataTable.render.date(),
+            },
+            {
+                targets: -5,
                 render: DataTable.render.date(),
             },
         ],
