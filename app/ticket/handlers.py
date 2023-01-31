@@ -89,7 +89,9 @@ def get_ticket_by_message_id_reply(id_email_message_in_reply_to):
 
 def get_new_emails():
     with MailBox(host=settings.EMAIL_IMAP_HOST, port=settings.EMAIL_IMAP_PORT).login(
-        username=settings.EMAIL_HOST_USER, password=settings.EMAIL_HOST_PASSWORD
+        username=settings.EMAIL_HOST_USER,
+        password=settings.EMAIL_HOST_PASSWORD,
+        initial_folder=settings.EMAIL_INITIAL_FOLDER,
     ) as mailbox:
         for mail in mailbox.fetch(AND(seen=False), charset="utf8"):
             yield mail

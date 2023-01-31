@@ -8,6 +8,7 @@ env = environ.Env(
     EMAIL_USE_TLS=(bool, False),
     EMAIL_IMAP_PORT=(int, 993),
     EMAIL_IMAP_HOST=(str, "localhost"),
+    EMAIL_INITIAL_FOLDER=(str, "INBOX"),
     PERIOD_CHECK_EMAIL=(float, 60.0),  # seconds
     SUBJECT_TO_TICKET=(str, "ticket"),
     RABBIT_HOST=(str, "localhost"),
@@ -117,6 +118,7 @@ EMAIL_IMAP_PORT = env("EMAIL_IMAP_PORT")
 EMAIL_IMAP_HOST = env("EMAIL_IMAP_HOST")
 SUBJECT_TO_TICKET = env("SUBJECT_TO_TICKET")
 
+EMAIL_INITIAL_FOLDER = env("EMAIL_INITIAL_FOLDER")
 PERIOD_CHECK_EMAIL = env("PERIOD_CHECK_EMAIL")
 
 RABBIT_HOST = env("RABBIT_HOST")
