@@ -17,7 +17,7 @@ def setup_periodic_tasks(sender, **kwargs):
 
 @celery_app.task
 def add_new_tickets_in_email():
-    logging.info("Start check email")
+    logging.debug("Start check email")
     count_success_emails = save_tickets_from_emails()
     if count_success_emails:
         logging.info(f"Success check email. Count new tickets: {count_success_emails}")
