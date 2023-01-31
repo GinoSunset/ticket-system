@@ -57,7 +57,7 @@ class User(AbstractUser):
     def get_customers(self):
         if self.is_staff:
             return Customer.objects.all()
-        return None
+        return Customer.objects.none()
 
     @property
     def is_operator(self):
@@ -137,7 +137,8 @@ class Contractor(User):
         return {"contractor_id": self.pk}
 
     def get_customers(self) -> models.QuerySet[Customer]:
-        return None
+        "return empty queryset"
+        return Customer.objects.none()
 
 
 class CustomerProfile(models.Model):
