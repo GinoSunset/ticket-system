@@ -7,31 +7,31 @@
 {% endblock %}
 {% block content %}
 <h1>Исполнители</h1>
-<div class="ui container">
-    <table id="tableCastomers" class="ui table">
-        <thead>
-            <tr>
-                <th>Имя</th>
-                <th>Телефон</th>
-                <th>Email</th>
-                <th>Город</th>
-                <th>Область</th>
-                <th>Изменить</th>
-            </tr>
-        </thead>
-        <tbody>
-    {% for contractor in contractor_list  %}
+<a class="ui button" style="margin-bottom: 10px;" href="{% url 'contractor-create' %}">Добавить исполнителя</a> 
+<table id="tableCastomers" class="ui table">
+    <thead>
         <tr>
-            <td>{{ contractor.username }}</td>
-            <td>{% firstof contractor.phone %}</td>
-            <td>{{ contractor.email }}</td>
-            <td>{{ contractor.profile_contractor.city }}</td>
-            <td>{{ contractor.profile_contractor.region }}</td>
-            <td><a target="_blank" class="ui button info"  href="{% url 'contractor_edit' contractor.id %}">Изменить</a></td>
+            <th>Имя</th>
+            <th>Телефон</th>
+            <th>Email</th>
+            <th>Город</th>
+            <th>Область</th>
+            <th>Изменить</th>
         </tr>
+    </thead>
+    <tbody>
+    {% for contractor in contractor_list  %}
+    <tr>
+        <td>{{ contractor.username }}</td>
+        <td>{% firstof contractor.phone %}</td>
+        <td>{{ contractor.email }}</td>
+        <td>{{ contractor.profile_contractor.city }}</td>
+        <td>{{ contractor.profile_contractor.region }}</td>
+        <td><a target="_blank" class="ui button info"  href="{% url 'contractor_edit' contractor.id %}">Изменить</a></td>
+    </tr>
     {% endfor %}
-        </tbody>
-  </div>
+    </tbody>
+</table>
 {% endblock content %}
 
 {% block script %}

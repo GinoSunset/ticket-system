@@ -7,7 +7,7 @@ from users.models import Operator, User
 @pytest.mark.django_db
 def test_create_user_customer(operator_factory, client):
     operator: User = operator_factory()
-    url = reverse("create-customer")
+    url = reverse("customer-create")
     data = {"username": "operator-test", "email": "operator-test@gmail.com"}
 
     client.force_login(operator)

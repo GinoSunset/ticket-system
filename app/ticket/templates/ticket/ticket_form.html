@@ -21,7 +21,9 @@
             {% endif %}
         </div>
         {% endfor %}
-      <button class="ui button" type="submit">Создать</button>
+      <button class="ui button positive" type="submit">Создать</button>
+      <a class="ui button" style="margin-bottom: 10px;" href="{% url 'contractor-create' %}">Добавить исполнителя</a> 
+
     </form>
   </div>
 {% endblock content %}
