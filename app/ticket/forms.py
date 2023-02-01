@@ -41,7 +41,6 @@ class TicketsForm(forms.ModelForm):
         self.fields["status"].queryset = Dictionary.objects.filter(
             type_dict=type_status
         )
-        self.fields["status"].initial = kwargs.get("initial").get("status")
 
         self.fields["contractor"].queryset = Contractor.objects.all()
         if "customer_qs" in kwargs["initial"]:
