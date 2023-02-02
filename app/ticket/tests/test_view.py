@@ -138,3 +138,21 @@ def test_customer_save_ticket_has_all_needed_field(customer_factory, client):
     assert ticket.customer == user
     assert ticket.status == Dictionary.objects.get(code="work")
     assert ticket.contractor is None
+
+
+@pytest.mark.django_db
+def test_update_ticket_has_set_status_on_html_select(
+    ticket_factory, user_factory, client
+):
+    user = user_factory()
+    status = Dictionary.objects.get(code="consideration")
+    ticket = ticket_factory(creator=user, status=status)
+    client.force_login(user=user)
+    res = client.get(reverse("ticket-update", kwargs={"pk": ticket.pk}))
+    assert res.status_code == 200
+    widget = res.context_data["form"].fields["status"].widget
+    # \xd0\x9d\xd0\xb0 \xd1\x80\xd0\xb0\xd1\x81\xd1\x81\xd0\xbc\xd0\xbe\xd1\x82\xd1\x80\xd0\xb5\xd0\xbd\xd0\xb8\xd0\xb8
+    assert (
+        f'<option value="{status.pk}" selected>{status.description}</option>'
+        in res.content.decode()
+    )
