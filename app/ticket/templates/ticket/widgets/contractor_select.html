@@ -1,4 +1,6 @@
-<div class="ui fluid search selection dropdown">
+<div class="fields">
+    <div class="fifteen wide field">
+<div class="ui search selection dropdown">
     <input type="hidden"  name="{{ widget.name }}" value="{{widget.value|first}}" {% include "django/forms/widgets/attrs.html" %}>
     <i class="dropdown icon"></i>
     <div class="default text">Выбрать исполнителя</div>
@@ -9,4 +11,12 @@
         {% endfor %}
         {% endfor %}
     </div>
+</div>
+</div>
+
+<div class="one wide field">
+<a  href="{% url 'contractor-create' %} " class="ui icon button">
+    <i class="plus icon"></i>
+</a>
+</div>
 </div>
