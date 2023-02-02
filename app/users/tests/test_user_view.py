@@ -1,7 +1,7 @@
 import pytest
 from django.urls import reverse
 
-from users.models import Operator, User
+from users.models import Operator, User, ContractorProfile, Contractor
 
 
 @pytest.mark.django_db
@@ -69,3 +69,47 @@ class TestUpdateView:
         client.force_login(operator)
         res = client.get(url)
         assert res.status_code == 404
+
+
+class TestContractorView:
+    @pytest.mark.django_db
+    def test_update_view_contractor_save_city_region_and_note(
+        self, user_factory, operator_factory, client
+    ):
+        contractor = user_factory(role=User.Role.CONTRACTOR)
+        user = operator_factory()
+        url = reverse("contractor_edit", kwargs={"pk": contractor.pk})
+        data = {
+            "username": "contractor-test",
+            "email": "bla@email.com",
+            "city": "city17",
+            "region": "region17",
+            "note": "note17",
+        }
+        client.force_login(user)
+        res = client.post(url, data=data)
+        assert res.status_code == 302
+        profile = ContractorProfile.objects.first()
+        assert profile.city == data["city"]
+        assert profile.region == data["region"]
+        assert profile.note == data["note"]
+
+    @pytest.mark.django_db
+    def test_create_contractor_with_all_field(self, operator_factory, client):
+        operator = operator_factory()
+        url = reverse("contractor-create")
+        data = {
+            "username": "contractor-test",
+            "email": "bla@email.com",
+            "city": "city17",
+            "region": "region17",
+            "note": "note17",
+        }
+        client.force_login(operator)
+        res = client.post(url, data=data)
+        assert res.status_code == 302
+        contractor = Contractor.objects.get(username=data["username"])
+        assert contractor
+        assert contractor.profile_contractor.city == data["city"]
+        assert contractor.profile_contractor.region == data["region"]
+        assert contractor.profile_contractor.note == data["note"]

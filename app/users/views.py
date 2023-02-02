@@ -26,6 +26,7 @@ class CreateContractorView(LoginRequiredMixin, CreateView):
         self.object: Contractor = form.save()
         self.object.profile_contractor.city = form.cleaned_data["city"]
         self.object.profile_contractor.region = form.cleaned_data["region"]
+        self.object.profile_contractor.note = form.cleaned_data["note"]
         self.object.profile_contractor.save()
         return super().form_valid(form)
 
@@ -95,6 +96,7 @@ class UpdateContractorView(LoginRequiredMixin, UpdateView):
             )
         self.object.profile_contractor.city = form.cleaned_data["city"]
         self.object.profile_contractor.region = form.cleaned_data["region"]
+        self.object.profile_contractor.note = form.cleaned_data["note"]
         self.object.profile_contractor.save()
         return super().form_valid(form)
 
@@ -103,6 +105,7 @@ class UpdateContractorView(LoginRequiredMixin, UpdateView):
         if hasattr(self.object, "profile_contractor"):
             initial["city"] = self.object.profile_contractor.city
             initial["region"] = self.object.profile_contractor.region
+            initial["note"] = self.object.profile_contractor.note
         return initial
 
     def get_context_data(self, **kwargs):
