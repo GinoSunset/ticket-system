@@ -12,6 +12,8 @@ def ticket_directory_path(instance, filename):
 
 
 class Ticket(models.Model):
+    default_type_code = "hardware_setup"
+
     date_create = models.DateTimeField(auto_now_add=True)
     date_update = models.DateTimeField(auto_now=True)
     sap_id = models.CharField("ID SAP заявки", max_length=30, null=True, blank=True)

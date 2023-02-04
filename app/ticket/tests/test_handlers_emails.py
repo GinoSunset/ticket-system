@@ -20,6 +20,16 @@ def test_creating_ticket_form_emails(email_ticket, customer_factory):
 
 
 @pytest.mark.django_db
+def test_creating_ticket_form_emails_has_default_type_hardware_setup(
+    email_ticket, customer_factory
+):
+    customer_factory(email=email_ticket.from_)
+    create_ticket_from_email(email_ticket)
+    ticket = Ticket.objects.first()
+    assert ticket.type_ticket.code == "hardware_setup"
+
+
+@pytest.mark.django_db
 def test_create_DM_ticket(
     email_ticket,
     marked_up_text_DM_ticket,

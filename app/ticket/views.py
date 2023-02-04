@@ -41,6 +41,7 @@ class TicketFormView(LoginRequiredMixin, CreateView):
                 "creator": user,
                 "customer_qs": customer,
                 "status": Dictionary.get_status_ticket("work"),
+                "type_ticket": Dictionary.get_type_ticket(Ticket.default_type_code),
             }
         )
         return self.initial

@@ -110,10 +110,13 @@ def create_ticket_from_email(email: MailMessage) -> bool:
     ticket_info = get_info_from_message(message, customer)
     creator = User.objects.get(username=settings.TICKET_CREATOR_USERNAME)
     status = Dictionary.get_status_ticket("work")
+    type_ticket = Dictionary.get_type_ticket(Ticket.default_type_code)
+
     ticket = Ticket.objects.create(
         customer=customer,
         creator=creator,
         status=status,
+        type_ticket=type_ticket,
         id_email_message=id_email_message,
         **ticket_info,
     )

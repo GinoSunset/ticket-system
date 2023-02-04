@@ -40,3 +40,8 @@ class Dictionary(models.Model):
     def get_status_ticket(cls, code):
         dt = DictionaryType.objects.get(code="status_ticket")
         return cls.objects.get(type_dict=dt, code=code)
+
+    @classmethod
+    def get_type_ticket(cls, code):
+        dt = DictionaryType.objects.get(code="type_ticket")
+        return cls.objects.get(type_dict=dt, code=code)
