@@ -77,6 +77,7 @@ class TicketUpdateView(LoginRequiredMixin, AccessTicketMixin, UpdateView):
             {
                 "creator": user,
                 "customer_qs": customer,
+                "status": self.object.status,
             }
         )
         return self.initial
