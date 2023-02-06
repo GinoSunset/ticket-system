@@ -12,8 +12,8 @@
     <thead>
         <tr>
             <th>Имя</th>
-            <th>Телефон</th>
-            <th>Email</th>
+            <th>Фамилия</th>
+            <th>Компания</th>
             <th>Город</th>
             <th>Область</th>
             <th>Изменить</th>
@@ -22,9 +22,9 @@
     <tbody>
     {% for contractor in contractor_list  %}
     <tr>
-        <td>{{ contractor.username }}</td>
-        <td>{% firstof contractor.phone %}</td>
-        <td>{{ contractor.email }}</td>
+        <td>{{ contractor.first_name }}</td>
+        <td>{{ contractor.last_name }}</td>
+        <td>{{ contractor.profile_contractor.company|default:"" }}</td>
         <td>{{ contractor.profile_contractor.city }}</td>
         <td>{{ contractor.profile_contractor.region }}</td>
         <td><a target="_blank" class="ui button info"  href="{% url 'contractor_edit' contractor.id %}">Изменить</a></td>

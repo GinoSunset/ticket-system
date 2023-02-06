@@ -26,6 +26,7 @@ class CreateContractorView(LoginRequiredMixin, CreateView):
         self.object: Contractor = form.save()
         self.object.profile_contractor.city = form.cleaned_data["city"]
         self.object.profile_contractor.region = form.cleaned_data["region"]
+        self.object.profile_contractor.company = form.cleaned_data["company"]
         self.object.profile_contractor.note = form.cleaned_data["note"]
         self.object.profile_contractor.save()
         return super().form_valid(form)
@@ -97,6 +98,7 @@ class UpdateContractorView(LoginRequiredMixin, UpdateView):
         self.object.profile_contractor.city = form.cleaned_data["city"]
         self.object.profile_contractor.region = form.cleaned_data["region"]
         self.object.profile_contractor.note = form.cleaned_data["note"]
+        self.object.profile_contractor.company = form.cleaned_data["company"]
         self.object.profile_contractor.save()
         return super().form_valid(form)
 

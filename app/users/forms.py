@@ -18,6 +18,7 @@ class CustomerForm(forms.ModelForm):
 class ContractorForm(forms.ModelForm):
     city = forms.CharField(label="Город", max_length=50, required=False)
     region = forms.CharField(label="Область", max_length=100, required=False)
+    company = forms.CharField(label="Компания", required=False)
     note = forms.CharField(label="Примечание", required=False)
 
     class Meta:

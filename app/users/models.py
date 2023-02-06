@@ -45,6 +45,7 @@ class User(AbstractUser):
     last_connect = models.DateField(help_text="Последний вход", null=True, blank=True)
     phone = models.CharField("Телефон", max_length=18, blank=True, null=True)
     role = models.CharField(max_length=50, choices=Role.choices, verbose_name="Роль")
+    telegram_id = models.CharField("Telegram ID", max_length=100, blank=True, null=True)
 
     base_role = Role.OTHER
     objects = UserManager()
@@ -174,6 +175,9 @@ class ContractorProfile(models.Model):
     city = models.CharField(verbose_name="Город", max_length=50, null=True, blank=True)
     region = models.CharField(
         verbose_name="Область", max_length=100, null=True, blank=True
+    )
+    company = models.CharField(
+        verbose_name="Компания", max_length=100, null=True, blank=True
     )
     note = models.TextField(verbose_name="Примечание", null=True, blank=True)
 
