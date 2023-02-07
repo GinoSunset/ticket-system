@@ -82,6 +82,37 @@ class TicketUpdateView(LoginRequiredMixin, AccessTicketMixin, UpdateView):
         )
         return self.initial
 
+    def form_valid(self, form: TicketsForm):
+        result = super().form_valid(form)
+        self.create_comment_from_change_ticket(form)
+        return result
+
+    def create_comment_from_change_ticket(self, form):
+        template_dict = {
+            "status": "{field} изменен c '{prev_value}' на '{value}'\n",
+            "contractor": "{value} назначен исполнителем\n",
+            "planned_execution_date": "Планируемая дата выезда назначена на: {value}\n",
+        }
+
+        text = ""
+        for field in form.changed_data:
+            value = getattr(form.instance, field)
+            value = value if value else "Пусто"
+            message = template_dict.get(
+                field, "Поле {field} изменено c '{prev_value}' на '{value}'\n"
+            )
+            text += message.format(
+                field=(form.fields[field].label).lower(),
+                prev_value=form.initial.get(field, "Пусто") or "Не указано",
+                value=value,
+            )
+        Comment.objects.create(
+            ticket=form.instance,
+            author=self.request.user,
+            text=text,
+            is_system_message=True,
+        )
+
 
 class CommentCreateView(LoginRequiredMixin, CreateView):
     model = Comment

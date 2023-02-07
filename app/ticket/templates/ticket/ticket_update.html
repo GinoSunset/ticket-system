@@ -121,7 +121,7 @@
       <i class="pen icon"></i>
       {% endif %}
     </div>
-    <div class="text">
+    <div class="{% if comment.is_system_message %} ui info message {% endif %}text">
     {% if comment.text %}
       {{comment.text|safe|linebreaksbr|urlize }}
     {% else %}
@@ -155,7 +155,7 @@
     </div>
     
     {% endif %}
-    {% if comment.author == user %}
+    {% if comment.author == user and not comment.is_system_message %}
     <div class="actions">
         <a href={% url 'comment-update' ticket.pk comment.pk %} >Изменить</a>
     </div>
