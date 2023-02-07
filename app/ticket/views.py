@@ -84,7 +84,8 @@ class TicketUpdateView(LoginRequiredMixin, AccessTicketMixin, UpdateView):
 
     def form_valid(self, form: TicketsForm):
         result = super().form_valid(form)
-        self.create_comment_from_change_ticket(form)
+        if form.changed_data:
+            self.create_comment_from_change_ticket(form)
         return result
 
     def create_comment_from_change_ticket(self, form):
