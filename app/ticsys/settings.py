@@ -36,6 +36,7 @@ INSTALLED_APPS = [
     "ticsys",
     "ticket",
     "users",
+    "notifications",
 ]
 
 MIDDLEWARE = [
