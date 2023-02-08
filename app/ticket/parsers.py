@@ -68,12 +68,13 @@ class DMParser(BaseParser):
 
     def get_additional_text(self, text, index_end_sap_line, index_sign):
         additional_text = text[index_end_sap_line:index_sign]
-        return self.remove_cid_lines(additional_text)
+        text = self.remove_cid_lines(additional_text)
+        return text
 
     def remove_cid_lines(self, text):
         lines = text.splitlines()
         lines = [line for line in lines if "[cid:" not in line]
-        return "\n".join(lines)
+        return "\r\n".join(lines)
 
     def get_sap(self, text, index_start_sap_line, index_end_sap_line):
         sap = text[index_start_sap_line:index_end_sap_line]
