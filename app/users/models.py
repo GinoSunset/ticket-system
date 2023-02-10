@@ -46,6 +46,8 @@ class User(AbstractUser):
     phone = models.CharField("Телефон", max_length=18, blank=True, null=True)
     role = models.CharField(max_length=50, choices=Role.choices, verbose_name="Роль")
     telegram_id = models.CharField("Telegram ID", max_length=100, blank=True, null=True)
+    email_notify = models.BooleanField("Уведомлять по email", default=True)
+    telegram_notify = models.BooleanField("Уведомлять в Telegram", default=False)
 
     base_role = Role.OTHER
     objects = UserManager()
@@ -107,6 +109,9 @@ class Customer(User):
 
     def get_parser(self):
         return self.profile.parser
+
+    def get_operators(self) -> models.QuerySet:
+        return self.profile.linked_operators.all()
 
 
 class Operator(User):

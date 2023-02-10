@@ -3,9 +3,10 @@ from pathlib import Path
 
 env = environ.Env(
     DEBUG=(bool, False),
+    PROTOCOL=(str, "https"),
     EMAIL_HOST=(str, "localhost"),
-    EMAIL_PORT=(int, 25),
-    EMAIL_USE_TLS=(bool, False),
+    EMAIL_PORT=(int, 465),
+    EMAIL_USE_SSL=(bool, True),
     EMAIL_IMAP_PORT=(int, 993),
     EMAIL_IMAP_HOST=(str, "localhost"),
     EMAIL_INITIAL_FOLDER=(str, "INBOX"),
@@ -32,12 +33,16 @@ INSTALLED_APPS = [
     "django.contrib.sessions",
     "django.contrib.messages",
     "django.contrib.staticfiles",
+    "django.contrib.sites",
     "additionally",
     "ticsys",
     "ticket",
     "users",
     "notifications",
 ]
+
+SITE_ID = 1
+PROTOCOL = env("PROTOCOL")
 
 MIDDLEWARE = [
     "django.middleware.security.SecurityMiddleware",
@@ -109,12 +114,12 @@ LOGOUT_REDIRECT_URL = "/"
 
 TICKET_CREATOR_USERNAME = "email_robot"
 # Ticket email
-
+DEFAULT_FROM_EMAIL = env("EMAIL_HOST_USER")
 EMAIL_HOST_PASSWORD = env("EMAIL_HOST_PASSWORD")
 EMAIL_HOST = env("EMAIL_HOST")
 EMAIL_PORT = env("EMAIL_PORT")
 EMAIL_HOST_USER = env("EMAIL_HOST_USER")
-EMAIL_USE_TLS = env("EMAIL_USE_TLS")
+EMAIL_USE_SSL = env("EMAIL_USE_SSL")
 EMAIL_IMAP_PORT = env("EMAIL_IMAP_PORT")
 EMAIL_IMAP_HOST = env("EMAIL_IMAP_HOST")
 SUBJECT_TO_TICKET = env("SUBJECT_TO_TICKET")
