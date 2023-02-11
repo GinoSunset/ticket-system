@@ -1,5 +1,5 @@
 from django.dispatch import receiver
-from django.db.models.signals import post_save
+from django.db.models.signals import post_save, pre_save
 from django.conf import settings
 from django.contrib.sites.models import Site
 
@@ -13,8 +13,6 @@ from users.models import User, Customer
 def create_notification_signal(sender, instance, created, **kwargs):
     if created:
         create_notifications(instance)
-    if not created:
-        print("Ticket updated")
 
 
 def create_notifications(instance: Ticket):

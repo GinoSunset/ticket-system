@@ -8,6 +8,8 @@ from django.contrib.auth.mixins import LoginRequiredMixin
 
 from users.models import Operator, Customer, User, Contractor
 from additionally.models import Dictionary
+
+from notifications.models import Notification
 from .models import Ticket, Comment, CommentFile, CommentImage
 from .forms import TicketsForm, CommentForm, TicketsFormOperator
 from .mixin import AccessTicketMixin, AccessAuthorMixin
@@ -113,6 +115,7 @@ class TicketUpdateView(LoginRequiredMixin, AccessTicketMixin, UpdateView):
             text=text,
             is_system_message=True,
         )
+        Notification.create_notify_update_ticket(form.changed_data, form.instance)
 
 
 class CommentCreateView(LoginRequiredMixin, CreateView):

@@ -7,7 +7,11 @@ from additionally.models import Dictionary
 
 @pytest.mark.django_db
 def test_user_see_ticket_their_customer(
-    ticket_factory, user_factory, client, customer_factory
+    ticket_factory,
+    user_factory,
+    client,
+    customer_factory,
+    monkeypatch_delay_send_email_on_celery,
 ):
     operator: User = user_factory(role=User.Role.OPERATOR)
     operator = operator.get_role_user()
@@ -60,7 +64,9 @@ def test_contractor_see(ticket_factory, user_factory, client, customer_factory):
 
 
 @pytest.mark.django_db
-def test_admin_see_all_ticket(ticket_factory, user_factory, client):
+def test_admin_see_all_ticket(
+    ticket_factory, user_factory, client, monkeypatch_delay_send_email_on_celery
+):
     user1 = user_factory()
     admin_user = user_factory(is_staff=True)
     user_another = user_factory()

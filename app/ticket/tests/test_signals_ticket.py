@@ -7,7 +7,11 @@ class TestCreateNotifySignal:
 
     @pytest.mark.django_db
     def test_create_notify_by_new_ticket(
-        self, ticket_factory, customer_factory, operator_factory
+        self,
+        ticket_factory,
+        customer_factory,
+        operator_factory,
+        monkeypatch_delay_send_email_on_celery,
     ):
         """Test create notify by new ticket."""
         operator = operator_factory()

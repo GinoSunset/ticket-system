@@ -12,6 +12,11 @@ def ticket_directory_path(instance, filename):
 
 
 class Ticket(models.Model):
+    class Meta:
+        verbose_name = "Заявка"
+        verbose_name_plural = "Заявки"
+        ordering = ["-date_create"]
+
     default_type_code = "hardware_setup"
 
     date_create = models.DateTimeField(auto_now_add=True)
@@ -39,8 +44,6 @@ class Ticket(models.Model):
         related_name="customer_user",
         verbose_name="Заказчик",
         on_delete=models.PROTECT,
-        null=True,
-        blank=True,
     )
     planned_execution_date = models.DateField(
         "Плановая дата выезда/исполнения", null=True, blank=True

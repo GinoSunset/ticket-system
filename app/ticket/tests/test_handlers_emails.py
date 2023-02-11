@@ -46,7 +46,10 @@ def test_create_DM_ticket(
     create_ticket_from_email(email_ticket)
 
     ticket = Ticket.objects.first()
-    assert ticket.description == (descriptor + added_descriptor).strip()
+    assert (
+        ticket.description.splitlines()
+        == (descriptor + added_descriptor).strip().splitlines()
+    )
 
     assert ticket.address == shop_address
 

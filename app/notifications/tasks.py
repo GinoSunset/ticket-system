@@ -8,6 +8,11 @@ from notifications.models import Notification
 
 @celery_app.task
 def send_email_task(notification_pk):
+    status = send_email(notification_pk)
+    return status
+
+
+def send_email(notification_pk):
     notification = Notification.objects.get(pk=notification_pk)
 
     message = loader.get_template("notifications/mail_create_new_ticket.txt").render(

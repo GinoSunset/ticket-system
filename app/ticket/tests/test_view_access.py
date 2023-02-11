@@ -22,7 +22,7 @@ def test_not_access_for_customer(ticket_factory, customer_factory, client):
 @pytest.mark.django_db
 def test_not_access_for_contractor(ticket_factory, user_factory, client):
     user = user_factory(role=User.Role.CONTRACTOR)
-    ticket = ticket_factory(customer=user_factory(role=User.Role.CUSTOMER))
+    ticket = ticket_factory()
     client.force_login(user=user)
     res = client.get(reverse("ticket-update", kwargs={"pk": ticket.pk}))
     assert res.status_code == 403
@@ -50,7 +50,11 @@ def test_not_access_for_operator(
 
 @pytest.mark.django_db
 def test_has_access_for_operator(
-    operator_factory, ticket_factory, customer_factory, client
+    operator_factory,
+    ticket_factory,
+    customer_factory,
+    client,
+    monkeypatch_delay_send_email_on_celery,
 ):
     operator = operator_factory()
     customer = customer_factory()

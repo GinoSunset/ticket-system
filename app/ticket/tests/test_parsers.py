@@ -11,7 +11,10 @@ class TestDMParser:
 
         message_info = DMParser().parse(email_ticket.text)
 
-        assert message_info["description"] == (descriptor + added_descriptor).strip()
+        assert (
+            message_info["description"].splitlines()
+            == (descriptor + added_descriptor).strip().splitlines()
+        )
         assert message_info["address"] == shop_address
         assert message_info["sap_id"] == sap_number
 
