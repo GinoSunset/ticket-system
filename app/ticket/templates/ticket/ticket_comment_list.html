@@ -1,0 +1,66 @@
+<div class="comment">
+    <a class="avatar">
+      <img src="{{comment.author.get_avatar}}">
+    </a>
+    <div class="content">
+      <a class="author">{{comment.author}}</a>
+      <div class="metadata">
+        <span class="date">{{comment.date_create|date}}</span>
+        {% if comment.is_changed %}
+        <i class="pen icon"></i>
+        {% endif %}
+      </div>
+      <div class="{% if comment.is_system_message %} ui info message {% endif %}text">
+      {% if comment.text %}
+        {{comment.text|safe|linebreaksbr|urlize }}
+      {% else %}
+        <i>No text</i>
+      {% endif %}
+      </div>
+  
+      {% if comment.images.count %}
+      <div class="text">
+        <div class="ui small images">
+          {% for image in comment.images.all %}
+            {% if comment.author == user %}
+              <div class="ui fluid image">
+                <a class="ui grey right corner mini label" href="{% url 'delete-comment-image' image.pk %}">
+                  <i class="delete icon"></i>
+                </a>
+            {% endif %}
+                <a href="{{image.image.url}}">
+                  <img class="ui image" src={{image.image.url}}>
+                </a>
+              </div>
+
+          {% endfor %}
+        </div>
+      {% endif %}
+      {% if comment.files.count %}
+      <div class="text">
+        <div class="ui list">
+          {% for file in comment.files.all %}
+            <div class="item">
+              <i class="file icon"></i>
+              <div class="content">
+                <a href="{{file.file.url}}">  {{file.file_name}}</a>
+                {% if comment.author == user %}
+                <a class="ui icon mini label" href="{% url 'delete-comment-file' file.pk %}" >
+                  <i class="delete icon"></i>
+                </a>
+                {% endif %}
+              </div>
+            </div>
+          {% endfor %}
+        </div>
+        
+      </div>
+      
+      {% endif %}
+      {% if comment.author == user and not comment.is_system_message %}
+      <div class="actions">
+          <a href={% url 'comment-update' ticket.pk comment.pk %} >Изменить</a>
+      </div>
+      {% endif %}
+    </div>
+</div>

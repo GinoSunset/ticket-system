@@ -114,6 +114,8 @@ class Ticket(models.Model):
 class Comment(models.Model):
     class Meta:
         ordering = ("-date_create",)
+        verbose_name = "Комментарий"
+        verbose_name_plural = "Комментарии"
 
     LEN_SHORT_TEXT = 10
 
@@ -158,6 +160,10 @@ class Comment(models.Model):
 
 
 class CommentFile(models.Model):
+    class Meta:
+        verbose_name = "Файл комментария"
+        verbose_name_plural = "Файлы комментариев"
+
     comment = models.ForeignKey(Comment, related_name="files", on_delete=models.CASCADE)
     file = models.FileField(
         "Файл", upload_to=ticket_directory_path, null=True, blank=True
@@ -169,6 +175,10 @@ class CommentFile(models.Model):
 
 
 class CommentImage(models.Model):
+    class Meta:
+        verbose_name = "Изображение комментария"
+        verbose_name_plural = "Изображения комментариев"
+
     comment = models.ForeignKey(
         Comment, related_name="images", on_delete=models.CASCADE
     )

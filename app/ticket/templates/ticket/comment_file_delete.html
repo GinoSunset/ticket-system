@@ -1,0 +1,33 @@
+{% extends 'ticsys/index.html' %}
+{% block content %}
+
+<div class="ui modal active">
+  <i class="close icon"></i>
+  <div class="header">
+    Удалить файл
+  </div>
+  <div class="image content">
+    {% if object.image.url %}
+    <div class="ui medium image">
+      <img src= {{object.image.url}} >
+    </div>
+    {% endif %}
+    <div class="description">
+      <div class="ui header">Вы уверены, что хотите удалить файл '{% firstof object.image_name object.file_name %}' </div>
+    </div>
+  </div>
+  <div class="actions">
+
+    <form action="{% url url_delete_name object.id %}"  class="ui inline form" method="post">
+      {% csrf_token %}
+      <button class="ui black deny button" onclick="window.history.go(-1); return false;" >
+        Нет
+      </button>
+      <button class="ui positive right labeled icon button" type="submit">
+        Да
+        <i class="checkmark icon"></i>
+      </button>
+    </form>
+  </div>
+</div>
+{% endblock content %}

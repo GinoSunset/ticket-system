@@ -1,9 +1,9 @@
 from typing import Union
 
 from django.db.models import QuerySet
-from django.views.generic import ListView, UpdateView
+from django.views.generic import ListView, UpdateView, DeleteView
 from django.views.generic.edit import CreateView
-
+from django.urls import reverse
 from django.contrib.auth.mixins import LoginRequiredMixin
 
 from users.models import Operator, Customer, User, Contractor
@@ -166,3 +166,31 @@ class CommentUpdateView(LoginRequiredMixin, AccessAuthorMixin, UpdateView):
                 continue
             CommentFile.objects.create(file=file, comment=self.object)
         return super().form_valid(form)
+
+
+class DeleteCommentFileView(LoginRequiredMixin, AccessAuthorMixin, DeleteView):
+    model = CommentFile
+    template_name = "ticket/comment_file_delete.html"
+    author_field = "comment__author"
+
+    def get_context_data(self, **kwargs):
+        kwargs = super().get_context_data(**kwargs)
+        kwargs["url_delete_name"] = "delete-comment-file"
+        return kwargs
+
+    def get_success_url(self):
+        return reverse("ticket-update", kwargs={"pk": self.object.comment.ticket.pk})
+
+
+class DeleteCommentImageView(LoginRequiredMixin, AccessAuthorMixin, DeleteView):
+    model = CommentImage
+    template_name = "ticket/comment_file_delete.html"
+    author_field = "comment__author"
+
+    def get_context_data(self, **kwargs):
+        kwargs = super().get_context_data(**kwargs)
+        kwargs["url_delete_name"] = "delete-comment-image"
+        return kwargs
+
+    def get_success_url(self):
+        return reverse("ticket-update", kwargs={"pk": self.object.comment.ticket.pk})

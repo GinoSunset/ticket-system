@@ -5,6 +5,8 @@ from .views import (
     TicketUpdateView,
     CommentCreateView,
     CommentUpdateView,
+    DeleteCommentFileView,
+    DeleteCommentImageView,
 )
 
 
@@ -17,5 +19,15 @@ urlpatterns = [
         "<int:ticket_pk>/comment/<int:pk>",
         CommentUpdateView.as_view(),
         name="comment-update",
+    ),
+    path(
+        "delete-comment-file/<int:pk>",
+        DeleteCommentFileView.as_view(),
+        name="delete-comment-file",
+    ),
+    path(
+        "delete-comment-image/<int:pk>",
+        DeleteCommentImageView.as_view(),
+        name="delete-comment-image",
     ),
 ]
