@@ -22,12 +22,12 @@
       <div class="text">
         <div class="ui small images">
           {% for image in comment.images.all %}
-            {% if comment.author == user %}
-              <div class="ui fluid image">
+          <div class="ui fluid image">
+                {% if comment.author == user %}
                 <a class="ui grey right corner mini label" href="{% url 'delete-comment-image' image.pk %}">
                   <i class="delete icon"></i>
                 </a>
-            {% endif %}
+                {% endif %}
                 <a href="{{image.image.url}}">
                   <img class="ui image" src={{image.image.url}}>
                 </a>
