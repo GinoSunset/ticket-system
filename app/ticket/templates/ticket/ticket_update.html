@@ -113,12 +113,12 @@
                 {% endif %}
               </a>
             {% endif %}
-            {% if ticket.status.code != "done" %}
+            {% comment %} {% if ticket.status.code != "done" %}
               <a class="ui left floated button positive basic" >Выполнить</a>
             {% endif %}
             {% if ticket.status.code != "cancel" %}
               <a class="ui left floated button negative basic">Отменить</a>
-            {% endif %}
+            {% endif %} {% endcomment %}
           {% endif %}
         </div>
         <div class="eight wide column">
