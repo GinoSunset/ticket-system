@@ -109,7 +109,7 @@ def create_ticket_from_email(email: MailMessage) -> bool:
     id_email_message = email.headers.get("message-id")[0].strip()
     ticket_info = get_info_from_message(message, customer)
     creator = User.objects.get(username=settings.TICKET_CREATOR_USERNAME)
-    status = Dictionary.get_status_ticket("work")
+    status = Dictionary.get_status_ticket("new")
     type_ticket = Dictionary.get_type_ticket(Ticket.default_type_code)
 
     ticket = Ticket.objects.create(

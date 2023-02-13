@@ -113,6 +113,7 @@ class Ticket(models.Model):
             "consideration": "teal",
             "revision": "yellow",
             "done": "green",
+            "new": "violet",
         }
         return color.get(self.status.code, "detail")
 
