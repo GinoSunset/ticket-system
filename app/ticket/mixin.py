@@ -20,6 +20,16 @@ class AccessTicketMixin(UserPassesTestMixin):
         return ticket.creator == user
 
 
+class AccessOperatorMixin(UserPassesTestMixin):
+    def test_func(self):
+        user: User = self.request.user
+        if user.is_staff:
+            return True
+        if user.is_operator:
+            return True
+        return False
+
+
 class AccessAuthorMixin(UserPassesTestMixin):
     def test_func(self):
         user: User = self.request.user

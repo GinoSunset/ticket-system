@@ -122,6 +122,13 @@ class Ticket(models.Model):
 
 
 class Comment(models.Model):
+    TEMPLATE_DICT = {
+        "status": "{field} изменен c '{prev_value}' на '{value}'\n",
+        "contractor": "{value} назначен(а) исполнителем\n",
+        "planned_execution_date": "Планируемая дата выезда назначена на: {value}\n",
+        "responsible": "{value} назначен(а) ответственным\n",
+    }
+
     class Meta:
         ordering = ("-date_create",)
         verbose_name = "Комментарий"
@@ -167,6 +174,33 @@ class Comment(models.Model):
 
     def get_absolute_url(self):
         return reverse("ticket-update", kwargs={"pk": self.ticket.pk})
+
+    @classmethod
+    def create_update_system_comment(cls, text, ticket, user):
+        Comment.objects.create(
+            ticket=ticket,
+            author=user,
+            text=text,
+            is_system_message=True,
+        )
+
+    @classmethod
+    def get_text_system_comment(cls, changed_data, initial_data, named_field, ticket):
+
+        text = ""
+        for field in changed_data:
+            value = getattr(ticket, field)
+            value = value if value else "Пусто"
+            message = cls.TEMPLATE_DICT.get(
+                field, "Поле {field} изменено c '{prev_value}' на '{value}'\n"
+            )
+            text += message.format(
+                field=(named_field[field]),
+                prev_value=initial_data.get(field, "Пусто") or "Не указано",
+                value=value,
+            )
+
+        return text
 
 
 class CommentFile(models.Model):

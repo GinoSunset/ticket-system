@@ -7,6 +7,7 @@ from .views import (
     CommentUpdateView,
     DeleteCommentFileView,
     DeleteCommentImageView,
+    TicketToWorkView,
 )
 
 
@@ -30,4 +31,5 @@ urlpatterns = [
         DeleteCommentImageView.as_view(),
         name="delete-comment-image",
     ),
+    path("to-work/<int:pk>", TicketToWorkView.as_view(), name="ticket-to-work"),
 ]

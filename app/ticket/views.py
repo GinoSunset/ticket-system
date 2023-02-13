@@ -1,10 +1,11 @@
 from typing import Union
 
 from django.db.models import QuerySet
-from django.views.generic import ListView, UpdateView, DeleteView
+from django.views.generic import ListView, UpdateView, DeleteView, View
 from django.views.generic.edit import CreateView
 from django.urls import reverse
 from django.contrib.auth.mixins import LoginRequiredMixin
+from django.shortcuts import redirect
 
 from users.models import Operator, Customer, User, Contractor
 from additionally.models import Dictionary
@@ -12,7 +13,7 @@ from additionally.models import Dictionary
 from notifications.models import Notification
 from .models import Ticket, Comment, CommentFile, CommentImage
 from .forms import TicketsForm, CommentForm, TicketsFormCustomer
-from .mixin import AccessTicketMixin, AccessAuthorMixin
+from .mixin import AccessTicketMixin, AccessAuthorMixin, AccessOperatorMixin
 from .utils import is_image
 
 
@@ -91,30 +92,14 @@ class TicketUpdateView(LoginRequiredMixin, AccessTicketMixin, UpdateView):
         return result
 
     def create_comment_from_change_ticket(self, form):
-        template_dict = {
-            "status": "{field} изменен c '{prev_value}' на '{value}'\n",
-            "contractor": "{value} назначен исполнителем\n",
-            "planned_execution_date": "Планируемая дата выезда назначена на: {value}\n",
-        }
-
-        text = ""
-        for field in form.changed_data:
-            value = getattr(form.instance, field)
-            value = value if value else "Пусто"
-            message = template_dict.get(
-                field, "Поле {field} изменено c '{prev_value}' на '{value}'\n"
-            )
-            text += message.format(
-                field=(form.fields[field].label).lower(),
-                prev_value=form.initial.get(field, "Пусто") or "Не указано",
-                value=value,
-            )
-        Comment.objects.create(
-            ticket=form.instance,
-            author=self.request.user,
-            text=text,
-            is_system_message=True,
+        changed_data = form.changed_data
+        initial_data = form.initial
+        named_field = {field: form[field].label.lower() for field in form.fields}
+        ticket = form.instance
+        text = Comment.get_text_system_comment(
+            changed_data, initial_data, named_field, ticket
         )
+        Comment.create_update_system_comment(text, ticket, self.request.user)
         Notification.create_notify_update_ticket(form.changed_data, form.instance)
 
 
@@ -194,3 +179,24 @@ class DeleteCommentImageView(LoginRequiredMixin, AccessAuthorMixin, DeleteView):
 
     def get_success_url(self):
         return reverse("ticket-update", kwargs={"pk": self.object.comment.ticket.pk})
+
+
+class TicketToWorkView(LoginRequiredMixin, AccessOperatorMixin, View):
+    def get(self, request, *args, **kwargs):
+        ticket: Ticket = Ticket.objects.get(pk=kwargs.get("pk"))
+        status_work = Dictionary.get_status_ticket("work")
+        message = Comment.TEMPLATE_DICT.get("status")
+        message = message.format(
+            field="статус",
+            prev_value=ticket.status.description,
+            value=status_work.description,
+        )
+        message += Comment.TEMPLATE_DICT.get("responsible").format(
+            value=self.request.user
+        )
+        ticket.status = status_work
+        ticket.responsible = request.user
+        ticket.save()
+
+        Comment.create_update_system_comment(message, ticket, self.request.user)
+        return redirect("ticket-update", pk=ticket.pk)

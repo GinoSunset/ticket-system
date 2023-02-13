@@ -5,7 +5,7 @@ from additionally.models import Dictionary
 from django.urls import reverse
 from django.db.models import signals
 
-from ticket.models import Comment
+from ticket.models import Comment, Ticket
 
 
 class TestUpdateTicket:
@@ -60,4 +60,22 @@ class TestUpdateTicket:
         )
         comment = Comment.objects.filter(ticket=ticket)
         assert comment.exists()
-        assert f"{contractor} назначен исполнителем" in comment.first().text
+        assert f"{contractor} назначен(а) исполнителем" in comment.first().text
+
+    @pytest.mark.django_db
+    def test_update_status_to_work_create_comment(
+        self,
+        ticket_factory,
+        operator_factory,
+        client,
+        monkeypatch_delay_send_email_on_celery,
+    ):
+        user = operator_factory()
+        status = Dictionary.objects.get(code="new")
+        ticket: Ticket = ticket_factory(creator=user, status=status)
+        client.force_login(user=user)
+        res = client.get(reverse("ticket-to-work", kwargs={"pk": ticket.pk}))
+        assert res.status_code == 302
+        ticket.refresh_from_db()
+        assert ticket.comments.count() == 1
+        assert f"статус изменен c " in ticket.comments.first().text
