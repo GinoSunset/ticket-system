@@ -14,6 +14,7 @@ class TicketsForm(forms.ModelForm):
             "description",
             "customer",
             "contractor",
+            "responsible",
             "status",
             "city",
             "address",
@@ -48,7 +49,7 @@ class TicketsForm(forms.ModelForm):
             self.fields["customer"].initial = kwargs["initial"].get("customer")
 
 
-class TicketsFormOperator(forms.ModelForm):
+class TicketsFormCustomer(forms.ModelForm):
     class Meta:
         model = Ticket
         fields = [

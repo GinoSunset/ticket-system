@@ -3,6 +3,7 @@ from django.urls import reverse
 from django.contrib.auth import get_user_model
 
 from additionally.models import Dictionary
+from users.models import Operator
 
 User = get_user_model()
 
@@ -92,6 +93,14 @@ class Ticket(models.Model):
 
     id_email_message = models.CharField(
         verbose_name="ID письма в почте", null=True, blank=True, max_length=100
+    )
+
+    responsible = models.ForeignKey(
+        Operator,
+        verbose_name="Ответственный",
+        on_delete=models.PROTECT,
+        null=True,
+        blank=True,
     )
 
     def __str__(self):

@@ -11,7 +11,7 @@ from additionally.models import Dictionary
 
 from notifications.models import Notification
 from .models import Ticket, Comment, CommentFile, CommentImage
-from .forms import TicketsForm, CommentForm, TicketsFormOperator
+from .forms import TicketsForm, CommentForm, TicketsFormCustomer
 from .mixin import AccessTicketMixin, AccessAuthorMixin
 from .utils import is_image
 
@@ -50,7 +50,7 @@ class TicketFormView(LoginRequiredMixin, CreateView):
 
     def get_form_class(self):
         if self.request.user.is_customer:
-            return TicketsFormOperator
+            return TicketsFormCustomer
         return self.form_class
 
     def form_valid(self, form):

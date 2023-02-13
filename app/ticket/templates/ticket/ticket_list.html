@@ -24,6 +24,7 @@
         <th id="sap_id">SAP</th>
         <th id="type_ticket">Тип заявки</th>
         <th id="customer">Заказчик</th>
+        <th id="responsible">Ответсвенный</th>
         {% if not user.is_customer %}
         <th id="contractor">Иполнитель</th>
         {% endif %}
@@ -42,6 +43,7 @@
         <td data-label="sap_id">{% firstof ticket.sap_id %}</td>
         <td data-label="type_ticket">{% firstof ticket.type_ticket %}</td>
         <td data-label="customer">{% firstof ticket.customer %}</td>
+        <td data-label="responsible">{% firstof ticket.responsible %}</td>
         {% if not user.is_customer %}
         <td data-label="contractor">{% firstof ticket.contractor %}</td>
         {% endif %}

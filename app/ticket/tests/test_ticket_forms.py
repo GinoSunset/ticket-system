@@ -11,9 +11,14 @@ from notifications.models import Notification
 
 @pytest.mark.django_db
 def test_customer_form_not_field_customer_status_contractor(customer_factory, client):
-    """Исполнитель, Статус, Заказчик, Плановая дата закрытия"""
+    """Исполнитель, Статус, Заказчик, Плановая дата закрытия, Ответственный не должны быть в форме для заказчика"""
 
-    removed_field_for_customer = ["customer", "contractor", "planned_execution_date"]
+    removed_field_for_customer = [
+        "customer",
+        "contractor",
+        "planned_execution_date",
+        "responsible",
+    ]
 
     user = customer_factory()
     client.force_login(user=user)
