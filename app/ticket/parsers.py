@@ -47,8 +47,8 @@ class DMParser(BaseParser):
         message_info["sap_id"] == sap_number
         """
 
-        descriptor = text[: text.find("Телефон:")]
-        info = text[text.find("Телефон:") : text.find("SAP:")]
+        descriptor = text[: text.find("\nТелефон:") + 1]
+        info = text[text.find("\nТелефон:") + 1 : text.find("SAP:")]
 
         index_start_sap_line, index_end_sap_line = self.get_indexes_sap(text)
 
@@ -102,6 +102,7 @@ class DMParser(BaseParser):
         lines = info.splitlines()
         if len(lines) == 1:
             lines = info.split("</p>")
+        lines = [line.strip() for line in lines if line.strip()]
 
         result = defaultdict(str)
         for line in lines:

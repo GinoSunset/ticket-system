@@ -60,6 +60,10 @@ class TestDMParser:
         message_info = DMParser().parse(text_dm_2)
         assert message_info
 
+    def test_parser_dm3(self, text_dm_3, description_dm_3):
+        message_info = DMParser().parse(text_dm_3)
+        assert message_info
+
     def test_parser_dm2_not_sign_img(self, text_dm_2):
         message_info = DMParser().parse(text_dm_2)
         assert "[cid:image004.png@01D92A6D.90491210]" not in message_info["description"]
