@@ -108,6 +108,8 @@ class UpdateContractorView(LoginRequiredMixin, UpdateView):
             initial["city"] = self.object.profile_contractor.city
             initial["region"] = self.object.profile_contractor.region
             initial["note"] = self.object.profile_contractor.note
+            initial["company"] = self.object.profile_contractor.company
+
         return initial
 
     def get_context_data(self, **kwargs):

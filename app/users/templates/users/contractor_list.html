@@ -27,7 +27,12 @@
         <td>{{ contractor.profile_contractor.company|default:"" }}</td>
         <td>{{ contractor.profile_contractor.city }}</td>
         <td>{{ contractor.profile_contractor.region }}</td>
-        <td><a target="_blank" class="ui button info"  href="{% url 'contractor_edit' contractor.id %}">Изменить</a></td>
+        <td>
+            <a target="_blank" class="ui button info"  href="{% url 'contractor_edit' contractor.id %}">Изменить </a>
+            {% if contractor.profile_contractor.note %}
+            <i class="info icon link" data-content="{{ contractor.profile_contractor.note }}"></i>
+            {% endif %}
+        </td>
     </tr>
     {% endfor %}
     </tbody>
@@ -36,13 +41,18 @@
 
 {% block script %}
 <script>
+
+
 var table = $('#tableCastomers').DataTable({
     stateSave: true,
     
     language: {
         url: "{% static 'DataTables/ru.json'%}"
-    }
-      
+    } 
   });
+table.on('draw.dt', function () {
+    $('.info.icon.link').popup();    
+});
+  
 </script>
 {% endblock script %}
