@@ -183,6 +183,7 @@ class DeleteCommentImageView(LoginRequiredMixin, AccessAuthorMixin, DeleteView):
 
 class TicketToWorkView(LoginRequiredMixin, AccessOperatorMixin, View):
     def get(self, request, *args, **kwargs):
+        user = self.request.user
         ticket: Ticket = Ticket.objects.get(pk=kwargs.get("pk"))
         status_work = Dictionary.get_status_ticket("work")
         message = Comment.TEMPLATE_DICT.get("status")
@@ -191,12 +192,12 @@ class TicketToWorkView(LoginRequiredMixin, AccessOperatorMixin, View):
             prev_value=ticket.status.description,
             value=status_work.description,
         )
-        message += Comment.TEMPLATE_DICT.get("responsible").format(
-            value=self.request.user
-        )
+        responsible_msg = Comment.TEMPLATE_DICT.get("responsible")
+        responsible_msg = responsible_msg.format(value=user)
+        message += responsible_msg
         ticket.status = status_work
         ticket.responsible = request.user
         ticket.save()
 
-        Comment.create_update_system_comment(message, ticket, self.request.user)
+        Comment.create_update_system_comment(message, ticket, user)
         return redirect("ticket-update", pk=ticket.pk)

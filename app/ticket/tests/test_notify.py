@@ -12,7 +12,7 @@ class TestUpdateTicket:
     @pytest.mark.django_db
     def test_save_comment_update_status(self, ticket_factory, client, operator_factory):
 
-        user = operator_factory()
+        user = operator_factory(first_name="John", last_name="Smit")
         status = Dictionary.objects.get(code="work")
         new_status = Dictionary.objects.get(code="done")
         ticket = ticket_factory(creator=user, status=status)
@@ -24,6 +24,7 @@ class TestUpdateTicket:
                 "status": new_status.pk,
                 "description": ticket.description,
                 "customer": ticket.customer.pk,
+                "responsible": user.pk,
             },
         )
         comment = Comment.objects.filter(ticket=ticket)
@@ -32,6 +33,7 @@ class TestUpdateTicket:
             f"статус изменен c '{status.description}' на '{new_status.description}'"
             in comment.first().text
         )
+        assert f"John Smit" in comment.first().text
 
     @pytest.mark.django_db
     def test_save_comment_update_contractor(
@@ -70,7 +72,7 @@ class TestUpdateTicket:
         client,
         monkeypatch_delay_send_email_on_celery,
     ):
-        user = operator_factory()
+        user = operator_factory(first_name="John", last_name="Smit")
         status = Dictionary.objects.get(code="new")
         ticket: Ticket = ticket_factory(creator=user, status=status)
         client.force_login(user=user)
@@ -78,4 +80,6 @@ class TestUpdateTicket:
         assert res.status_code == 302
         ticket.refresh_from_db()
         assert ticket.comments.count() == 1
-        assert f"статус изменен c " in ticket.comments.first().text
+        comment = ticket.comments.first().text
+        assert f"статус изменен c " in comment
+        assert f"John Smit" in comment

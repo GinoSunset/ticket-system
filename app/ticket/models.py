@@ -190,7 +190,7 @@ class Comment(models.Model):
         text = ""
         for field in changed_data:
             value = getattr(ticket, field)
-            value = value if value else "Пусто"
+            value = str(value) if value else "Пусто"
             message = cls.TEMPLATE_DICT.get(
                 field, "Поле {field} изменено c '{prev_value}' на '{value}'\n"
             )
