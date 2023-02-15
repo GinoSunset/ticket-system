@@ -38,11 +38,11 @@ class Notification(models.Model):
     def create_notify_update_customer(cls, ticket: Ticket):
         link = f"{settings.PROTOCOL}://{Site.objects.get_current()}{ticket.get_absolute_url()}"
         message = (
-            f"Вы назначены исполнителем заявки №{ticket.id}."
-            "Информация о заявке:"
-            f"адрес: {ticket.address}"
-            "описание:"
-            f"{ticket.description}"
+            f"Вы назначены исполнителем заявки №{ticket.id}.\n"
+            "Информация о заявке:\n"
+            f"адрес: {ticket.address}\n"
+            "описание:\n"
+            f"{ticket.description} \n"
             f"Перейти к заявке: {link}"
         )
         user = ticket.contractor
