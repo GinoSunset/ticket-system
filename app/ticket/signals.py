@@ -11,6 +11,7 @@ from users.models import User, Customer
 
 @receiver(post_save, sender=Ticket)
 def create_notification_signal(sender, instance, created, **kwargs):
+    return
     if created:
         create_notifications(instance)
 
