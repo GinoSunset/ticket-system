@@ -114,6 +114,7 @@ class Ticket(models.Model):
             "revision": "yellow",
             "done": "green",
             "new": "violet",
+            "testing": "pink",
         }
         return color.get(self.status.code, "detail")
 
