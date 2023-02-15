@@ -3,7 +3,13 @@
       <img src="{{comment.author.get_avatar}}">
     </a>
     <div class="content">
-      <a class="author">{{comment.author}}</a>
+      <span class="author">
+        {% if comment.author == ticket.customer %}
+            {{ticket.customer.get_role_user}} ({{ticket.customer.first_name}} {{ticket.customer.last_name}})
+        {% else %}
+            {{comment.author}}
+        {% endif %}
+      </span>
       <div class="metadata">
         <span class="date">{{comment.date_create|date}}</span>
         {% if comment.is_changed %}

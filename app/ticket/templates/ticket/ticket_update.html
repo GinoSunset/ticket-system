@@ -74,7 +74,7 @@
         </div>
         <div class="item"> 
           <div class="header"> Заказчик</div> 
-          {{ticket.customer}}
+          {{ticket.customer.get_role_user}} ({{ticket.customer.first_name}} {{ticket.customer.last_name}})
         </div>
         <div class="item"> 
           <div class="header"> Исполнитель</div> 
