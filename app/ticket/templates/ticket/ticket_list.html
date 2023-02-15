@@ -42,7 +42,7 @@
         <td data-label="date_create">{{ticket.date_create| date:"Y-m-d"}}</td>
         <td data-label="sap_id">{% firstof ticket.sap_id %}</td>
         <td data-label="type_ticket">{% firstof ticket.type_ticket %}</td>
-        <td data-label="customer">{% firstof ticket.customer %}</td>
+        <td data-label="customer">{% firstof ticket.customer.get_role_user %}</td>
         <td data-label="responsible">{% firstof ticket.responsible %}</td>
         {% if not user.is_customer %}
         <td data-label="contractor">{% firstof ticket.contractor %}</td>

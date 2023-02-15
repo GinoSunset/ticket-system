@@ -14,6 +14,7 @@ class CreateCustomerView(LoginRequiredMixin, CreateView):
     def form_valid(self, form):
         self.object: Customer = form.save()
         self.object.profile.linked_operators.add(self.request.user.get_role_user())
+        self.object.profile.company = form.cleaned_data["company"]
         return super().form_valid(form)
 
 
@@ -74,7 +75,14 @@ class UpdateCustomer(LoginRequiredMixin, UpdateView):
 
     def form_valid(self, form):
         self.object: Customer = form.save()
+        self.object.profile.company = form.cleaned_data["company"]
+        self.object.profile.save()
         return super().form_valid(form)
+
+    def get_initial(self):
+        initial = super().get_initial()
+        initial["company"] = self.object.profile.company
+        return initial
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)

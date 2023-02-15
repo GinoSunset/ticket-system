@@ -11,7 +11,8 @@
 <table id="tableCastomers" class="ui table">
     <thead>
         <tr>
-            <th>Имя</th>
+            <th>Компания</th>
+            <th>Имя и Фамилия</th>
             <th>Телефон</th>
             <th>Email</th>
             <th>Тип парсера</th>
@@ -21,7 +22,8 @@
     <tbody>
     {% for customer in customer_list  %}
     <tr>
-        <td>{{ customer.username }}</td>
+        <td>{{ customer.profile.company|default:"" }}</td>
+        <td>{{ customer.first_name }} {{ customer.last_name }}</td>
         <td>{% firstof customer.phone %}</td>
         <td>{{ customer.email }}</td>
         <td>{{ customer.profile.parser }}</td>

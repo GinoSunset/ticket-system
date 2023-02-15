@@ -118,6 +118,12 @@ class Customer(User):
     def get_operators(self) -> models.QuerySet:
         return self.profile.linked_operators.all()
 
+    def __str__(self) -> str:
+        if self.profile:
+            if self.profile.company:
+                return self.profile.company
+        return super().__str__()
+
 
 class Operator(User):
     class Meta:
@@ -169,6 +175,9 @@ class CustomerProfile(models.Model):
         blank=True,
     )
     parser = models.CharField(verbose_name="Парсер", max_length=50, default="base")
+    company = models.CharField(
+        verbose_name="Компания", max_length=100, null=True, blank=True
+    )
 
     def __str__(self) -> str:
         return str(self.user)

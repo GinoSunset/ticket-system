@@ -4,6 +4,8 @@ from .models import Customer, Contractor, ContractorProfile
 
 
 class CustomerForm(forms.ModelForm):
+    company = forms.CharField(label="Компания", required=False)
+
     class Meta:
         model = Customer
         fields = [
