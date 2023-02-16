@@ -1,0 +1,16 @@
+Вы назначены исполнителем заявки №{{ticket.id}}.
+
+Информация о заявке:
+{% if ticket.address%}Адрес: {{ticket.address}}{%endif%}
+{% if ticket.shop_id%}Магазин: {{ticket.shop_id}}{%endif%}
+{% if ticket.full_name%}ФИО: {{ticket.full_name}}{%endif%}
+{% if ticket.phone%}Телефон: {{ticket.phone}}{%endif%}
+{% if ticket.position%}Должность: {{ticket.position}}{%endif%}
+{% if ticket.sap_id%}SAP: {{ticket.sap_id}}{%endif%}
+{% if ticket.metadata%}Дополнительная информация: {{ticket.metadata}}{%endif%}
+
+ОПИСАНИЕ:
+{{ticket.description}}
+
+
+Перейти к заявке: {{link}}
