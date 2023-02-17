@@ -1,0 +1,51 @@
+{% extends 'ticsys/index.html' %}
+{% load static %}
+{% block header_style %}
+<link rel="stylesheet" type="text/css" href="{% static 'DataTables/DataTables-1.13.1/css/dataTables.semanticui.min.css' %}"/> 
+<script type="text/javascript" src="{% static 'DataTables/DataTables-1.13.1/js/jquery.dataTables.min.js' %}"></script>
+<script type="text/javascript" src="{% static 'DataTables/DataTables-1.13.1/js/dataTables.semanticui.min.js' %}"></script>
+{% endblock %}
+{% block content %}
+<h1>Отчеты</h1>
+<a class="ui button" style="margin-bottom: 10px;" href="{% url 'create-report' %}">Создать отчет</a>
+<table id="tableCastomers" class="ui table">
+    <thead>
+        <tr>
+            <th>Id</th>
+            <th>Дата создания</th>
+            <th>Период</th>
+            <th>Скачать</th>
+
+        </tr>
+    </thead>
+    <tbody>
+    {% for report in report_list  %}
+    <tr>
+        <td>{{ report.id }}</td>
+        <td>{{ report.date_create|date:"Y-m-d" }}</td>
+        <td>{{ report.start_date }}-{{report.end_date}} </td>
+        <td><a href="{% url 'download-report' report.id %}" class="ui button basic">Скачать</a></td>
+    </tr>
+    {% endfor %}
+    </tbody>
+</table>
+{% endblock content %}
+
+{% block script %}
+<script>
+var table = $('#tableCastomers').DataTable({
+    stateSave: true,
+    columnDefs: [
+            {
+                targets: 1,
+                render: DataTable.render.date(),
+            },
+        ],
+    order: [[0, 'desc']],
+    language: {
+        url: "{% static 'DataTables/ru.json'%}"
+    }
+      
+  });
+</script>
+{% endblock script %}

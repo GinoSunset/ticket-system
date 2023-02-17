@@ -1,0 +1,51 @@
+{% extends 'ticsys/index.html' %}
+{% block content %}
+<h1>{% firstof name_page 'Создание отчета' %}</h1>
+<div class="ui container">
+    <form class="ui form" method="post">
+        {{ form.non_field_errors }}
+        {% csrf_token %}
+        {% for field in form %}
+        <div class="field">
+            {{ field.errors }}
+            {{ field.label_tag }} 
+            {{ field }}
+        </div>
+        {% endfor %}
+      <button class="ui button" type="submit">{% firstof name_btn 'Создать' %}</button>
+    </form>
+  </div>
+{% endblock content %}
+
+{% block script %}
+<script>
+  $('#date_calendar_start_date').calendar({
+    type: 'date',
+    endCalendar: $('#date_calendar_end_date'),
+    firstDayOfWeek: 1,
+    text: {
+    days: ['В', 'П', 'В', 'С', 'Ч', 'П', 'С'],
+      today: 'Сегодня',
+      months: ["Январь", "Февраль", "Март", "Апрель", "Май", "Июнь", "Июль", "Август", "Сентябрь", "Октябрь", "Ноябрь", "Декабрь"],
+      monthsShort: ["Янв", "Фев", "Мар", "Апр", "Май", "Июн", "Июл", "Авг", "Сен", "Окт", "Ноя", "Дек"],
+    },
+    formatter: {
+      date: 'DD.MM.YYYY'
+    }
+  });
+  $('#date_calendar_end_date').calendar({
+    type: 'date',
+    startCalendar: $('#date_calendar_start_date'),
+    firstDayOfWeek: 1,
+    text: {
+    days: ['В', 'П', 'В', 'С', 'Ч', 'П', 'С'],
+      today: 'Сегодня',
+      months: ["Январь", "Февраль", "Март", "Апрель", "Май", "Июнь", "Июль", "Август", "Сентябрь", "Октябрь", "Ноябрь", "Декабрь"],
+      monthsShort: ["Янв", "Фев", "Мар", "Апр", "Май", "Июн", "Июл", "Авг", "Сен", "Окт", "Ноя", "Дек"],
+    },
+    formatter: {
+      date: 'DD.MM.YYYY'
+    }
+  });
+</script>
+{% endblock script %}

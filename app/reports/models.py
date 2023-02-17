@@ -42,6 +42,7 @@ row_style_bold = StyleField(
 row_style_center = StyleField(
     BORDER_DEFAULT, ALIGNMENT_DEFAULT, FONT_DEFAULT, None, None
 )
+row_style_number = StyleField(BORDER_DEFAULT, ALIGNMENT_DEFAULT, FONT_DEFAULT, None, 1)
 
 
 class Report(models.Model):
@@ -60,6 +61,10 @@ class Report(models.Model):
 
     def __str__(self):
         return f"{self.start_date}-{self.end_date} [{self.date_create}]"
+
+    @property
+    def file_name(self):
+        return self.file.name.split("/")[-1]
 
     def create_report(self):
         tickets = Ticket.objects.filter(
@@ -103,7 +108,7 @@ class Report(models.Model):
         ]
         for header in headers:
             c = Cell(ws, column=headers.index(header) + 1, row=1, value=header)
-            self.set_style(c, style=style_title)
+            self.set_style(c, ws, style=style_title)
             # c.length = style_title.length
 
             yield c
@@ -116,15 +121,17 @@ class Report(models.Model):
 
         for num, value in enumerate(data):
             c = Cell(ws, column=num + 1, row=row_num, value=value)
-            if num in (number_row, date_start, date_end):
-                self.set_style(c, style=row_style_center)
+            if num == number_row:
+                self.set_style(c, ws, style=row_style_number)
+            if num in (date_start, date_end):
+                self.set_style(c, ws, style=row_style_center)
             elif num == sap_id:
-                self.set_style(c, style=row_style_bold)
+                self.set_style(c, ws, style=row_style_bold)
             else:
-                self.set_style(c, style=row_style)
+                self.set_style(c, ws, style=row_style)
             yield c
 
-    def set_style(self, c, style):
+    def set_style(self, c, ws: Worksheet, style):
         if style.border:
             c.border = style.border
         if style.alignment:
@@ -133,3 +140,9 @@ class Report(models.Model):
             c.font = style.font
         if style.fill:
             c.fill = style.fill
+        if style.length:
+            ws.column_dimensions[c.column_letter].width = style.length
+        else:
+            length = len(str(c.value)) + 4
+            length = length if length > 10 else 10
+            ws.column_dimensions[c.column_letter].width = length
