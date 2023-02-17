@@ -9,3 +9,5 @@ class TicketFactory(factory.django.DjangoModelFactory):
 
     description = factory.Faker("text")
     customer = factory.SubFactory(CustomerFactory)
+    sap_id = factory.Faker("ean")
+    address = factory.Faker("address")

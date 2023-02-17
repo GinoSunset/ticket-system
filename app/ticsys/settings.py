@@ -39,6 +39,7 @@ INSTALLED_APPS = [
     "ticket",
     "users",
     "notifications",
+    "reports",
 ]
 
 SITE_ID = 1
