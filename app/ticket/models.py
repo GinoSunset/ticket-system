@@ -1,8 +1,8 @@
+from additionally.models import Dictionary
+from django.contrib.auth import get_user_model
 from django.db import models
 from django.urls import reverse
-from django.contrib.auth import get_user_model
-
-from additionally.models import Dictionary
+from django.utils import timezone
 from users.models import Operator
 
 User = get_user_model()
@@ -103,6 +103,10 @@ class Ticket(models.Model):
         blank=True,
     )
 
+    completion_date = models.DateTimeField(
+        "Дата завершения", null=True, blank=True, help_text="Дата завершения заявки"
+    )
+
     def __str__(self):
         return f"{self.pk} - {self.type_ticket}, {self.customer=}"
 
@@ -120,6 +124,14 @@ class Ticket(models.Model):
 
     def get_absolute_url(self):
         return reverse("ticket-update", kwargs={"pk": self.pk})
+
+    def save(
+        self, force_insert=False, force_update=False, using=None, update_fields=None
+    ):
+        if self.pk:
+            if self.status == Dictionary.objects.get(code="done"):
+                self.completion_date = timezone.now()
+        return super().save(force_insert, force_update, using, update_fields)
 
 
 class Comment(models.Model):

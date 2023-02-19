@@ -7,13 +7,14 @@ from openpyxl.cell.cell import Cell
 from collections import namedtuple
 
 from django.db import models
+from django.db.models import Q
 from users.models import User
 from tempfile import NamedTemporaryFile
 
 from ticket.models import Ticket
 from additionally.models import Dictionary
 
-ALIGNMENT_DEFAULT = Alignment(horizontal="center", vertical="center", wrapText=True)
+ALIGNMENT_DEFAULT = Alignment(horizontal="center", vertical="center", wrapText=False)
 alignment_not_wrap = Alignment(horizontal="center", vertical="center", wrapText=False)
 alignment_not_wrap_left = Alignment(
     horizontal="left", vertical="center", wrapText=False
@@ -66,12 +67,20 @@ class Report(models.Model):
     def file_name(self):
         return self.file.name.split("/")[-1]
 
-    def create_report(self):
+    def get_tickets_to_report(self):
+        status = Dictionary.get_status_ticket("done")
         tickets = Ticket.objects.filter(
-            date_create__gte=self.start_date,
-            date_update__lte=self.end_date,
-            status=Dictionary.get_status_ticket("done"),
-        ).values("sap_id", "shop_id", "address", "date_create", "date_update")
+            Q(status=status)
+            & (
+                Q(date_update__lte=self.end_date)
+                | Q(completion_date__lte=self.end_date)
+            )
+            & Q(date_create__gte=self.start_date)
+        )
+        return tickets
+
+    def create_report(self):
+        tickets = self.get_tickets_to_report()
         self.create_excel_file(tickets)
 
     def create_excel_file(self, tickets):

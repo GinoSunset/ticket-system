@@ -1,11 +1,12 @@
 import pytest
 from notifications.models import Notification
 
+from additionally.models import Dictionary
+
 
 class TestCreateNotifySignal:
     """Test create notify signal."""
 
-    @pytest.mark.skip
     @pytest.mark.django_db
     def test_create_notify_by_new_ticket(
         self,
