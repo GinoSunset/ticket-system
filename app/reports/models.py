@@ -1,4 +1,5 @@
 import openpyxl
+import re
 from openpyxl.styles import Font, Alignment, Color, PatternFill
 from openpyxl.styles.borders import Border, Side
 from openpyxl.worksheet.worksheet import Worksheet
@@ -84,12 +85,19 @@ class Report(models.Model):
         comments = ticket.get_comments_for_report()
         comments_text = "\n------------\n".join(
             [
-                f"[{comment.author}-{comment.date_create.strftime('%d-%m-%Y')}]\n{comment.text}"
+                f"[{comment.author}-{comment.date_create.strftime('%d-%m-%Y')}]\n{self.clean_text_from_html(comment.text)}"
                 for comment in comments
             ]
         )
 
         return comments_text
+
+    def clean_text_from_html(self, text):
+        if "<div>" not in text:
+            return text
+        html_tag_pattern = re.compile(r"<[^>]+>")
+        text_without_html = re.sub(html_tag_pattern, "", text)
+        return f"<! удалены html теги !>{text_without_html}"
 
     def create_excel_file(self, tickets):
         """

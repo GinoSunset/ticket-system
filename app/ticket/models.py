@@ -141,7 +141,7 @@ class Ticket(models.Model):
 
 
 class Comment(models.Model):
-    NO_REPORT_TEXTS = ["Вложение из письма"]
+    NO_REPORT_TEXTS = ["Вложение из письма", ""]
 
     TEMPLATE_DICT = {
         "status": "{field} изменен c '{prev_value}' на '{value}'\n",
