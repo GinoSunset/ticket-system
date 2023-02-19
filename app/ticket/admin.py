@@ -16,9 +16,10 @@ class TicketAdmin(admin.ModelAdmin):
     )
     search_fields = (
         "sap_id",
-        "type_ticket__name",
+        "type_ticket__description",
         "customer__username",
         "contractor__username",
+        "status__description",
     )
 
 
