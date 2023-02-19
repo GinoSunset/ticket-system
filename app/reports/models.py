@@ -14,11 +14,9 @@ from tempfile import NamedTemporaryFile
 from ticket.models import Ticket
 from additionally.models import Dictionary
 
-ALIGNMENT_DEFAULT = Alignment(horizontal="center", vertical="center", wrapText=False)
-alignment_not_wrap = Alignment(horizontal="center", vertical="center", wrapText=False)
-alignment_not_wrap_left = Alignment(
-    horizontal="left", vertical="center", wrapText=False
-)
+ALIGNMENT_DEFAULT = Alignment(horizontal="center", vertical="center", wrapText=True)
+alignment_not_wrap = Alignment(horizontal="center", vertical="center", wrapText=True)
+alignment_wrap_left = Alignment(horizontal="left", vertical="center", wrapText=True)
 font_bold = Font(size=14, bold=True)
 FONT_DEFAULT = Font(size=14, bold=False)
 color = Color(rgb="3aaacf")
@@ -34,16 +32,15 @@ StyleField = namedtuple("StyleField", ["border", "alignment", "font", "fill", "l
 style_title = StyleField(BORDER_DEFAULT, ALIGNMENT_DEFAULT, font_bold, None, None)
 style_title_not_bold = StyleField(None, alignment_not_wrap, FONT_DEFAULT, None, None)
 
-row_style = StyleField(
-    BORDER_DEFAULT, alignment_not_wrap_left, FONT_DEFAULT, None, None
-)
-row_style_bold = StyleField(
-    BORDER_DEFAULT, alignment_not_wrap_left, font_bold, None, None
-)
+row_style = StyleField(BORDER_DEFAULT, alignment_wrap_left, FONT_DEFAULT, None, None)
+row_style_bold = StyleField(BORDER_DEFAULT, alignment_wrap_left, font_bold, None, None)
 row_style_center = StyleField(
     BORDER_DEFAULT, ALIGNMENT_DEFAULT, FONT_DEFAULT, None, None
 )
 row_style_number = StyleField(BORDER_DEFAULT, ALIGNMENT_DEFAULT, FONT_DEFAULT, None, 1)
+row_style_comment = StyleField(
+    BORDER_DEFAULT, alignment_wrap_left, FONT_DEFAULT, None, 60
+)
 
 
 class Report(models.Model):
@@ -72,8 +69,8 @@ class Report(models.Model):
         tickets = Ticket.objects.filter(
             Q(status=status)
             & (
-                Q(date_update__lte=self.end_date)
-                | Q(completion_date__lte=self.end_date)
+                Q(date_update__date__lte=self.end_date)
+                | Q(completion_date__date__lte=self.end_date)
             )
             & Q(date_create__gte=self.start_date)
         )
@@ -82,6 +79,17 @@ class Report(models.Model):
     def create_report(self):
         tickets = self.get_tickets_to_report()
         self.create_excel_file(tickets)
+
+    def get_comments(self, ticket):
+        comments = ticket.get_comments_for_report()
+        comments_text = "\n------------\n".join(
+            [
+                f"[{comment.author}-{comment.date_create.strftime('%d-%m-%Y')}]\n{comment.text}"
+                for comment in comments
+            ]
+        )
+
+        return comments_text
 
     def create_excel_file(self, tickets):
         """
@@ -93,13 +101,15 @@ class Report(models.Model):
         ws.title = "Отчет"
         ws.append(self.header_style(ws))
         for num, ticket in enumerate(tickets):
+            comments_text = self.get_comments(ticket)
             values = [
                 num + 1,
-                ticket["sap_id"],
-                ticket["shop_id"],
-                ticket["address"],
-                ticket["date_create"].date(),
-                ticket["date_update"].date(),
+                ticket.sap_id,
+                ticket.shop_id,
+                ticket.address,
+                ticket.date_create.date(),
+                ticket.date_update.date(),
+                comments_text,
             ]
             ws.append(self.row_style(ws, num + 2, values))
         with NamedTemporaryFile() as tmp:
@@ -114,6 +124,7 @@ class Report(models.Model):
             "Адрес Объекта (магазина «Детский мир»)",
             "Дата принятия в работу",
             "Дата закрытия заявки",
+            "Комментарии",
         ]
         for header in headers:
             c = Cell(ws, column=headers.index(header) + 1, row=1, value=header)
@@ -127,6 +138,7 @@ class Report(models.Model):
         date_start = 4
         date_end = 5
         sap_id = 1
+        comment = 6
 
         for num, value in enumerate(data):
             c = Cell(ws, column=num + 1, row=row_num, value=value)
@@ -136,6 +148,8 @@ class Report(models.Model):
                 self.set_style(c, ws, style=row_style_center)
             elif num == sap_id:
                 self.set_style(c, ws, style=row_style_bold)
+            elif num == comment:
+                self.set_style(c, ws, style=row_style_comment)
             else:
                 self.set_style(c, ws, style=row_style)
             yield c
@@ -152,6 +166,6 @@ class Report(models.Model):
         if style.length:
             ws.column_dimensions[c.column_letter].width = style.length
         else:
-            length = len(str(c.value)) + 4
+            length = len(str(c.value)) + 6
             length = length if length > 10 else 10
             ws.column_dimensions[c.column_letter].width = length

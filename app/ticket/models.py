@@ -125,6 +125,12 @@ class Ticket(models.Model):
     def get_absolute_url(self):
         return reverse("ticket-update", kwargs={"pk": self.pk})
 
+    def get_comments_for_report(self):
+
+        comments = self.comments.filter(is_system_message=False, text__isnull=False)
+        comments = comments.exclude(text__in=Comment.NO_REPORT_TEXTS)
+        return comments
+
     def save(
         self, force_insert=False, force_update=False, using=None, update_fields=None
     ):
@@ -135,6 +141,8 @@ class Ticket(models.Model):
 
 
 class Comment(models.Model):
+    NO_REPORT_TEXTS = ["Вложение из письма"]
+
     TEMPLATE_DICT = {
         "status": "{field} изменен c '{prev_value}' на '{value}'\n",
         "contractor": "{value} назначен(а) исполнителем\n",
