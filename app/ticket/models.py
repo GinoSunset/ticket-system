@@ -126,8 +126,8 @@ class Ticket(models.Model):
         return reverse("ticket-update", kwargs={"pk": self.pk})
 
     def get_comments_for_report(self):
-
         comments = self.comments.filter(is_system_message=False, text__isnull=False)
+        comments = comments.exclude(is_for_report=False)
         comments = comments.exclude(text__in=Comment.NO_REPORT_TEXTS)
         return comments
 
@@ -171,6 +171,7 @@ class Comment(models.Model):
     )
     is_changed = models.BooleanField(default=False)
     is_system_message = models.BooleanField(default=False)
+    is_for_report = models.BooleanField(default=False)
 
     def __str__(self) -> str:
         content = ""

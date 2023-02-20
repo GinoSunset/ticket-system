@@ -5,7 +5,7 @@ from django.views.generic import ListView, UpdateView, DeleteView, View
 from django.views.generic.edit import CreateView
 from django.urls import reverse
 from django.contrib.auth.mixins import LoginRequiredMixin
-from django.shortcuts import redirect
+from django.shortcuts import redirect, get_object_or_404
 
 from users.models import Operator, Customer, User, Contractor
 from additionally.models import Dictionary
@@ -201,3 +201,11 @@ class TicketToWorkView(LoginRequiredMixin, AccessOperatorMixin, View):
 
         Comment.create_update_system_comment(message, ticket, user)
         return redirect("ticket-update", pk=ticket.pk)
+
+
+class UpdateCommentForReportView(LoginRequiredMixin, AccessOperatorMixin, View):
+    def get(self, request, *args, **kwargs):
+        comment = get_object_or_404(Comment, pk=kwargs.get("pk"))
+        comment.is_for_report = not comment.is_for_report
+        comment.save()
+        return redirect("ticket-update", pk=comment.ticket.pk)
