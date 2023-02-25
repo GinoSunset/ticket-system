@@ -1,0 +1,31 @@
+<div class="fields">
+    <div class="fifteen wide field">
+        <div class="ui input">
+            <input type="text"  name="{{ widget.name }}" value="{{widget.value|default:""}}" {% include "django/forms/widgets/attrs.html" %}>
+        </div>
+    </div>
+
+    <div class="one wide field">
+        <a class="ui icon button">
+            <i class="plus icon"></i>
+        </a>
+    </div>
+</div>
+
+<script>
+    $(document).ready(function(){
+        let phone_count_el = $("[name=extra_phones_count]");
+        let phone_count = Number(phone_count_el.val());
+        $('.ui.icon.button').click(function(){
+            var input = $(this).parent().prev().find('input');
+            var value = input.val();
+            var name = input.attr('name');
+            var newInput = $('<div class="fifteen wide field"><div class="ui input"><input type="text" name="'+name+'_'+phone_count+'"></div></div>');
+            phone_count += 1;
+            phone_count_el.val(phone_count);
+            var newDiv = $('<div class="fields"></div>');
+            newDiv.append(newInput);
+            $(this).parent().parent().parent().append(newDiv);
+        });
+    });
+</script>

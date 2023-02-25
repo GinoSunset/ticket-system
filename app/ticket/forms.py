@@ -1,11 +1,14 @@
 from django import forms
 from additionally.models import Dictionary, DictionaryType
 from .models import Ticket, Comment
-from .widgets import CalendarInput, ContractorSelect
+from .widgets import CalendarInput, ContractorSelect, PhoneInput, PhoneInputWithoutAdd
 from users.models import Contractor
 
 
 class TicketsForm(forms.ModelForm):
+
+    extra_phones_count = forms.CharField(widget=forms.HiddenInput())
+
     class Meta:
         model = Ticket
         fields = [
@@ -28,10 +31,21 @@ class TicketsForm(forms.ModelForm):
         widgets = {
             "planned_execution_date": CalendarInput(),
             "contractor": ContractorSelect(),
+            "phone": PhoneInput(attrs={"type": "tel"}),
         }
 
     def __init__(self, *args, **kwargs):
+        extra_phones = kwargs.pop("extra_phone", 0)
         super().__init__(*args, **kwargs)
+
+        self.fields["extra_phones_count"].initial = extra_phones
+        for i in range(extra_phones):
+            self.fields[f"phone_{i}"] = forms.CharField(
+                label="Дополнительный телефон",
+                widget=PhoneInputWithoutAdd(attrs={"type": "tel"}),
+                required=False,
+            )
+
         type_ticket = DictionaryType.objects.get(code="type_ticket")
         type_status = DictionaryType.objects.get(code="status_ticket")
         self.fields["type_ticket"].queryset = Dictionary.objects.filter(

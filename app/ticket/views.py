@@ -85,6 +85,15 @@ class TicketUpdateView(LoginRequiredMixin, AccessTicketMixin, UpdateView):
         )
         return self.initial
 
+    def get_form_kwargs(self):
+        # TODO:  Задать начальное
+        kwargs = super().get_form_kwargs()
+        if self.request.POST:
+            extra_phones = self.request.POST.get("extra_phones_count")
+            if extra_phones:
+                kwargs["extra_phone"] = int(extra_phones)
+        return kwargs
+
     def form_valid(self, form: TicketsForm):
         result = super().form_valid(form)
         if form.changed_data:

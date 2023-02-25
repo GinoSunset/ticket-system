@@ -18,3 +18,11 @@ class ContractorSelect(Select):
                 option["city"] = contractor.profile_contractor.city
                 option["region"] = contractor.profile_contractor.region
         return option
+
+
+class PhoneInput(Input):
+    template_name = "ticket/widgets/phone.html"
+
+
+class PhoneInputWithoutAdd(Input):
+    template_name = "ticket/widgets/phone_without_add.html"
