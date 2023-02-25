@@ -70,6 +70,12 @@ class TicketUpdateView(LoginRequiredMixin, AccessTicketMixin, UpdateView):
     form_class = TicketsForm
     template_name = "ticket/ticket_update.html"
 
+    def get_context_data(self, **kwargs):
+        kwargs = super().get_context_data(**kwargs)
+        if self.object.phone:
+            kwargs["phones"] = self.object.phone.splitlines()
+        return kwargs
+
     def get_initial(self):
         self.initial = super().get_initial()
         customer = Customer.objects.all()

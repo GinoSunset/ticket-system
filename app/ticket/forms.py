@@ -28,6 +28,7 @@ class TicketsForm(forms.ModelForm):
         widgets = {
             "planned_execution_date": CalendarInput(),
             "contractor": ContractorSelect(),
+            "phone": forms.Textarea(attrs={"rows": 2}),
         }
 
     def __init__(self, *args, **kwargs):
@@ -67,6 +68,7 @@ class TicketsFormCustomer(forms.ModelForm):
         ]
         widgets = {
             "status": forms.TextInput(attrs={"type": "hidden"}),
+            "phone": forms.Textarea(attrs={"rows": 2}),
         }
 
     def __init__(self, *args, **kwargs):

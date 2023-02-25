@@ -9,7 +9,9 @@
       <div class="item">
         <i class="phone icon"></i>
         <div class="content">
-          <a href="tel:{{ticket.phone}}"> {{ticket.phone}}</a>
+          {% for phone  in phones %}
+            <a href="tel:{{phone}}"> {{phone}}</a>
+          {% endfor %}
         </div>
       </div>
       {%endif%}
