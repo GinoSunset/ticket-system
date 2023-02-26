@@ -32,3 +32,6 @@ class ContractorForm(forms.ModelForm):
             "first_name",
             "last_name",
         ]
+        widgets = {
+            "phone": forms.Textarea(attrs={"rows": 2}),
+        }

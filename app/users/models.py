@@ -43,7 +43,7 @@ class User(AbstractUser):
     )
     date_of_create = models.DateTimeField(auto_now_add=True)
     last_connect = models.DateField(help_text="Последний вход", null=True, blank=True)
-    phone = models.CharField("Телефон", max_length=18, blank=True, null=True)
+    phone = models.CharField("Телефон", max_length=72, blank=True, null=True)
     role = models.CharField(max_length=50, choices=Role.choices, verbose_name="Роль")
     telegram_id = models.CharField("Telegram ID", max_length=100, blank=True, null=True)
     email_notify = models.BooleanField("Уведомлять по email", default=True)
