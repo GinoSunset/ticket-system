@@ -189,9 +189,6 @@ class Act(models.Model):
     file_doc_act = models.FileField(
         upload_to="secret/acts/%Y/%m/", verbose_name="Акт выполненных работ"
     )
-    file_act_pdf = models.FileField(
-        upload_to="secret/acts/%Y/%m/", verbose_name="Акт выполненных работ PDF"
-    )
 
     def create_act(self):
         template_dir = settings.BASE_DIR / "reports/templates/reports/act"
