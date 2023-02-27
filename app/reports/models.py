@@ -182,7 +182,7 @@ class Report(models.Model):
 class Act(models.Model):
 
     ticket = models.OneToOneField(
-        Ticket, verbose_name="Заявка", on_delete=models.CASCADE, related_name="act"
+        Ticket, verbose_name="Заявка", on_delete=models.CASCADE
     )
 
     date_create = models.DateTimeField(auto_now_add=True, verbose_name="Дата создания")
@@ -194,14 +194,6 @@ class Act(models.Model):
     )
 
     def create_act(self):
-        self.create_doc_act()
-        self.create_pdf_act()
-
-    def create_doc_act(self):
-        """
-        Create doc file with act
-        """
-
         template_dir = settings.BASE_DIR / "reports/templates/reports/act"
         template = template_dir / "act_DM.docx"
         doc = DocxTemplate(template)
@@ -215,9 +207,29 @@ class Act(models.Model):
         return f"Акт {self.ticket}"
 
     def get_context(self):
+        date_start = self.ticket.date_to_work or self.ticket.date_create
+        date_str = self.get_str_date(date_start)
         context = {
             "ticket": self.ticket,
-            "date": self.ticket.completion_date.strftime("«%d»   %m   %Y"),
+            "date": date_str,
             "org": self.ticket.customer.profile.company or " ",
         }
         return context
+
+    def get_str_date(self, date):
+        month = {
+            1: "января",
+            2: "февраля",
+            3: "марта",
+            4: "апреля",
+            5: "мая",
+            6: "июня",
+            7: "июля",
+            8: "августа",
+            9: "сентября",
+            10: "октября",
+            11: "ноября",
+            12: "декабря",
+        }
+        date_str = f"«{date.day}» {month[date.month]} {date.year}"
+        return date_str

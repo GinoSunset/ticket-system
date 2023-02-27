@@ -63,6 +63,24 @@
         </div>
       </div>
       {%endif%}
+      {% if user.is_operator or user.is_contractor %}
+      {% if ticket.act.file_doc_act %}
+        <div class="item">
+          <i class="file alternate icon"></i>
+          <div class="content">
+            <a href="{{ticket.act.file_doc_act.url}}" target="_blank">Скачать акт</a>
+          </div>
+        </div>
+      {% else %}
+        <div class="item">
+          <i class="file alternate icon"></i>
+          <div class="content">
+            <a href="{% url 'act-create' ticket.pk %}">Создать акт</a>
+          </div>
+        </div>
+      {% endif %}
+      
+      {% endif %}
 
     </div>
   </div>

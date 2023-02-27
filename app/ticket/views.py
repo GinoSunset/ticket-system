@@ -6,6 +6,7 @@ from django.views.generic.edit import CreateView
 from django.urls import reverse
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.shortcuts import redirect, get_object_or_404
+from reports.models import Act
 
 from users.models import Operator, Customer, User, Contractor
 from additionally.models import Dictionary
@@ -206,6 +207,16 @@ class TicketToWorkView(LoginRequiredMixin, AccessOperatorMixin, View):
         ticket.save()
 
         Comment.create_update_system_comment(message, ticket, user)
+        return redirect("ticket-update", pk=ticket.pk)
+
+
+class TicketCreateAct(LoginRequiredMixin, AccessOperatorMixin, View):
+    def get(self, request, *args, **kwargs):
+        ticket: Ticket = Ticket.objects.get(pk=kwargs.get("pk"))
+        if not hasattr(ticket, "act"):
+            act = Act.objects.create(ticket=ticket)
+            ticket.refresh_from_db()
+        ticket.act.create_act()
         return redirect("ticket-update", pk=ticket.pk)
 
 

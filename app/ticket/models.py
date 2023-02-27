@@ -3,6 +3,7 @@ from django.contrib.auth import get_user_model
 from django.db import models
 from django.urls import reverse
 from django.utils import timezone
+from reports.utils import create_act_for_ticket
 from users.models import Operator
 
 User = get_user_model()
@@ -107,6 +108,10 @@ class Ticket(models.Model):
         "Дата завершения", null=True, blank=True, help_text="Дата завершения заявки"
     )
 
+    date_to_work = models.DateTimeField(
+        "Дата взятия в работу", null=True, blank=True, help_text="Дата взятия в работу"
+    )
+
     def __str__(self):
         return f"{self.pk} - {self.type_ticket}, {self.customer=}"
 
@@ -137,6 +142,14 @@ class Ticket(models.Model):
         if self.pk:
             if self.status == Dictionary.objects.get(code="done"):
                 self.completion_date = timezone.now()
+            if self.status == Dictionary.objects.get(code="work"):
+                if not self.date_to_work:
+                    self.date_to_work = timezone.now()
+                    self.save()
+                if not hasattr(self, "act"):
+                    self.act = create_act_for_ticket(ticket=self)
+                if not self.act.file_doc_act:
+                    self.act.create_act()
         return super().save(force_insert, force_update, using, update_fields)
 
 

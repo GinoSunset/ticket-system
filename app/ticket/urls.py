@@ -9,6 +9,7 @@ from .views import (
     DeleteCommentImageView,
     TicketToWorkView,
     UpdateCommentForReportView,
+    TicketCreateAct,
 )
 
 
@@ -38,4 +39,5 @@ urlpatterns = [
         name="comment-toggle-for-report",
     ),
     path("to-work/<int:pk>", TicketToWorkView.as_view(), name="ticket-to-work"),
+    path("act-create/<int:pk>", TicketCreateAct.as_view(), name="act-create"),
 ]

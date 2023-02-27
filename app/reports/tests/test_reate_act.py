@@ -1,3 +1,5 @@
+import tempfile
+from django.test import override_settings
 import pytest
 
 from django.utils import timezone
@@ -5,6 +7,7 @@ from reports.models import Act
 
 
 @pytest.mark.django_db
+@override_settings(MEDIA_ROOT=tempfile.mkdtemp())
 def test_generate_success_act(
     ticket_factory, customer_factory, act_factory, status_done
 ):
@@ -18,5 +21,5 @@ def test_generate_success_act(
     ticket.save()
     ticket.refresh_from_db()
     act: Act = act_factory(ticket=ticket)
-    act.create_doc_act()
+    act.create_act()
     assert act.file_doc_act is not None
