@@ -180,6 +180,9 @@ class Report(models.Model):
 
 
 class Act(models.Model):
+    class Meta:
+        verbose_name = "Акт выполненных работ"
+        verbose_name_plural = "Акты выполненных работ"
 
     ticket = models.OneToOneField(
         Ticket, verbose_name="Заявка", on_delete=models.CASCADE
