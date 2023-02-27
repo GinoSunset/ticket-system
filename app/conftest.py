@@ -2,6 +2,7 @@ import pytest
 
 from pytest_factoryboy import register
 from ticket.factory import TicketFactory
+from additionally.models import Dictionary
 from notifications.tasks import send_email, send_email_task
 
 from notifications.factory import NotificationFactory
@@ -11,7 +12,7 @@ from users.factory import (
     OperatorFactory,
     ContractorFactory,
 )
-from reports.factories import ReportFactory
+from reports.factories import ReportFactory, ActFactory
 
 register(TicketFactory)
 register(UserFactory)
@@ -20,6 +21,7 @@ register(OperatorFactory)
 register(ContractorFactory)
 register(NotificationFactory)
 register(ReportFactory)
+register(ActFactory)
 
 
 @pytest.fixture
@@ -28,3 +30,8 @@ def monkeypatch_delay_send_email_on_celery(monkeypatch):
         return send_email(*args, **kwargs)
 
     monkeypatch.setattr(send_email_task, "delay", mock_delay)
+
+
+@pytest.fixture
+def status_done():
+    return Dictionary.get_status_ticket("done")

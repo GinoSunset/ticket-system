@@ -1,19 +1,19 @@
-import openpyxl
 import re
-from openpyxl.styles import Font, Alignment, Color, PatternFill
-from openpyxl.styles.borders import Border, Side
-from openpyxl.worksheet.worksheet import Worksheet
-from openpyxl.cell.cell import Cell
-
 from collections import namedtuple
-
-from django.db import models
-from django.db.models import Q
-from users.models import User
 from tempfile import NamedTemporaryFile
 
-from ticket.models import Ticket
+import openpyxl
 from additionally.models import Dictionary
+from django.conf import settings
+from django.db import models
+from django.db.models import Q
+from docxtpl import DocxTemplate
+from openpyxl.cell.cell import Cell
+from openpyxl.styles import Alignment, Color, Font, PatternFill
+from openpyxl.styles.borders import Border, Side
+from openpyxl.worksheet.worksheet import Worksheet
+from ticket.models import Ticket
+from users.models import User
 
 ALIGNMENT_DEFAULT = Alignment(horizontal="center", vertical="center", wrapText=True)
 alignment_not_wrap = Alignment(horizontal="center", vertical="center", wrapText=True)
@@ -177,3 +177,47 @@ class Report(models.Model):
             length = len(str(c.value)) + 6
             length = length if length > 10 else 10
             ws.column_dimensions[c.column_letter].width = length
+
+
+class Act(models.Model):
+
+    ticket = models.OneToOneField(
+        Ticket, verbose_name="Заявка", on_delete=models.CASCADE, related_name="act"
+    )
+
+    date_create = models.DateTimeField(auto_now_add=True, verbose_name="Дата создания")
+    file_doc_act = models.FileField(
+        upload_to="secret/acts/%Y/%m/", verbose_name="Акт выполненных работ"
+    )
+    file_act_pdf = models.FileField(
+        upload_to="secret/acts/%Y/%m/", verbose_name="Акт выполненных работ PDF"
+    )
+
+    def create_act(self):
+        self.create_doc_act()
+        self.create_pdf_act()
+
+    def create_doc_act(self):
+        """
+        Create doc file with act
+        """
+
+        template_dir = settings.BASE_DIR / "reports/templates/reports/act"
+        template = template_dir / "act_DM.docx"
+        doc = DocxTemplate(template)
+        context = self.get_context()
+        doc.render(context)
+        with NamedTemporaryFile() as tmp:
+            doc.save(tmp.name)
+            self.file_doc_act.save(f"{self.ticket.pk}.docx", tmp)
+
+    def __str__(self) -> str:
+        return f"Акт {self.ticket}"
+
+    def get_context(self):
+        context = {
+            "ticket": self.ticket,
+            "date": self.ticket.completion_date.strftime("«%d»   %m   %Y"),
+            "org": self.ticket.customer.profile.company or " ",
+        }
+        return context
