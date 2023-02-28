@@ -1,4 +1,10 @@
 {% extends 'ticsys/index.html' %}
+{% load static %}
+{% block header_style %}
+<link rel="stylesheet" type="text/css" href="{% static 'DataTables/DataTables-1.13.1/css/dataTables.semanticui.min.css' %}"/> 
+<script type="text/javascript" src="{% static 'DataTables/DataTables-1.13.1/js/jquery.dataTables.min.js' %}"></script>
+<script type="text/javascript" src="{% static 'DataTables/DataTables-1.13.1/js/dataTables.semanticui.min.js' %}"></script>
+{% endblock %}
 {% block content %}
 <h1>Заявка №{{ticket.pk}}</h1>
 
@@ -156,7 +162,7 @@
 {% endfor %}
 </div>
 
-<div class="ui modal">
+<div class="ui modal" id="changeTicket">
   <i class="close icon"></i>
   <div class="header">Изменить заявку</div>
   <div class="content">
@@ -180,8 +186,10 @@
 {% endblock content %}
 {% block script %}
 <script>
-  $('.ui.modal')
-  .modal('attach events', '#run_modal', 'show');
+
+  $("#run_modal").click(function(){
+      $('#changeTicket').modal('show');
+  });
 
   $('#date_calendar_planned_execution_date').calendar({
     type: "date",

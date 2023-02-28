@@ -1,0 +1,94 @@
+{% load static %}
+<div class="fields">
+    <div class="fifteen wide field">
+        <select id="{{ widget.name }}_id" class="contractor input" disable name="{{ widget.name }}"{% include "django/forms/widgets/attrs.html" %}>{% for group_name, group_choices, group_index in widget.optgroups %}{% if group_name %}
+            <optgroup label="{{ group_name }}">{% endif %}{% for option in group_choices %}
+                {% include option.template_name with widget=option %}{% endfor %}{% if group_name %}
+                </optgroup>{% endif %}{% endfor %}
+        </select>
+    </div>
+
+    <div class="one wide field">
+    <a  href="{% url 'contractor-create' %} " class="ui icon button">
+        <i class="plus icon"></i>
+    </a>
+    </div>
+</div>
+
+<div class="ui modal choice contractor" id="modalChoiceContractor">
+    <i class="close icon"></i>
+    <div class="header">
+      Выбрать исполнителя
+    </div>
+   <div class="content">
+        <table id="tableContractor" class="ui table" style="width:100%">
+            <thead>
+                <tr>
+                    <th>id</th>
+                    <th>Имя</th>
+                    <th>Фамилия</th>
+                    <th>Компания</th>
+                    <th>Город</th>
+                    <th>Область</th>
+                    <th>Примечание</th>
+                </tr>
+            </thead>
+        </table>
+    </div>
+    <div class="actions">
+        <div id="apply" class="ui positive right labeled icon button">
+            Выбрать
+            <i class="checkmark icon"></i>
+        </div>
+  </div>
+
+<script>
+    $('[name="{{ widget.name }}"]').click(function(){
+        $('#modalChoiceContractor').modal('show');
+    });
+    $('#modalChoiceContractor').modal({
+        allowMultiple: true
+      })
+
+    var table  = $('#tableContractor').DataTable({
+        ajax: {
+            url: "{% url 'contractor-list-ajax' %}",
+        },
+        paging: false,
+        bPaginate: false,
+        language: {
+            url: "{% static 'DataTables/ru.json'%}"
+        }
+    })
+    $('#tableContractor tbody').on('click', 'tr', function () {
+        if ($(this).hasClass('selected')) {
+            $(this).removeClass('selected');
+        } else {
+            table.$('tr.selected').removeClass('selected');
+            $(this).addClass('selected');
+        }
+    });
+
+    $('#apply').click(function () {
+        if (table.$('tr.selected').length === 0) {
+            $.toast({
+                class: 'error',
+                message: `Исполнитель не выбран !`
+              })
+              return false;
+            }
+        $('[name="{{ widget.name }}"]').val(table.rows('.selected').data()[0][0]);
+
+    });
+
+    const selects =  document.getElementById('{{ widget.name }}_id')
+
+    selects.addEventListener('mousedown', dropDown);
+    
+
+    function dropDown(e) {
+    e.preventDefault();
+
+
+    }
+</script>

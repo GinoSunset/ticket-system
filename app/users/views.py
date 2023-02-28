@@ -1,7 +1,9 @@
 from django.urls import reverse, reverse_lazy
 from django.views.generic import ListView, CreateView, UpdateView
 from django.contrib.auth.mixins import LoginRequiredMixin
-from django.http import Http404
+from django.http import Http404, JsonResponse
+
+from ticket.mixin import AccessOperatorMixin
 from .forms import CustomerForm, ContractorForm
 from .models import Customer, Contractor, ContractorProfile
 
@@ -53,6 +55,29 @@ class ListCustomerView(LoginRequiredMixin, ListView):
 class ListContractorView(LoginRequiredMixin, ListView):
     model = Contractor
     template_name = "users/contractor_list.html"
+
+
+class ListContractorJsonView(LoginRequiredMixin, AccessOperatorMixin, ListView):
+    model = Contractor
+
+    def render_to_response(self, context, **response_kwargs):
+        """first_name, last_name, company, city, region, note"""
+        return JsonResponse(
+            {
+                "data": [
+                    [
+                        contractor.id,
+                        contractor.first_name,
+                        contractor.last_name,
+                        contractor.profile_contractor.company,
+                        contractor.profile_contractor.city,
+                        contractor.profile_contractor.region,
+                        contractor.profile_contractor.note,
+                    ]
+                    for contractor in context["object_list"]
+                ]
+            }
+        )
 
 
 class UpdateCustomer(LoginRequiredMixin, UpdateView):

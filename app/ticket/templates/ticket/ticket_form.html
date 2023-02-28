@@ -1,4 +1,10 @@
 {% extends 'ticsys/index.html' %}
+{% load static %}
+{% block header_style %}
+<link rel="stylesheet" type="text/css" href="{% static 'DataTables/DataTables-1.13.1/css/dataTables.semanticui.min.css' %}"/> 
+<script type="text/javascript" src="{% static 'DataTables/DataTables-1.13.1/js/jquery.dataTables.min.js' %}"></script>
+<script type="text/javascript" src="{% static 'DataTables/DataTables-1.13.1/js/dataTables.semanticui.min.js' %}"></script>
+{% endblock %}
 {% block content %}
 <h1>Новая заявка</h1>
 <div class="ui container">
