@@ -104,7 +104,14 @@
         </div>
         <div class="item"> 
           <div class="header"> Исполнитель</div> 
-          {% firstof ticket.contractor "<i>Не назначен</i>" %}
+          {% if ticket.contractor %}
+          {{ticket.contractor}}
+          {% if ticket.contractor.phone %}
+          <a href="tel:{{ticket.contractor.phone}}">{{ticket.contractor.phone}}</a>
+          {% endif %}
+          {% else %}
+          <i>Не назначен</i>
+          {% endif %}
         </div>
         <div class="item"> 
           <div class="header"> Статус</div> 
