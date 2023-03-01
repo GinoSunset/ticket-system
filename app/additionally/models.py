@@ -45,3 +45,17 @@ class Dictionary(models.Model):
     def get_type_ticket(cls, code):
         dt = DictionaryType.objects.get(code="type_ticket")
         return cls.objects.get(type_dict=dt, code=code)
+
+    def get_status_color(self):
+        if self.type_dict != DictionaryType.objects.get(code="status_ticket"):
+            return
+        color = {
+            "work": "blue",
+            "search_contractor": "orange",
+            "consideration": "teal",
+            "revision": "yellow",
+            "done": "green",
+            "new": "violet",
+            "testing": "pink",
+        }
+        return color.get(self.code, "detail")

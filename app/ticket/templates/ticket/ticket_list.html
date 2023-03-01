@@ -8,14 +8,23 @@
 
 {% block content %}
 <h1>Заявки</h1>
-
-<div class="ui icon right floated pointing dropdown button ">
-  <i class="wrench icon"></i>
-  <div class="menu">
-    <div class="header">Настройка отображения</div>
-    <div class="item" onclick="toogle_hidden_done()"><i id="icon_hide_show" class="hide icon"></i><span id="hide_text">Скрыть завершенные</span></div>
+{% comment %} <div class="ui icon right floated pointing multiple dropdown button "> {% endcomment %}
+  <div class="ui multiple right floated dropdown labeled icon button " id="filterBtn">
+    <input type="hidden" name="filters">
+    <i class="filter icon"></i>
+    <span class="text">Скрыть статусы</span>
+    <div class="menu">
+  
+      <div class="scrolling menu">
+        {% for status in statuses %}
+        <div class="item" data-value="{{status.description}}">
+          <div class="ui {{status.get_status_color}} empty circular label"></div>
+          {{status.description}}
+        </div>
+        {% endfor %}
+      </div>
+    </div>
   </div>
-</div>
 <table id="tableTickets"class="ui celled small compact table">
     <thead>
       <tr>
@@ -67,17 +76,27 @@
 {% block script %}
 <script>
     {% if  object_list%}
-    var hidden_done = JSON.parse(localStorage.hidden_done || null) || false;
-    if (hidden_done){
-      $("#icon_hide_show").toggleClass("hide eye");
-      $('#hide_text').text("Показать завершенные");
+    var hidden_values = JSON.parse(localStorage.hidden_value || null) || false;
+    if (hidden_values){
+      let hidden_value_list = hidden_values.split(",");
+      for (var i = 0; i < hidden_value_list.length; i++) {
+        $("#filterBtn").dropdown('set selected', hidden_value_list[i]);
+      }
+      
     }
 
     $.fn.dataTable.ext.search.push(function (settings, data, dataIndex) {
       var status = data
-
-      if (status.indexOf("Выполнено") >= 0 && hidden_done ) {
+      to_hide = $("#filterBtn").dropdown('get value');
+      if (!to_hide){
+        return true;
+      }
+      to_hide = to_hide.split(",");
+      for (var i = 0; i < to_hide.length; i++) {
+        to_hide[i] = to_hide[i].trim();
+        if (status.indexOf(to_hide[i]) >= 0) {
           return false;
+        }
       }
       return true;
     });
@@ -101,18 +120,15 @@
     });
 
 
-    $(".pointing.dropdown.button").dropdown()
+    $("#filterBtn").dropdown({
+      onChange: function (value, text, $selectedItem) {
+        localStorage.setItem('hidden_value', JSON.stringify(value));
+        
+        table.draw();
 
-    function toogle_hidden_done(){
-      hidden_done = !hidden_done;
-      localStorage.setItem('hidden_done', JSON.stringify(hidden_done));
-      table.draw();
-      $("#icon_hide_show").toggleClass("hide eye");
-      var text = $('#hide_text').text();
-      $('#hide_text').text(
-        text == "Скрыть завершенные" ? "Показать завершенные" : "Скрыть завершенные");
+      }
+    })
 
-    }
     {% endif %}
 
 
