@@ -67,8 +67,10 @@ class Report(models.Model):
 
     def get_tickets_to_report(self):
         status = Dictionary.get_status_ticket("done")
+        warranty = Dictionary.get_type_ticket("warranty")
         tickets = Ticket.objects.filter(
             Q(status=status)
+            & ~Q(type_ticket=warranty)
             & (
                 Q(completion_date__date__lte=self.end_date)
                 | Q(date_update__date__lte=self.end_date)
