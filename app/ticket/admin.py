@@ -13,8 +13,12 @@ class TicketAdmin(admin.ModelAdmin):
         "status",
         "city",
         "id_email_message",
+        "date_update",
+        "date_create",
     )
+    readonly_fields = ("date_update", "date_create")
     search_fields = (
+        "pk",
         "sap_id",
         "type_ticket__description",
         "customer__username",
