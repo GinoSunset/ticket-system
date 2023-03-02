@@ -70,10 +70,10 @@ class Report(models.Model):
         tickets = Ticket.objects.filter(
             Q(status=status)
             & (
-                Q(date_update__date__lte=self.end_date)
-                | Q(completion_date__date__lte=self.end_date)
+                Q(completion_date__date__lte=self.end_date)
+                | Q(date_update__date__lte=self.end_date)
             )
-            & Q(date_create__gte=self.start_date)
+            & Q(completion_date__date__gte=self.start_date)
         )
         return tickets
 
