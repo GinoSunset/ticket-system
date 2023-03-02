@@ -113,13 +113,18 @@ class Report(models.Model):
         ws.append(self.header_style(ws))
         for num, ticket in enumerate(tickets):
             comments_text = self.get_comments(ticket)
+            start_date = ticket.date_to_work or ticket.date_create
+            end_date = ticket.completion_date or ticket.date_update
+            start_date = start_date.strftime("%d.%m.%Y")
+            end_date = end_date.strftime("%d.%m.%Y")
+
             values = [
                 num + 1,
                 ticket.sap_id,
                 ticket.shop_id,
                 ticket.address,
-                ticket.date_create.date(),
-                ticket.date_update.date(),
+                start_date,
+                end_date,
                 comments_text,
             ]
             ws.append(self.row_style(ws, num + 2, values))
