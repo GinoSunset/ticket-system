@@ -73,7 +73,10 @@ class Report(models.Model):
                 Q(completion_date__date__lte=self.end_date)
                 | Q(date_update__date__lte=self.end_date)
             )
-            & Q(completion_date__date__gte=self.start_date)
+            & (
+                Q(completion_date__date__gte=self.start_date)
+                | Q(date_update__date__gte=self.start_date)
+            )
         )
         return tickets
 
