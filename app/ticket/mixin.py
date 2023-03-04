@@ -35,8 +35,10 @@ class AccessAuthorMixin(UserPassesTestMixin):
         user: User = self.request.user
         if user.is_staff:
             return True
-        object_ = self.get_object()
-        author = getattr(object_, self.author_field, None)
+        get_author_method = getattr(self, "get_author", None)
+        if not get_author_method:
+            raise AttributeError("Object must have get_author method")
+        author = get_author_method()
         if author is None:
             return False
         return author == user

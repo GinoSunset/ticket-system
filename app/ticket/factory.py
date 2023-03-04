@@ -1,6 +1,6 @@
 import factory
 from .models import Ticket, Comment
-from users.factory import CustomerFactory
+from users.factory import CustomerFactory, UserFactory
 
 
 class TicketFactory(factory.django.DjangoModelFactory):
@@ -19,4 +19,4 @@ class CommentFactory(factory.django.DjangoModelFactory):
 
     text = factory.Faker("text")
     ticket = factory.SubFactory(TicketFactory)
-    user = factory.SubFactory(CustomerFactory)
+    author = factory.SubFactory(UserFactory)

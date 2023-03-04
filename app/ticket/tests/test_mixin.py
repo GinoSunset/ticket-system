@@ -5,7 +5,8 @@ from ticket.mixin import AccessAuthorMixin
 
 class TestAccessAuthorMixin:
     class MockView(AccessAuthorMixin):
-        author_field = "author"
+        def get_author(self):
+            return self.author
 
         def __init__(self, author, request=None):
             self.author = author

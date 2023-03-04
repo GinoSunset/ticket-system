@@ -3,6 +3,8 @@ from django.urls import reverse
 from ticket.models import Ticket
 from users.models import User, Customer, Contractor
 from additionally.models import Dictionary
+from django.core.files.uploadedfile import SimpleUploadedFile
+from ticket.models import CommentImage
 
 
 @pytest.mark.django_db
@@ -176,3 +178,20 @@ def test_update_status_to_work(
     ticket.refresh_from_db()
     assert ticket.status == Dictionary.objects.get(code="work")
     assert ticket.responsible == user
+
+
+@pytest.mark.django_db
+def test_delete_comment_image_by_operator(
+    ticket_factory,
+    operator_factory,
+    client,
+    monkeypatch_delay_send_email_on_celery,
+    comment_factory,
+):
+    user = operator_factory()
+    comment = comment_factory(author=user)
+    image = comment.images.create(image=SimpleUploadedFile("test.jpg", b"test"))
+    client.force_login(user=user)
+    res = client.post(reverse("delete-comment-image", kwargs={"pk": image.pk}))
+    assert res.status_code == 302
+    assert not CommentImage.objects.filter(pk=image.pk).exists()

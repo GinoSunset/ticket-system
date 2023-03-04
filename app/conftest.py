@@ -1,7 +1,7 @@
 import pytest
 
 from pytest_factoryboy import register
-from ticket.factory import TicketFactory
+from ticket.factory import TicketFactory, CommentFactory
 from additionally.models import Dictionary
 from notifications.tasks import send_email, send_email_task
 
@@ -22,6 +22,7 @@ register(ContractorFactory)
 register(NotificationFactory)
 register(ReportFactory)
 register(ActFactory)
+register(CommentFactory)
 
 
 @pytest.fixture
