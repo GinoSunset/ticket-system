@@ -137,7 +137,7 @@ class Ticket(models.Model):
         return comments
 
     def get_colored_status_if_dup_shop(self):
-        if self.status.code == "new":
+        if self.status and self.status.code == "new":
             if self.is_dup_shop():
                 return "violet colored"
         return
