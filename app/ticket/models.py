@@ -136,6 +136,15 @@ class Ticket(models.Model):
         comments = comments.exclude(text__in=Comment.NO_REPORT_TEXTS)
         return comments
 
+    def get_colored_status_if_dup_shop(self):
+        if self.status.code == "new":
+            if self.is_dup_shop():
+                return "violet colored"
+        return
+
+    def is_dup_shop(self):
+        return Ticket.objects.filter(shop_id=self.shop_id).count() >= 2
+
     def save(
         self, force_insert=False, force_update=False, using=None, update_fields=None
     ):

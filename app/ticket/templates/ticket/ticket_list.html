@@ -56,7 +56,7 @@
         <td data-label="contractor">{% firstof ticket.contractor %}</td>
         {% endif %}
         <td data-label="planned_execution_date">{{ticket.planned_execution_date|date:"Y-m-d"}}</td>
-        <td data-label="status">{% if ticket.status %} <div class="ui {{ticket.get_color_status}} label">{{ticket.status}}</div>{% endif %}</td>
+        <td data-label="status" class={{ ticket.get_colored_status_if_dup_shop }}>{% if ticket.status %} <div class="ui {{ticket.get_color_status}} label">{{ticket.status}}</div>{% endif %}</td>
         <td data-label="address">{% firstof ticket.city %}</td>
         <td data-label="shop_id">{% firstof ticket.shop_id %}</td>
         <td><a class="ui button info" target="_blank" href={% url 'ticket-update' ticket.pk %}>Просмотр</a></td>
