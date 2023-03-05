@@ -142,7 +142,8 @@ class CommentUpdateView(LoginRequiredMixin, AccessAuthorMixin, UpdateView):
     template_name = "ticket/comment_form.html"
 
     def get_author(self):
-        return self.object.author
+        obj = self.get_object()
+        return obj.author
 
     def get_initial(self):
         self.initial.update({"author": self.request.user})
@@ -172,7 +173,8 @@ class DeleteCommentFileView(LoginRequiredMixin, AccessAuthorMixin, DeleteView):
     template_name = "ticket/comment_file_delete.html"
 
     def get_author(self):
-        return self.object.comment.author
+        obj = self.get_object()
+        return obj.comment.author
 
     def get_context_data(self, **kwargs):
         kwargs = super().get_context_data(**kwargs)
