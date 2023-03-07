@@ -107,6 +107,7 @@ def create_ticket_from_email(email: MailMessage) -> bool:
     message = email.text or email.html
     message = remove_duplicate_new_lines(message)
     id_email_message = email.headers.get("message-id")[0].strip()
+    reply_to = email.cc
     ticket_info = get_info_from_message(message, customer)
     creator = User.objects.get(username=settings.TICKET_CREATOR_USERNAME)
     status = Dictionary.get_status_ticket("new")
@@ -118,6 +119,7 @@ def create_ticket_from_email(email: MailMessage) -> bool:
         status=status,
         type_ticket=type_ticket,
         id_email_message=id_email_message,
+        _reply_to_emails=",".join(reply_to),
         **ticket_info,
     )
     save_attachment(email, ticket, customer)

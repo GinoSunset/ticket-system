@@ -112,6 +112,16 @@ class Ticket(models.Model):
         "Дата взятия в работу", null=True, blank=True, help_text="Дата взятия в работу"
     )
 
+    _reply_to_emails = models.CharField(
+        "Адреса для ответов", max_length=1000, null=True, blank=True
+    )
+
+    @property
+    def reply_to_emails(self):
+        if self._reply_to_emails:
+            return self._reply_to_emails.split(",")
+        return []
+
     def __str__(self):
         return f"{self.pk} - {self.type_ticket}, {self.customer=}"
 
