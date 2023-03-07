@@ -20,6 +20,12 @@ logging.basicConfig(
     level=logging.INFO,
     format="%(asctime)s %(levelname)s %(message)s",
 )
+# add logging save to file
+fh = logging.FileHandler("save_reply_to_from_emails.log")
+fh.setLevel(logging.INFO)
+formatter = logging.Formatter("%(asctime)s - %(name)s - %(levelname)s - %(message)s")
+fh.setFormatter(formatter)
+logging.getLogger().addHandler(fh)
 
 
 def get_mails():
