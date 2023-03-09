@@ -30,6 +30,7 @@ def create_notifications(instance: Ticket):
         Notification.objects.create(
             user=user,
             message=message,
+            type_notify=Notification.TypeNotification.NEW_TICKET,
         )
 
 

@@ -221,7 +221,9 @@ class TicketToWorkView(LoginRequiredMixin, AccessOperatorMixin, View):
         ticket.responsible = request.user
         ticket.save()
 
+        Notification.create_notify_for_customer_when_ticket_to_work(ticket)
         Comment.create_update_system_comment(message, ticket, user)
+
         return redirect("ticket-update", pk=ticket.pk)
 
 

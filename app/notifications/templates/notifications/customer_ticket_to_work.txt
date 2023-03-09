@@ -1,2 +1,3 @@
-заявка {% if ticket.sap_id%}{{sap_id}}{% else %}{{ticket.pk}}{% endif %} взята в работу. Ответвенный {{operator}}
-подробнее по ссылке {{link}}
+Заявка {% if ticket.sap_id%}{{sap_id}}{% else %}{{ticket.pk}}{% endif %} взята в работу. 
+Ответвенный {{ticket.responsible}}.
+Подробнее по ссылке {{link}}

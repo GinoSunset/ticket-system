@@ -1,11 +1,11 @@
 import pytest
-import factory
 
 from additionally.models import Dictionary
 from django.urls import reverse
-from django.db.models import signals
 
+from notifications.models import Notification
 from ticket.models import Comment, Ticket
+from django.core import mail
 
 
 class TestUpdateTicket:
@@ -83,3 +83,32 @@ class TestUpdateTicket:
         comment = ticket.comments.first().text
         assert f"статус изменен c " in comment
         assert f"John Smit" in comment
+
+    @pytest.mark.django_db
+    def test_update_status_to_done_create_notify_for_customer_with_all_emails(
+        self,
+        ticket_factory,
+        operator_factory,
+        customer_factory,
+        client,
+        monkeypatch_delay_send_email_on_celery,
+    ):
+        emails = {"cust1@email.com", "cust2@email.com", "cust3@email.com"}
+        user = operator_factory(first_name="John", last_name="Smit")
+        status = Dictionary.objects.get(code="new")
+        customer = customer_factory(email="cust1@email.com")
+        ticket: Ticket = ticket_factory(
+            creator=user,
+            status=status,
+            customer=customer,
+            _reply_to_emails=",".join(emails),
+        )
+        client.force_login(user=user)
+
+        res = client.get(reverse("ticket-to-work", kwargs={"pk": ticket.pk}))
+        assert res.status_code == 302
+
+        notify = Notification.objects.first()
+
+        assert notify.user == customer
+        assert emails == set(mail.outbox[0].to)
