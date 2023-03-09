@@ -13,11 +13,12 @@ def create_customer_profile(sender, instance, created, **kwargs):
 
 
 def send_notify(notification):
-    if notification.user:
-        if notification.user.email and notification.user.email_notify:
-            send_email_task.delay(notification.pk)
-        if notification.user.telegram_id and notification.user.telegram_notify:
-            send_telegram_notify(notification.user, notification)
+    if notification.user.telegram_id and notification.user.telegram_notify:
+        send_telegram_notify(notification.user, notification)
+    if notification.user.email_notify and (
+        notification.emails or notification.email or notification.user.email
+    ):
+        send_email_task.delay(notification.pk)
 
 
 def send_telegram_notify(user, notification):

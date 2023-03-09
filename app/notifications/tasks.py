@@ -20,7 +20,7 @@ def send_email(notification_pk):
     )
     subject = "Новая заявка"
     status = send_mail(
-        subject, message, settings.EMAIL_HOST_USER, [notification.user.email]
+        subject, message, settings.EMAIL_HOST_USER, notification.get_emails()
     )
 
     return status

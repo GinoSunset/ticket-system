@@ -1,6 +1,8 @@
 from additionally.models import Dictionary
 from django.contrib.auth import get_user_model
 from django.db import models
+from django.conf import settings
+from django.contrib.sites.models import Site
 from django.urls import reverse
 from django.utils import timezone
 from reports.utils import create_act_for_ticket
@@ -139,6 +141,9 @@ class Ticket(models.Model):
 
     def get_absolute_url(self):
         return reverse("ticket-update", kwargs={"pk": self.pk})
+
+    def get_external_url(self):
+        return f"{settings.PROTOCOL}://{Site.objects.get_current()}{self.get_absolute_url()}"
 
     def get_comments_for_report(self):
         comments = self.comments.filter(is_system_message=False, text__isnull=False)
