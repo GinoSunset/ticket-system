@@ -63,3 +63,19 @@ def test_not_take_ticket_with_type_warranty(ticket_factory, report_factory):
     )
     tickets = report.get_tickets_to_report()
     assert tickets.count() == 0
+
+
+@pytest.mark.django_db
+def test_success_get_comment_for_report(
+    ticket_factory, comment_factory, report_factory
+):
+    ticket = ticket_factory()
+    size_comment_for_report = 3
+    comments = comment_factory.create_batch(
+        size=size_comment_for_report, ticket=ticket, is_for_report=True
+    )
+    comment_factory(is_for_report=False)
+    report: Report = report_factory()
+
+    comments_str = report.get_comments(ticket)
+    assert len(comments_str.split(report.COMMENT_SEP)) == size_comment_for_report

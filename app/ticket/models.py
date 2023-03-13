@@ -1,8 +1,10 @@
+import re
+
 from additionally.models import Dictionary
-from django.contrib.auth import get_user_model
-from django.db import models
 from django.conf import settings
+from django.contrib.auth import get_user_model
 from django.contrib.sites.models import Site
+from django.db import models
 from django.urls import reverse
 from django.utils import timezone
 from reports.utils import create_act_for_ticket
@@ -223,6 +225,18 @@ class Comment(models.Model):
                 content += " "
             content += f"[{self.images.count()} image(s)]"
         return f"[{self.ticket.pk}] {content}"
+
+    def comment_for_report(self):
+        header = f"[{self.author}-{self.date_create.strftime('%d-%m-%Y')}]"
+        return f"{header}\n{self.clean_text_from_html(self.text)}"
+
+    @staticmethod
+    def clean_text_from_html(text: str) -> str:
+        if "<div>" not in text:
+            return text
+        html_tag_pattern = re.compile(r"<[^>]+>")
+        text_without_html = re.sub(html_tag_pattern, "", text)
+        return f"<! удалены html теги !>{text_without_html}"
 
     def get_short_text(self) -> str:
         if self.text:

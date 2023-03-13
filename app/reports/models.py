@@ -1,4 +1,3 @@
-import re
 from collections import namedtuple
 from tempfile import NamedTemporaryFile
 
@@ -45,6 +44,8 @@ row_style_comment = StyleField(
 
 
 class Report(models.Model):
+    COMMENT_SEP = "\n------------\n"
+
     class Meta:
         verbose_name = "Отчет"
         verbose_name_plural = "Отчеты"
@@ -86,23 +87,12 @@ class Report(models.Model):
         tickets = self.get_tickets_to_report()
         self.create_excel_file(tickets)
 
-    def get_comments(self, ticket):
+    def get_comments(self, ticket: Ticket) -> str:
         comments = ticket.get_comments_for_report()
-        comments_text = "\n------------\n".join(
-            [
-                f"[{comment.author}-{comment.date_create.strftime('%d-%m-%Y')}]\n{self.clean_text_from_html(comment.text)}"
-                for comment in comments
-            ]
+        comments_text = self.COMMENT_SEP.join(
+            [comment.comment_for_report() for comment in comments]
         )
-
         return comments_text
-
-    def clean_text_from_html(self, text):
-        if "<div>" not in text:
-            return text
-        html_tag_pattern = re.compile(r"<[^>]+>")
-        text_without_html = re.sub(html_tag_pattern, "", text)
-        return f"<! удалены html теги !>{text_without_html}"
 
     def create_excel_file(self, tickets):
         """
