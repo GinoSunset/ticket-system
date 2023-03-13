@@ -80,6 +80,8 @@ class TicketUpdateView(LoginRequiredMixin, AccessTicketMixin, UpdateView):
         kwargs = super().get_context_data(**kwargs)
         if self.object.phone:
             kwargs["phones"] = self.object.phone.splitlines()
+        if not self.request.user.is_operator:
+            kwargs.pop("form")
         return kwargs
 
     def get_initial(self):

@@ -229,3 +229,29 @@ def test_update_comment(
     assert res.status_code == 302
     comment.refresh_from_db()
     assert comment.text == "new_text"
+
+
+class TestUpdateTicketPage:
+    @pytest.mark.django_db
+    def test_update_ticket_by_customer_has_not_form_in_context(
+        self, ticket_factory, customer_factory, client
+    ):
+        user = customer_factory()
+        ticket = ticket_factory(customer=user)
+        client.force_login(user=user)
+        res = client.get(reverse("ticket-update", kwargs={"pk": ticket.pk}))
+        assert res.status_code == 200
+        assert "form" not in res.context_data
+
+    @pytest.mark.django_db
+    def test_update_ticket_by_operator_has_form_in_context(
+        self, ticket_factory, operator_factory, client, customer_factory
+    ):
+        operator = operator_factory()
+        customer = customer_factory()
+        ticket = ticket_factory(customer=customer)
+        operator.customers.add(ticket.customer.profile)
+        client.force_login(user=operator)
+        res = client.get(reverse("ticket-update", kwargs={"pk": ticket.pk}))
+        assert res.status_code == 200
+        assert "form" in res.context_data

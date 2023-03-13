@@ -168,7 +168,7 @@
   {% include "ticket/ticket_comment_list.html" %}
 {% endfor %}
 </div>
-
+{% if user.is_operator %}
 <div class="ui modal" id="changeTicket">
   <i class="close icon"></i>
   <div class="header">Изменить заявку</div>
@@ -190,6 +190,7 @@
     </form>
   </div>
 </div>
+{% endif %}
 {% endblock content %}
 {% block script %}
 <script>
