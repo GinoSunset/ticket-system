@@ -24,14 +24,19 @@ def save_tickets_from_emails() -> int:
             )
             continue
         logging.info(f"Processing ticket from {email.from_}")
-        if is_reply_message(email):
-            logging.info("Email is reply message. Save as comment")
-            status = create_comment_from_email(email)
-        else:
-            status = create_ticket_from_email(email)
+        status = processing_email(email)
         if status:
             count += 1
     return count
+
+
+def processing_email(email):
+    if is_reply_message(email):
+        logging.info("Email is reply message. Save as comment")
+        status = create_comment_from_email(email)
+    else:
+        status = create_ticket_from_email(email)
+    return status
 
 
 def is_email_for_processing(email: MailMessage) -> bool:
@@ -48,6 +53,8 @@ def is_email_for_processing(email: MailMessage) -> bool:
 def is_reply_message(email: MailMessage) -> bool:
     if email.headers.get("in-reply-to"):
         return True
+    if email.subject.startswith("RE: "):
+        return True
     return False
 
 
@@ -55,17 +62,13 @@ def create_comment_from_email(email: MailMessage) -> bool:
     email_customer = email.from_
     user = User.objects.get(email__iregex=email_customer)
 
-    message = email.text or email.html
     id_email_message = email.headers.get("message-id")[0].strip()
-    id_email_message_in_reply_to = email.headers.get("in-reply-to")[0]
-    try:
-        ticket = get_ticket_by_message_id_reply(id_email_message_in_reply_to)
-    except Ticket.DoesNotExist:
-        logging.info(
-            f"Ticket with id_email_message {id_email_message_in_reply_to} not found"
-        )
+    ticket = get_ticket_from_email(email)
+    if not ticket:
         return False
+    message = email.text or email.html
     message = cleanup_comment_text(message)
+    message = f"[Из письма] {message}"
     comment = ticket.comments.create(
         text=message,
         author=user,
@@ -73,6 +76,34 @@ def create_comment_from_email(email: MailMessage) -> bool:
     )
     save_attachment(email, ticket, user, comment)
     return True
+
+
+def get_ticket_from_email(email):
+    ticket = None
+
+    id_email_message_in_reply_to = email.headers.get("in-reply-to")
+    if id_email_message_in_reply_to:
+        id_email_message_in_reply_to = id_email_message_in_reply_to[0].strip()
+        ticket = get_ticket_by_message_id_reply(id_email_message_in_reply_to)
+        if not ticket:
+            logging.info(
+                f"Ticket with id_email_message {id_email_message_in_reply_to} not found"
+            )
+        return ticket
+
+    sap_id = get_sap_id_from_subject(email.subject)
+    if sap_id:
+        ticket = Ticket.objects.filter(sap_id=sap_id).last()
+        if not ticket:
+            logging.info(f"Ticket with sap_id {sap_id} from {email.subject} not found")
+    return ticket
+
+
+def get_sap_id_from_subject(subject: str) -> str:
+    match = re.search(r"\d{10}", subject)
+    if match:
+        return match.group(0)
+    return None
 
 
 def get_ticket_by_message_id_reply(id_email_message_in_reply_to):
@@ -83,7 +114,7 @@ def get_ticket_by_message_id_reply(id_email_message_in_reply_to):
         return comment.ticket
     ticket = Ticket.objects.filter(id_email_message=id_email_message_in_reply_to).last()
     if not ticket:
-        raise Ticket.DoesNotExist
+        return None
     return ticket
 
 
@@ -137,17 +168,27 @@ def get_info_from_message(message: str, customer: Customer) -> dict:
     return info
 
 
-def cleanup_comment_text(text: str) -> str:
+def cleanup_comment_text(start_text: str) -> str:
     """
     remove all text start char '>' and text after it
     """
+    text = remove_inner_mail_text(start_text)
     lines = text.splitlines()
     new_lines = []
     for line in lines:
         if line.startswith(">"):
             continue
+        if "[cid:" in line:
+            continue
         new_lines.append(line)
     return remove_duplicate_new_lines("\n".join(new_lines).strip())
+
+
+def remove_inner_mail_text(text: str) -> str:
+    messages = text.split("From: ")
+    if messages:
+        return messages[0]
+    return text
 
 
 def remove_duplicate_new_lines(text: str) -> str:

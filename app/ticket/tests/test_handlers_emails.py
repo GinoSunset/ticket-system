@@ -1,8 +1,11 @@
 import pytest
+from django.conf import settings
+from imap_tools.message import MailMessage
 from ticket.handlers import (
     create_ticket_from_email,
     create_comment_from_email,
     cleanup_comment_text,
+    processing_email,
 )
 from ticket.models import Ticket
 
@@ -81,3 +84,19 @@ def test_load_ticket(customer_factory):
 
     result = save_tickets_from_emails()
     assert result == 1
+
+
+@pytest.mark.django_db
+def test_creating_comment_from_emails_with_trees(customer_factory, ticket_factory):
+    sap_id_from_email = "8001128295"
+    with open(
+        settings.BASE_DIR / f"ticket/tests/RE_{sap_id_from_email}_tets.eml", "rb"
+    ) as f:
+        data = f.read()
+    email_ticket = MailMessage.from_bytes(data)
+
+    customer_factory(email=email_ticket.from_)
+    ticket: Ticket = ticket_factory(sap_id=sap_id_from_email)
+    status = processing_email(email_ticket)
+
+    assert status
