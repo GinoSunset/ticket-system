@@ -16,6 +16,8 @@ class AccessTicketMixin(UserPassesTestMixin):
             return ticket.contractor == user
         if user.is_operator:
             operator: Operator = user.get_role_user()
+            if ticket.creator == user:
+                return True
             return ticket.customer in operator.get_customers()
         return ticket.creator == user
 

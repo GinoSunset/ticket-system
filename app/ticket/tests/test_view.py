@@ -150,9 +150,9 @@ def test_customer_save_ticket_has_all_needed_field(customer_factory, client):
 
 @pytest.mark.django_db
 def test_update_ticket_has_set_status_on_html_select(
-    ticket_factory, user_factory, client
+    ticket_factory, operator_factory, client
 ):
-    user = user_factory()
+    user = operator_factory()
     status = Dictionary.objects.get(code="consideration")
     ticket = ticket_factory(creator=user, status=status)
     client.force_login(user=user)
