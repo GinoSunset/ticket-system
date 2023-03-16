@@ -146,10 +146,10 @@
                 {% endif %}
               </a>
             {% endif %}
-            {% comment %} {% if ticket.status.code != "done" %}
-              <a class="ui left floated button positive basic" >Выполнить</a>
+            {% if ticket.status.code != "done" %}
+              <a class="ui left floated button positive basic" id="to_done" >Выполнить</a>
             {% endif %}
-            {% if ticket.status.code != "cancel" %}
+            {% comment %} {% if ticket.status.code != "cancel" %}
               <a class="ui left floated button negative basic">Отменить</a>
             {% endif %} {% endcomment %}
           {% endif %}
@@ -194,11 +194,19 @@
 {% endblock content %}
 {% block script %}
 <script>
-
+  {% if user.is_operator %}
   $("#run_modal").click(function(){
       $('#changeTicket').modal('show');
   });
 
+  $("#to_done").click(function(){
+    $.modal('confirm', "Выполнить?" ,'Перевести задачу в выполнено и отправить сообщения заказчику?', function(choice){
+      if (choice){
+      window.location.href = "{% url 'ticket-to-done' ticket.pk %}";
+      }
+    });
+  });
+  {% endif %}
   $('#date_calendar_planned_execution_date').calendar({
     type: "date",
     firstDayOfWeek: 1,

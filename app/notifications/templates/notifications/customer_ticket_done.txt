@@ -1,0 +1,9 @@
+Заявка {% if ticket.sap_id%}{{ticket.sap_id}}{% else %}{{ticket.pk}}{% endif %} выполнена. 
+
+{% if ticket.get_comments_for_report%}Комментарии:{% endif%}
+{% for comment in ticket.get_comments_for_report %}------------
+{{comment.comment_for_report}}
+{% endfor %}
+
+Подробнее по ссылке {{link}}
+

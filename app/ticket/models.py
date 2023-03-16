@@ -147,10 +147,12 @@ class Ticket(models.Model):
     def get_external_url(self):
         return f"{settings.PROTOCOL}://{Site.objects.get_current()}{self.get_absolute_url()}"
 
-    def get_comments_for_report(self):
-        comments = self.comments.filter(is_system_message=False, text__isnull=False)
+    def get_comments_for_report(self, prefetch=False):
+        comments = self.comments.filter(is_system_message=False)
         comments = comments.exclude(is_for_report=False)
         comments = comments.exclude(text__in=Comment.NO_REPORT_TEXTS)
+        if prefetch:
+            comments = comments.prefetch_related("files", "images")
         return comments
 
     def get_colored_status_if_dup_shop(self):

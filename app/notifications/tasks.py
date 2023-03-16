@@ -1,5 +1,5 @@
 from ticsys import celery_app
-from django.core.mail import send_mail
+from django.core.mail import EmailMessage
 from django.template import loader
 from django.conf import settings
 
@@ -12,7 +12,7 @@ def send_email_task(notification_pk):
     return status
 
 
-def send_email(notification_pk):
+def send_email(notification_pk: int) -> int:
     type_mail_template = {
         "create_new_ticket": "notifications/mail/create_new_ticket.txt",
         "ticket_to_work": "notifications/mail/ticket_to_work.txt",
@@ -25,14 +25,29 @@ def send_email(notification_pk):
     )
     message = loader.get_template(template).render({"message": notification.message})
     subject = get_subject(notification)
-    status = send_mail(
+
+    email = EmailMessage(
         subject, message, settings.EMAIL_HOST_USER, notification.get_emails()
     )
 
+    if notification.is_needed_to_attach_files():
+        set_attachments(email, notification)
+
+    status = email.send()
     return status
 
 
-def get_subject(notification):
+def set_attachments(email: EmailMessage, notification: Notification) -> None:
+    if not notification.ticket:
+        return
+    for comment in notification.ticket.get_comments_for_report(prefetch=True):
+        for file in comment.files.all():
+            email.attach_file(file.file.path)
+        for image in comment.images.all():
+            email.attach_file(image.image.path)
+
+
+def get_subject(notification: Notification) -> str:
     if notification.subject:
         return notification.subject
 
