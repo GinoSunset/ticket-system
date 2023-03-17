@@ -15,15 +15,13 @@
         {% if comment.is_changed %}
         <i class="pen icon"></i>
         {% endif %}
-        {% if  user.is_operator and not comment.is_system_message and comment.text %}
+        {% if  user.is_operator and not comment.is_system_message %}
         <a href={% url 'comment-toggle-for-report' comment.pk %}><i data-content="Добавить комментарий к отчету" class="{% if comment.is_for_report %} check  {% endif %}outline circle icon"></i></a>
         {% endif %}
       </div>
       <div class="{% if comment.is_system_message %} ui info message {% endif %}text">
       {% if comment.text %}
         {{comment.text|safe|linebreaksbr|urlize }}
-      {% else %}
-        <i>No text</i>
       {% endif %}
       </div>
   

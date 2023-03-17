@@ -78,4 +78,26 @@ def test_success_get_comment_for_report(
     report: Report = report_factory()
 
     comments_str = report.get_comments(ticket)
+    assert comments_str
     assert len(comments_str.split(report.COMMENT_SEP)) == size_comment_for_report
+
+
+@pytest.mark.django_db
+def test_remove_empty_comment_for_report(
+    ticket_factory, comment_factory, report_factory
+):
+    ticket = ticket_factory()
+    size_no_empty_comment_for_report = 3
+    comments = comment_factory.create_batch(
+        size=size_no_empty_comment_for_report, ticket=ticket, is_for_report=True
+    )
+    comment_factory(text=None, is_for_report=True, ticket=ticket)
+    report: Report = report_factory()
+
+    assert len(ticket.get_comments_for_report()) == size_no_empty_comment_for_report + 1
+
+    comments_str = report.get_comments(ticket)
+    assert comments_str
+    assert (
+        len(comments_str.split(report.COMMENT_SEP)) == size_no_empty_comment_for_report
+    )

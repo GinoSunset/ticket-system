@@ -87,11 +87,12 @@ class Report(models.Model):
         tickets = self.get_tickets_to_report()
         self.create_excel_file(tickets)
 
-    def get_comments(self, ticket: Ticket) -> str:
+    def get_comments(self, ticket: Ticket) -> str | None:
         comments = ticket.get_comments_for_report()
-        comments_text = self.COMMENT_SEP.join(
-            [comment.comment_for_report() for comment in comments]
-        )
+        comments_report_texts = [
+            comment.comments_to_str_for_report() for comment in comments if comment.text
+        ]
+        comments_text = self.COMMENT_SEP.join(comments_report_texts)  # type: ignore
         return comments_text
 
     def create_excel_file(self, tickets):
