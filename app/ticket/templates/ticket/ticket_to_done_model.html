@@ -1,0 +1,88 @@
+{% if user.is_operator %}
+<div class="ui modal" id="ticketToDone">
+    <i class="close icon"></i>
+    <div class="header">Завершить задачу</div>
+    <div class="content">
+        Хотите добавить комментарий? Он прикрепиться к отчету автоматически
+        <button class="ui button large" id="btnAddCommentToReport">Добавить</button>
+    </div>
+    <div class="actions">
+        <a aria-label="Ok"  href="{% url 'ticket-to-done' ticket.pk %}" class="ui button positive">ОК</a>
+        <button aria-label="No" class="ui button negative">Отменить</button>
+    </div>
+</div>
+
+
+<div class="ui modal" id="CommentToReport">
+    <i class="close icon"></i>
+    <div class="header">Добавить комментарий к отчету</div>
+    <div class="content">
+        <form class="ui form" id="CreateCommentForReport">
+            {{ form_comment_to_report.non_field_errors }}
+            {% csrf_token %}
+            {% for field in form_comment_to_report %}
+            <div class="field">
+                {{ field.errors }}
+                {% if not field.is_hidden%}
+                {{ field.label_tag }} 
+                {% endif %}
+                {{ field }}
+            </div>
+            {% endfor %}    
+        </form>
+
+    </div>
+    <div class="actions">
+        <button aria-label="Ok" class="ui button positive" id="saveFortComment" >Сохранить</button>
+        <button aria-label="No" class="ui button negative">Отмена</button>
+    </div>
+</div>
+
+{% endif %}
+
+<script>
+    $("#btnAddCommentToReport").click(function(){
+        $("#CommentToReport").modal('show');
+
+    })
+    $("#CommentToReport").modal({
+        allowMultiple: true
+    });
+    
+    $("#saveFortComment").click(function(){
+        $("#CreateCommentForReport").submit();
+    })
+
+    $("#CreateCommentForReport").on('submit', function(e){
+        e.preventDefault();
+        create_comment_for_report($(this));
+    })
+
+
+    function create_comment_for_report(that){
+        var url = "{% url 'comment-create' ticket.id %}"
+        var formData = new FormData(that.get(0));        
+
+        $.ajax({
+            type: "POST",
+            url: url,
+            data: formData,
+            contentType: false,
+            processData: false,
+            success: function (data) {
+                $.toast({
+                    class: 'success',
+                    message: `Комментарий успешно добавлен`
+                  })
+                $("#CommentToReport").modal('hide');
+            },
+            error: function (data) {
+                $.toast({
+                    class: 'error',
+                    message: `Произошла ошибка при добавлении комментария, попробуйте добавить вручную`
+                  })
+            }
+           
+        });
+    } 
+</script>

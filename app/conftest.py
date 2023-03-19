@@ -36,3 +36,8 @@ def monkeypatch_delay_send_email_on_celery(monkeypatch):
 @pytest.fixture
 def status_done():
     return Dictionary.get_status_ticket("done")
+
+
+@pytest.fixture
+def status_in_work():
+    return Dictionary.get_status_ticket("work")

@@ -116,7 +116,9 @@ class Notification(models.Model):
         )
 
     @classmethod
-    def create_notify_for_customer_when_ticket_to_done(cls, ticket: Ticket):
+    def create_notify_for_customer_when_ticket_to_done(
+        cls, ticket: Ticket
+    ) -> "Notification":
         link = ticket.get_external_url()
         message = loader.get_template("notifications/customer_ticket_done.txt").render(
             {
@@ -133,3 +135,4 @@ class Notification(models.Model):
             ticket=ticket,
             subject=f"Заявка №{ticket.sap_id or ticket.pk} выполнена",
         )
+        return notify

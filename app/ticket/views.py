@@ -78,10 +78,15 @@ class TicketUpdateView(LoginRequiredMixin, AccessTicketMixin, UpdateView):
 
     def get_context_data(self, **kwargs):
         kwargs = super().get_context_data(**kwargs)
+
         if self.object.phone:
             kwargs["phones"] = self.object.phone.splitlines()
         if not self.request.user.is_operator:
             kwargs.pop("form")
+        if self.request.user.is_operator:
+            kwargs["form_comment_to_report"] = CommentForm(
+                initial={"is_for_report": True}
+            )
         return kwargs
 
     def get_initial(self):

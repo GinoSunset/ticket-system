@@ -191,6 +191,7 @@
   </div>
 </div>
 {% endif %}
+{% include "ticket/ticket_to_done_model.html" %}
 {% endblock content %}
 {% block script %}
 <script>
@@ -200,11 +201,7 @@
   });
 
   $("#to_done").click(function(){
-    $.modal('confirm', "Выполнить?" ,'Перевести задачу в выполнено и отправить сообщения заказчику?', function(choice){
-      if (choice){
-      window.location.href = "{% url 'ticket-to-done' ticket.pk %}";
-      }
-    });
+    $("#ticketToDone").modal('show');
   });
   {% endif %}
   $('#date_calendar_planned_execution_date').calendar({
