@@ -146,7 +146,7 @@
                 {% endif %}
               </a>
             {% endif %}
-            {% if ticket.status.code != "done" %}
+            {% if ticket.status.code != "done"  and ticket.status.code != "cancel"%}
               <a class="ui left floated button positive basic" id="to_done" >Выполнить</a>
             {% endif %}
             {% comment %} {% if ticket.status.code != "cancel" %}
