@@ -147,10 +147,12 @@ class Ticket(models.Model):
     def get_external_url(self):
         return f"{settings.PROTOCOL}://{Site.objects.get_current()}{self.get_absolute_url()}"
 
-    def get_comments_for_report(self):
-        comments = self.comments.filter(is_system_message=False, text__isnull=False)
+    def get_comments_for_report(self, prefetch=False) -> "models.QuerySet[Comment]":
+        comments = self.comments.filter(is_system_message=False)
         comments = comments.exclude(is_for_report=False)
         comments = comments.exclude(text__in=Comment.NO_REPORT_TEXTS)
+        if prefetch:
+            comments = comments.prefetch_related("files", "images")
         return comments
 
     def get_colored_status_if_dup_shop(self):
@@ -226,9 +228,10 @@ class Comment(models.Model):
             content += f"[{self.images.count()} image(s)]"
         return f"[{self.ticket.pk}] {content}"
 
-    def comment_for_report(self):
-        header = f"[{self.author}-{self.date_create.strftime('%d-%m-%Y')}]"
-        return f"{header}\n{self.clean_text_from_html(self.text)}"
+    def comments_to_str_for_report(self) -> str | None:
+        if self.text:
+            header = f"[{self.author}-{self.date_create.strftime('%d-%m-%Y')}]"
+            return f"{header}\n{self.clean_text_from_html(self.text)}"
 
     @staticmethod
     def clean_text_from_html(text: str) -> str:

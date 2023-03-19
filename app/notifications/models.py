@@ -1,3 +1,5 @@
+from typing import Sequence
+
 from django.db import models
 from django.contrib.auth import get_user_model
 from django.conf import settings
@@ -35,8 +37,15 @@ class Notification(models.Model):
         choices=TypeNotification.choices,
         default=TypeNotification.OTHER,
     )
+    ticket = models.ForeignKey(
+        Ticket,
+        on_delete=models.CASCADE,
+        related_name="notifications",
+        blank=True,
+        null=True,
+    )
 
-    def get_emails(self):
+    def get_emails(self) -> Sequence[str]:
         emails = set()
         if self.email:
             emails.add(self.email)
@@ -46,7 +55,7 @@ class Notification(models.Model):
             emails_list = [i.strip().lower() for i in self.emails.split(",")]
             emails.update(emails_list)
         self.remove_self_email(emails)
-        return emails
+        return list(emails)
 
     def remove_self_email(self, emails: set):
         """
@@ -57,6 +66,9 @@ class Notification(models.Model):
 
     def __str__(self):
         return f"{self.user} - {self.message}"
+
+    def is_needed_to_attach_files(self):
+        return self.type_notify in [Notification.TypeNotification.TICKET_DONE]
 
     class Meta:
         ordering = ["-created_at"]
@@ -84,6 +96,7 @@ class Notification(models.Model):
             user=user,
             message=message,
             type_notify=cls.TypeNotification.SET_CONTRACTOR,
+            ticket=ticket,
             subject=f"Заявка №{ticket.id}",
         )
 
@@ -99,4 +112,27 @@ class Notification(models.Model):
             message=message,
             type_notify="ticket_to_work",
             emails=ticket._reply_to_emails,
+            ticket=ticket,
         )
+
+    @classmethod
+    def create_notify_for_customer_when_ticket_to_done(
+        cls, ticket: Ticket
+    ) -> "Notification":
+        link = ticket.get_external_url()
+        message = loader.get_template("notifications/customer_ticket_done.txt").render(
+            {
+                "ticket": ticket,
+                "link": link,
+            }
+        )
+        user = ticket.customer
+        notify = cls.objects.create(
+            user=user,
+            message=message,
+            type_notify="ticket_done",
+            emails=ticket._reply_to_emails,
+            ticket=ticket,
+            subject=f"Заявка №{ticket.sap_id or ticket.pk} выполнена",
+        )
+        return notify

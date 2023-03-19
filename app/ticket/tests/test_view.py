@@ -1,5 +1,6 @@
 import pytest
 from django.urls import reverse
+from ticket.models import Comment
 from ticket.models import Ticket
 from users.models import User, Customer, Contractor
 from additionally.models import Dictionary
@@ -150,9 +151,9 @@ def test_customer_save_ticket_has_all_needed_field(customer_factory, client):
 
 @pytest.mark.django_db
 def test_update_ticket_has_set_status_on_html_select(
-    ticket_factory, user_factory, client
+    ticket_factory, operator_factory, client
 ):
-    user = user_factory()
+    user = operator_factory()
     status = Dictionary.objects.get(code="consideration")
     ticket = ticket_factory(creator=user, status=status)
     client.force_login(user=user)
@@ -255,3 +256,24 @@ class TestUpdateTicketPage:
         res = client.get(reverse("ticket-update", kwargs={"pk": ticket.pk}))
         assert res.status_code == 200
         assert "form" in res.context_data
+
+
+class TestCommentViews:
+    @pytest.mark.django_db
+    def test_create_comment_with_flag_is_for_report(
+        self,
+        ticket_factory,
+        operator_factory,
+        client,
+        monkeypatch_delay_send_email_on_celery,
+    ):
+        user = operator_factory()
+        ticket = ticket_factory(creator=user)
+        client.force_login(user=user)
+        res = client.post(
+            reverse("comment-create", kwargs={"ticket_pk": ticket.pk}),
+            data={"text": "bla", "is_for_report": True},
+        )
+        assert res.status_code == 302
+        comment = Comment.objects.first()
+        assert comment.is_for_report

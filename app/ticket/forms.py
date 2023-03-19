@@ -89,4 +89,8 @@ class CommentForm(forms.ModelForm):
 
     class Meta:
         model = Comment
-        fields = ["text"]
+        fields = ["text", "is_for_report"]
+
+        widgets = {
+            "is_for_report": forms.HiddenInput(),
+        }

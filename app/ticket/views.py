@@ -78,10 +78,15 @@ class TicketUpdateView(LoginRequiredMixin, AccessTicketMixin, UpdateView):
 
     def get_context_data(self, **kwargs):
         kwargs = super().get_context_data(**kwargs)
+
         if self.object.phone:
             kwargs["phones"] = self.object.phone.splitlines()
         if not self.request.user.is_operator:
             kwargs.pop("form")
+        if self.request.user.is_operator:
+            kwargs["form_comment_to_report"] = CommentForm(
+                initial={"is_for_report": True}
+            )
         return kwargs
 
     def get_initial(self):
@@ -224,6 +229,26 @@ class TicketToWorkView(LoginRequiredMixin, AccessOperatorMixin, View):
         ticket.save()
 
         Notification.create_notify_for_customer_when_ticket_to_work(ticket)
+        Comment.create_update_system_comment(message, ticket, user)
+
+        return redirect("ticket-update", pk=ticket.pk)
+
+
+class TicketToDoneView(LoginRequiredMixin, AccessOperatorMixin, View):
+    def get(self, request, *args, **kwargs):
+        user = self.request.user
+        ticket: Ticket = Ticket.objects.get(pk=kwargs.get("pk"))
+        status_done = Dictionary.get_status_ticket("done")
+        message = Comment.TEMPLATE_DICT[("status")]
+        message = message.format(
+            field="статус",
+            prev_value=ticket.status.description,
+            value=status_done.description,
+        )
+        ticket.status = status_done
+        ticket.save()
+
+        Notification.create_notify_for_customer_when_ticket_to_done(ticket)
         Comment.create_update_system_comment(message, ticket, user)
 
         return redirect("ticket-update", pk=ticket.pk)

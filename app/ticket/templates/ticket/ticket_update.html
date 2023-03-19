@@ -146,10 +146,10 @@
                 {% endif %}
               </a>
             {% endif %}
-            {% comment %} {% if ticket.status.code != "done" %}
-              <a class="ui left floated button positive basic" >Выполнить</a>
+            {% if ticket.status.code != "done" %}
+              <a class="ui left floated button positive basic" id="to_done" >Выполнить</a>
             {% endif %}
-            {% if ticket.status.code != "cancel" %}
+            {% comment %} {% if ticket.status.code != "cancel" %}
               <a class="ui left floated button negative basic">Отменить</a>
             {% endif %} {% endcomment %}
           {% endif %}
@@ -191,14 +191,19 @@
   </div>
 </div>
 {% endif %}
+{% include "ticket/ticket_to_done_model.html" %}
 {% endblock content %}
 {% block script %}
 <script>
-
+  {% if user.is_operator %}
   $("#run_modal").click(function(){
       $('#changeTicket').modal('show');
   });
 
+  $("#to_done").click(function(){
+    $("#ticketToDone").modal('show');
+  });
+  {% endif %}
   $('#date_calendar_planned_execution_date').calendar({
     type: "date",
     firstDayOfWeek: 1,
