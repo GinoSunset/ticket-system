@@ -254,6 +254,26 @@ class TicketToDoneView(LoginRequiredMixin, AccessOperatorMixin, View):
         return redirect("ticket-update", pk=ticket.pk)
 
 
+class TicketToCancelView(LoginRequiredMixin, AccessOperatorMixin, View):
+    def get(self, request, *args, **kwargs):
+        user = self.request.user
+        ticket: Ticket = Ticket.objects.get(pk=kwargs.get("pk"))
+        status_cancel = Dictionary.get_status_ticket("cancel")
+        message = Comment.TEMPLATE_DICT[("status")]
+        message = message.format(
+            field="статус",
+            prev_value=ticket.status.description,
+            value=status_cancel.description,
+        )
+        ticket.status = status_cancel
+        ticket.save()
+
+        Notification.create_notify_for_customer_when_ticket_to_cancel(ticket)
+        Comment.create_update_system_comment(message, ticket, user)
+
+        return redirect("ticket-update", pk=ticket.pk)
+
+
 class TicketCreateAct(LoginRequiredMixin, AccessOperatorMixin, View):
     def get(self, request, *args, **kwargs):
         ticket: Ticket = Ticket.objects.get(pk=kwargs.get("pk"))

@@ -68,7 +68,10 @@ class Notification(models.Model):
         return f"{self.user} - {self.message}"
 
     def is_needed_to_attach_files(self):
-        return self.type_notify in [Notification.TypeNotification.TICKET_DONE]
+        return self.type_notify in [
+            Notification.TypeNotification.TICKET_DONE,
+            Notification.TypeNotification.TICKET_CANCEL,
+        ]
 
     class Meta:
         ordering = ["-created_at"]
@@ -134,5 +137,27 @@ class Notification(models.Model):
             emails=ticket._reply_to_emails,
             ticket=ticket,
             subject=f"Заявка №{ticket.sap_id or ticket.pk} выполнена",
+        )
+        return notify
+
+    @classmethod
+    def create_notify_for_customer_when_ticket_to_cancel(
+        cls, ticket: Ticket
+    ) -> "Notification":
+        link = ticket.get_external_url()
+        message = loader.get_template("notifications/customer_ticket_done.txt").render(
+            {
+                "ticket": ticket,
+                "link": link,
+            }
+        )
+        user = ticket.customer
+        notify = cls.objects.create(
+            user=user,
+            message=message,
+            type_notify="ticket_cancel",
+            emails=ticket._reply_to_emails,
+            ticket=ticket,
+            subject=f"Заявка №{ticket.sap_id or ticket.pk} отменена",
         )
         return notify

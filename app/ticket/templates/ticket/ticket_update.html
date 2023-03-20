@@ -149,9 +149,9 @@
             {% if ticket.status.code != "done"  and ticket.status.code != "cancel"%}
               <a class="ui left floated button positive basic" id="to_done" >Выполнить</a>
             {% endif %}
-            {% comment %} {% if ticket.status.code != "cancel" %}
-              <a class="ui left floated button negative basic">Отменить</a>
-            {% endif %} {% endcomment %}
+            {% if ticket.status.code != "cancel" and ticket.status.code != "done"  %}
+              <a class="ui left floated button negative basic" id="to_cancel" >Отменить</a>
+            {% endif %}
           {% endif %}
         </div>
         <div class="eight wide column">
@@ -191,7 +191,7 @@
   </div>
 </div>
 {% endif %}
-{% include "ticket/ticket_to_done_model.html" %}
+{% include "ticket/ticket_to_quick_status.html" %}
 {% endblock content %}
 {% block script %}
 <script>
@@ -202,6 +202,10 @@
 
   $("#to_done").click(function(){
     $("#ticketToDone").modal('show');
+  });
+
+  $("#to_cancel").click(function(){
+    $("#ticketToCancel").modal('show');
   });
   {% endif %}
   $('#date_calendar_planned_execution_date').calendar({

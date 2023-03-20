@@ -26,6 +26,7 @@ def test_send_email(
         ("ticket_to_work", "Заявка в работе"),
         ("other", "Уведомление"),
         ("ticket_done", "Заявка выполнена"),
+        ("ticket_cancel", "Заявка отменена"),
     ],
 )
 def test_email_has_needed_subject(
@@ -86,6 +87,22 @@ def test_send_email_when_ticket_status_to_done(
     file = comment_2.files.create(file=SimpleUploadedFile("test.txt", b"test"))
 
     Notification.create_notify_for_customer_when_ticket_to_done(ticket)
+
+    assert len(mail.outbox) == 1
+    assert len(mail.outbox[0].attachments) == 2
+
+
+@pytest.mark.django_db
+def test_send_email_when_ticket_status_to_cancel(
+    monkeypatch_delay_send_email_on_celery, comment_factory, ticket_factory
+):
+    ticket = ticket_factory()
+    comment = comment_factory(is_for_report=True, ticket=ticket)
+    image = comment.images.create(image=SimpleUploadedFile("test.jpg", b"test"))
+    comment_2 = comment_factory(is_for_report=True, ticket=ticket)
+    file = comment_2.files.create(file=SimpleUploadedFile("test.txt", b"test"))
+
+    Notification.create_notify_for_customer_when_ticket_to_cancel(ticket)
 
     assert len(mail.outbox) == 1
     assert len(mail.outbox[0].attachments) == 2

@@ -12,6 +12,19 @@
     </div>
 </div>
 
+<div class="ui modal" id="ticketToCancel">
+    <i class="close icon"></i>
+    <div class="header">Отменить задачу</div>
+    <div class="content">
+        Хотите добавить комментарий? Он прикрепиться к отчету автоматически
+        <button class="ui button large" id="btnAddCommentToReport2">Добавить</button>
+    </div>
+    <div class="actions">
+        <a aria-label="Ok"  href="{% url 'ticket-to-cancel' ticket.pk %}" class="ui button positive">ОК</a>
+        <button aria-label="No" class="ui button negative">Отменить</button>
+    </div>
+</div>
+
 
 <div class="ui modal" id="CommentToReport">
     <i class="close icon"></i>
@@ -44,6 +57,10 @@
     $("#btnAddCommentToReport").click(function(){
         $("#CommentToReport").modal('show');
 
+    })
+    // TODO: remove ToReport2. Add class selector
+    $("#btnAddCommentToReport2").click(function(){
+        $("#CommentToReport").modal('show');
     })
     $("#CommentToReport").modal({
         allowMultiple: true

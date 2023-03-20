@@ -33,5 +33,10 @@ urlpatterns = [
     ),
     path("to-work/<int:pk>", views.TicketToWorkView.as_view(), name="ticket-to-work"),
     path("to-done/<int:pk>", views.TicketToDoneView.as_view(), name="ticket-to-done"),
+    path(
+        "to-cancel/<int:pk>",
+        views.TicketToCancelView.as_view(),
+        name="ticket-to-cancel",
+    ),
     path("act-create/<int:pk>", views.TicketCreateAct.as_view(), name="act-create"),
 ]

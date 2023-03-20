@@ -167,21 +167,6 @@ def test_update_ticket_has_set_status_on_html_select(
 
 
 @pytest.mark.django_db
-def test_update_status_to_work(
-    ticket_factory, operator_factory, client, monkeypatch_delay_send_email_on_celery
-):
-    user = operator_factory()
-    status = Dictionary.objects.get(code="new")
-    ticket: Ticket = ticket_factory(creator=user, status=status)
-    client.force_login(user=user)
-    res = client.get(reverse("ticket-to-work", kwargs={"pk": ticket.pk}))
-    assert res.status_code == 302
-    ticket.refresh_from_db()
-    assert ticket.status == Dictionary.objects.get(code="work")
-    assert ticket.responsible == user
-
-
-@pytest.mark.django_db
 def test_delete_comment_image_by_operator(
     ticket_factory,
     operator_factory,
@@ -256,6 +241,42 @@ class TestUpdateTicketPage:
         res = client.get(reverse("ticket-update", kwargs={"pk": ticket.pk}))
         assert res.status_code == 200
         assert "form" in res.context_data
+
+    @pytest.mark.django_db
+    def test_update_status_to_work(
+        self,
+        ticket_factory,
+        operator_factory,
+        client,
+        monkeypatch_delay_send_email_on_celery,
+    ):
+        user = operator_factory()
+        status = Dictionary.objects.get(code="new")
+        ticket: Ticket = ticket_factory(creator=user, status=status)
+        client.force_login(user=user)
+        res = client.get(reverse("ticket-to-work", kwargs={"pk": ticket.pk}))
+        assert res.status_code == 302
+        ticket.refresh_from_db()
+        assert ticket.status == Dictionary.objects.get(code="work")
+        assert ticket.responsible == user
+
+    @pytest.mark.django_db
+    def test_update_status_to_cancel(
+        self,
+        ticket_factory,
+        operator_factory,
+        client,
+        monkeypatch_delay_send_email_on_celery,
+    ):
+        user = operator_factory()
+        status = Dictionary.objects.get(code="new")
+        ticket: Ticket = ticket_factory(creator=user, status=status)
+        client.force_login(user=user)
+
+        res = client.get(reverse("ticket-to-cancel", kwargs={"pk": ticket.pk}))
+        assert res.status_code == 302
+        ticket.refresh_from_db()
+        assert ticket.status == Dictionary.objects.get(code="cancel")
 
 
 class TestCommentViews:
