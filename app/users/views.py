@@ -1,11 +1,11 @@
 from django.urls import reverse, reverse_lazy
-from django.views.generic import ListView, CreateView, UpdateView
+from django.views.generic import ListView, CreateView, UpdateView, DetailView
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.http import Http404, JsonResponse
 
 from ticket.mixin import AccessOperatorMixin
 from .forms import CustomerForm, ContractorForm
-from .models import Customer, Contractor, ContractorProfile
+from .models import Customer, Contractor, ContractorProfile, User
 
 
 class CreateCustomerView(LoginRequiredMixin, CreateView):
@@ -150,3 +150,7 @@ class UpdateContractorView(LoginRequiredMixin, UpdateView):
         context["name_page"] = "Изменить данные клиента"
         context["name_btn"] = "Изменить"
         return context
+
+
+class Account(LoginRequiredMixin, DetailView):
+    model = User

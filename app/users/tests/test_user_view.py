@@ -113,3 +113,12 @@ class TestContractorView:
         assert contractor.profile_contractor.city == data["city"]
         assert contractor.profile_contractor.region == data["region"]
         assert contractor.profile_contractor.note == data["note"]
+
+
+class TestAccountPage:
+    @pytest.mark.django_db
+    def test_account_page_exist(self, client, user_factory):
+        user = user_factory()
+        client.force_login(user)
+        res = client.get(reverse("account", kwargs={"pk": user.pk}))
+        assert res.status_code == 200
