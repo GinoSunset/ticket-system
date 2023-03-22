@@ -1,7 +1,6 @@
 {% extends 'ticsys/index.html' %}
 {% load static %}
 {% block header_style %}
-<link rel="stylesheet" href="{% static 'wrapper-img.css' %}">
 
 {% endblock %}
 {% block content %}
@@ -10,12 +9,15 @@
 <div class="ui two column grid container">
     <div class="column">
       <div class="ui segment">
-        <div class="img_wrap">
-            <img class="ui centered small circular image" id="avatarImg"  src="{{ user.get_avatar }}">
-            <div id="avatarChange" class="ui text center img_description">
-                <span>Изменить</span>
+        <div class="ui centered small circular image" id="dimmerAvatar">
+            <div id="avatarChange" class="ui dimmer">
+                <div class="content">
+                    Изменить
+                </div>
             </div>
+            <img class="" id="avatarImg"  src="{{ user.get_avatar }}">
         </div>
+
         <input type="file" name="avatar" id="avatarInput" style="display:none">
 
         <form class="ui form" method="post">
@@ -37,6 +39,9 @@
         var fileupload = document.getElementById("avatarInput");
         let btn = document.getElementById("avatarChange")
         var image = document.getElementById("avatarImg");
+        $("#dimmerAvatar").dimmer({
+            on: "hover"
+        })
         btn.onclick = function () {
             fileupload.click();
         };
