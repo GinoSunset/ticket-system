@@ -4,7 +4,7 @@ from django.contrib.auth.views import LoginView, LogoutView
 from users import views
 
 urlpatterns = [
-    path("<int:pk>", views.Account.as_view(), name="account"),
+    path("update/", views.Account.as_view(), name="account"),
     path("login/", LoginView.as_view(), name="login"),
     path("logout/", LogoutView.as_view(), name="logout"),
     path("customer/", views.CreateCustomerView.as_view(), name="customer-create"),
@@ -22,4 +22,5 @@ urlpatterns = [
         views.UpdateContractorView.as_view(),
         name="contractor_edit",
     ),
+    path("update-avatar/", views.UpdateAvatar.as_view(), name="update-avatar"),
 ]

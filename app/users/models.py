@@ -100,7 +100,7 @@ class User(AbstractUser):
         return self.username
 
     def get_absolute_url(self):
-        return reverse("account", kwargs={"pk": self.pk})
+        return reverse("account")
 
 
 class Customer(User):

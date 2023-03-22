@@ -152,5 +152,23 @@ class UpdateContractorView(LoginRequiredMixin, UpdateView):
         return context
 
 
-class Account(LoginRequiredMixin, DetailView):
+class Account(LoginRequiredMixin, UpdateView):
     model = User
+    fields = ["first_name", "last_name", "email"]
+    template_name = "users/account.html"
+
+    def get_object(self, queryset=None):
+        return self.request.user
+
+
+class UpdateAvatar(LoginRequiredMixin, UpdateView):
+    model = User
+    fields = ["avatar"]
+    template_name = "users/account.html"
+
+    def get_object(self, queryset=None):
+        return self.request.user
+
+    def form_valid(self, form):
+        super().form_valid(form)
+        return JsonResponse({"avatar": self.object.avatar.url})

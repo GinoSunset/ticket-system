@@ -1,0 +1,67 @@
+{% extends 'ticsys/index.html' %}
+{% load static %}
+{% block header_style %}
+<link rel="stylesheet" href="{% static 'wrapper-img.css' %}">
+
+{% endblock %}
+{% block content %}
+<h1>Личный кабинет</h1>
+{{user}}
+<div class="ui two column grid container">
+    <div class="column">
+      <div class="ui segment">
+        <div class="img_wrap">
+            <img class="ui centered small circular image" id="avatarImg"  src="{{ user.get_avatar }}">
+            <div id="avatarChange" class="ui text center img_description">
+                <span>Изменить</span>
+            </div>
+        </div>
+        <input type="file" name="avatar" id="avatarInput" style="display:none">
+
+        <form class="ui form" method="post">
+
+            {% csrf_token %}
+            {{form.as_p}}
+            <button class="ui button basic positive" type="submit">Сохранить</button>
+        </form>
+      </div>
+    </div>
+  
+  </div>
+
+{% endblock content %}
+
+{% block script %}
+<script>
+    window.onload = function () {
+        var fileupload = document.getElementById("avatarInput");
+        let btn = document.getElementById("avatarChange")
+        var image = document.getElementById("avatarImg");
+        btn.onclick = function () {
+            fileupload.click();
+        };
+        fileupload.onchange = function () {
+            // send file to server by ajax
+            var formData = new FormData();
+            let headerAvatar = document.getElementById('headerAvatar');
+            formData.append('avatar', fileupload.files[0]);
+            formData.append('csrfmiddlewaretoken', '{{ csrf_token }}');
+            $.ajax({
+                url: "{% url 'update-avatar' %}",
+                type: "POST",
+                data: formData,
+                processData: false,
+                contentType: false,
+                success: function (data) {
+                    image.src = data.avatar;
+                    headerAvatar.src = data.avatar;
+
+                }
+            });
+           
+
+        };
+    };
+</script>
+</script>
+{% endblock script %}
