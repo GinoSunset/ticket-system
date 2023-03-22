@@ -154,7 +154,14 @@ class UpdateContractorView(LoginRequiredMixin, UpdateView):
 
 class Account(LoginRequiredMixin, UpdateView):
     model = User
-    fields = ["first_name", "last_name", "email"]
+    fields = [
+        "first_name",
+        "last_name",
+        "email",
+        "telegram_id",
+        "email_notify",
+        "telegram_notify",
+    ]
     template_name = "users/account.html"
 
     def get_object(self, queryset=None):

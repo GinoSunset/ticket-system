@@ -5,31 +5,32 @@
 {% endblock %}
 {% block content %}
 <h1>Личный кабинет</h1>
-{{user}}
 <div class="ui two column grid container">
     <div class="column">
-      <div class="ui segment">
-        <div class="ui centered small circular image" id="dimmerAvatar">
-            <div id="avatarChange" class="ui dimmer">
-                <div class="content">
-                    Изменить
+        <div class="ui segment">
+            <div class="ui centered small circular image" id="dimmerAvatar">
+                <div id="avatarChange" class="ui dimmer">
+                    <div class="content">
+                        Изменить
+                    </div>
                 </div>
+                <img class="" id="avatarImg" src="{{ user.get_avatar }}">
             </div>
-            <img class="" id="avatarImg"  src="{{ user.get_avatar }}">
+
+            <input type="file" name="avatar" id="avatarInput" style="display:none">
+
+            <form class="ui form" method="post">
+
+                {% csrf_token %}
+                {{form.as_p}}
+                <button class="ui button basic positive right" id="saveUser" type="submit">Сохранить</button>
+            </form>
+            <button class="ui button basic right" id="changeUser">Изменить</button>
+
         </div>
-
-        <input type="file" name="avatar" id="avatarInput" style="display:none">
-
-        <form class="ui form" method="post">
-
-            {% csrf_token %}
-            {{form.as_p}}
-            <button class="ui button basic positive" type="submit">Сохранить</button>
-        </form>
-      </div>
     </div>
-  
-  </div>
+
+</div>
 
 {% endblock content %}
 
@@ -45,6 +46,15 @@
         btn.onclick = function () {
             fileupload.click();
         };
+        let changeUser = document.getElementById("changeUser");
+        $("#changeUser").click(function () {
+            let inputs = document.querySelectorAll('input');
+            for (let i = 0; i < inputs.length; i++) {
+                inputs[i].classList.remove("disabled");
+            }
+            changeUser.style.display = "none";
+            document.getElementById("saveUser").style.display = "block";
+        });
         fileupload.onchange = function () {
             // send file to server by ajax
             var formData = new FormData();
@@ -63,10 +73,27 @@
 
                 }
             });
-           
+
 
         };
+
+        disableFormInput()
     };
+
+    // #TODO: This function disable all input in form
+    function disableFormInput() {
+        let inputs = document.querySelectorAll('input');
+        for (let i = 0; i < inputs.length; i++) {
+            inputs[i].classList.add("ui");
+            inputs[i].classList.add("field");
+            inputs[i].classList.add("disabled");
+
+        }
+        document.getElementById("saveUser").style.display = "none";
+
+    }
+
+// TODO: add validator, remove dimmer 
 </script>
 </script>
 {% endblock script %}
