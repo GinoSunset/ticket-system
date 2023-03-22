@@ -16,6 +16,7 @@ env = environ.Env(
     RABBIT_LOGIN=(str, "guest"),
     RABBIT_PASSWORD=(str, "guest"),
     RABBIT_VHOST=(str, "/"),
+    MANAGER_EMAIL=(str, "manager@localhost"),
 )
 BASE_DIR = Path(__file__).resolve().parent.parent
 
@@ -139,3 +140,5 @@ CELERY_BROKER_URL = (
 CELERY_ACCEPT_CONTENT = ("application/json",)
 CELERY_RESULT_SERIALIZER = "json"
 CELERY_TASK_SERIALIZER = "json"
+
+MANAGER_EMAIL = env("MANAGER_EMAIL")

@@ -30,6 +30,7 @@ class Notification(models.Model):
     is_read = models.BooleanField(default=False)
     created_at = models.DateTimeField(auto_now_add=True)
     subject = models.CharField(max_length=255, blank=True, null=True)
+    bcc_email = models.EmailField(verbose_name="Скрытая копия", blank=True, null=True)
 
     type_notify = models.CharField(
         "Тип оповещения",
@@ -116,6 +117,7 @@ class Notification(models.Model):
             type_notify="ticket_to_work",
             emails=ticket._reply_to_emails,
             ticket=ticket,
+            bcc_email=settings.MANAGER_EMAIL,
         )
 
     @classmethod
@@ -137,6 +139,7 @@ class Notification(models.Model):
             emails=ticket._reply_to_emails,
             ticket=ticket,
             subject=f"Заявка №{ticket.sap_id or ticket.pk} выполнена",
+            bcc_email=settings.MANAGER_EMAIL,
         )
         return notify
 
@@ -145,7 +148,9 @@ class Notification(models.Model):
         cls, ticket: Ticket
     ) -> "Notification":
         link = ticket.get_external_url()
-        message = loader.get_template("notifications/customer_ticket_done.txt").render(
+        message = loader.get_template(
+            "notifications/customer_ticket_cancel.txt"
+        ).render(
             {
                 "ticket": ticket,
                 "link": link,
@@ -159,5 +164,6 @@ class Notification(models.Model):
             emails=ticket._reply_to_emails,
             ticket=ticket,
             subject=f"Заявка №{ticket.sap_id or ticket.pk} отменена",
+            bcc_email=settings.MANAGER_EMAIL,
         )
         return notify

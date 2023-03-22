@@ -106,3 +106,20 @@ def test_send_email_when_ticket_status_to_cancel(
 
     assert len(mail.outbox) == 1
     assert len(mail.outbox[0].attachments) == 2
+
+
+@pytest.mark.django_db
+@pytest.mark.parametrize(
+    "func",
+    [
+        Notification.create_notify_for_customer_when_ticket_to_cancel,
+        Notification.create_notify_for_customer_when_ticket_to_done,
+        Notification.create_notify_for_customer_when_ticket_to_work,
+    ],
+)
+def test_notify_change_status_has_bcc_email_manager(
+    monkeypatch_delay_send_email_on_celery, ticket_factory, func
+):
+    ticket = ticket_factory()
+    func(ticket)
+    assert settings.MANAGER_EMAIL in mail.outbox[0].bcc

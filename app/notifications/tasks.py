@@ -33,6 +33,9 @@ def send_email(notification_pk: int) -> int:
     if notification.is_needed_to_attach_files():
         set_attachments(email, notification)
 
+    if notification.bcc_email:
+        email.bcc = [notification.bcc_email]
+
     status = email.send()
     return status
 
