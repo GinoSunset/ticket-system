@@ -5,7 +5,10 @@ from notifications.models import Notification
 
 @pytest.mark.django_db
 def test_notify_to_task_done_has_all_comment_for_report(
-    ticket_factory, comment_factory, status_in_work
+    ticket_factory,
+    comment_factory,
+    status_in_work,
+    monkeypatch_delay_send_email_on_celery,
 ):
     ticket = ticket_factory(status=status_in_work)
     c1 = comment_factory(ticket=ticket, is_for_report=True)
@@ -19,7 +22,10 @@ def test_notify_to_task_done_has_all_comment_for_report(
 
 @pytest.mark.django_db
 def test_notify_to_task_cancel_has_all_comment_for_report(
-    ticket_factory, comment_factory, status_in_work
+    ticket_factory,
+    comment_factory,
+    status_in_work,
+    monkeypatch_delay_send_email_on_celery,
 ):
     ticket = ticket_factory(status=status_in_work)
     c1 = comment_factory(ticket=ticket, is_for_report=True)
