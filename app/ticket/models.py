@@ -168,7 +168,10 @@ class Ticket(models.Model):
         self, force_insert=False, force_update=False, using=None, update_fields=None
     ):
         if self.pk:
-            if self.status == Dictionary.objects.get(code="done"):
+            if (
+                self.status == Dictionary.objects.get(code="done")
+                and not self.completion_date
+            ):
                 self.completion_date = timezone.now()
             if self.status == Dictionary.objects.get(code="work"):
                 if not self.date_to_work:
