@@ -1,10 +1,18 @@
-from channels.testing import HttpCommunicator
+import pytest
+from channels.testing import WebsocketCommunicator
+from channels.db import database_sync_to_async
+from ticket.consumers import MainTableConsumer
 
-from ticket.consumer import MainTableConsumer
 
-
-def test_notify_when_create_new_ticket(ticket_factory):
-    communicator = HttpCommunicator(MainTableConsumer.as_asgi(), "GET", "/")
-    t = ticket_factory()
-    res = communicator.get_response()
-    assert False
+@pytest.mark.asyncio
+@pytest.mark.django_db(transaction=True)
+async def test_websocket_ticket(ticket_factory):
+    communicator = WebsocketCommunicator(MainTableConsumer.as_asgi(), "ws/")
+    connected, subprotocol = await communicator.connect()
+    assert connected
+    ticket = await database_sync_to_async(ticket_factory)()
+    # Test sending text
+    response = await communicator.receive_from()
+    assert response == ticket.id
+    # Close
+    await communicator.disconnect()
