@@ -5,10 +5,12 @@ from django.conf import settings
 from django.contrib.auth import get_user_model
 from django.contrib.sites.models import Site
 from django.db import models
+from django.db.models import Q
 from django.urls import reverse
 from django.utils import timezone
 from reports.utils import create_act_for_ticket
 from users.models import Operator
+
 
 User = get_user_model()
 
@@ -150,7 +152,7 @@ class Ticket(models.Model):
     def get_comments_for_report(self, prefetch=False) -> "models.QuerySet[Comment]":
         comments = self.comments.filter(is_system_message=False)
         comments = comments.exclude(is_for_report=False)
-        comments = comments.exclude(text__in=Comment.NO_REPORT_TEXTS)
+
         if prefetch:
             comments = comments.prefetch_related("files", "images")
         return comments
@@ -185,8 +187,6 @@ class Ticket(models.Model):
 
 
 class Comment(models.Model):
-    NO_REPORT_TEXTS = ["Вложение из письма", ""]
-
     TEMPLATE_DICT = {
         "status": "{field} изменен c '{prev_value}' на '{value}'\n",
         "contractor": "{value} назначен(а) исполнителем\n",

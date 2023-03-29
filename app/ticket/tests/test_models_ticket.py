@@ -1,5 +1,6 @@
 import pytest
 from additionally.models import Dictionary
+from django.core.files.uploadedfile import SimpleUploadedFile
 
 
 @pytest.mark.django_db
@@ -68,3 +69,11 @@ def test_not_change_date_to_work_if_status_work(ticket_factory):
     ticket.save()
     ticket.refresh_from_db()
     assert ticket.date_to_work == old_date
+
+
+@pytest.mark.django_db
+def test_comment_for_report_has_comment_with_empty_text(comment_factory):
+    comment = comment_factory(text="", is_for_report=True)
+    image = comment.images.create(image=SimpleUploadedFile("test.jpg", b"test"))
+
+    assert comment in comment.ticket.get_comments_for_report()
