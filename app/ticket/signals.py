@@ -1,7 +1,9 @@
+from asgiref.sync import async_to_sync
 from django.dispatch import receiver
 from django.db.models.signals import post_save, pre_save
 from django.conf import settings
 from django.contrib.sites.models import Site
+from channels.layers import get_channel_layer
 
 from ticket.models import Ticket
 from notifications.models import Notification
@@ -13,6 +15,16 @@ from users.models import User, Customer
 def create_notification_signal(sender, instance, created, **kwargs):
     if created:
         create_notifications(instance)
+
+
+@receiver(post_save, sender=Ticket)
+def send_ticket_to_channel(sender, instance, created, **kwargs):
+    if created:
+        channel_layer = get_channel_layer()
+        async_to_sync(channel_layer.group_send)(
+            "general",
+            {"type": "send_info_to_user_group", "ticket_id": instance.id},
+        )
 
 
 def create_notifications(instance: Ticket):

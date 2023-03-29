@@ -6,8 +6,11 @@ const chatSocket = new WebSocket(
 );
 
 chatSocket.onmessage = function (e) {
-    const data = JSON.parse(e.data);
-    console.log(data);
+    let data = JSON.parse(e.data);
+    let t = $('#tableTickets').DataTable();
+    let node = $(data.ticket).get(0);
+
+    t.row.add(node).draw(false);
 };
 
 chatSocket.onclose = function (e) {

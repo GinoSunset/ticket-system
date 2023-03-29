@@ -45,23 +45,7 @@
     </tr></thead>
     <tbody>
       {% for ticket in object_list %}
-      <tr>
-        <td data-label="id">{{ticket.pk}}</td>
-        <td data-label="date_create">{{ticket.date_create| date:"Y-m-d"}}</td>
-        <td data-label="sap_id">{% firstof ticket.sap_id %}</td>
-        <td data-label="type_ticket">{% firstof ticket.type_ticket %}</td>
-        <td data-label="customer">{% firstof ticket.customer.get_role_user %}</td>
-        <td data-label="responsible">{% firstof ticket.responsible %}</td>
-        {% if not user.is_customer %}
-        <td data-label="contractor">{% firstof ticket.contractor %}</td>
-        {% endif %}
-        <td data-label="planned_execution_date">{{ticket.planned_execution_date|date:"Y-m-d"}}</td>
-        <td data-label="status" class={{ ticket.get_colored_status_if_dup_shop }}>{% if ticket.status %} <div class="ui {{ticket.get_color_status}} label">{{ticket.status}}</div>{% endif %}</td>
-        <td data-label="address">{% firstof ticket.city %}</td>
-        <td data-label="shop_id">{% firstof ticket.shop_id %}</td>
-        <td><a class="ui button info" target="_blank" href={% url 'ticket-update' ticket.pk %}>Просмотр</a></td>
-      </tr>
-      
+      {% include 'ticket/ticket_row.html' %}
         {% empty %}
         <tr>
           <td>No tickets yet.</td>
