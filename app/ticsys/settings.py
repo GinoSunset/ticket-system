@@ -41,6 +41,7 @@ INSTALLED_APPS = [
     "users",
     "notifications",
     "reports",
+    "channels",
 ]
 
 SITE_ID = 1
@@ -142,3 +143,15 @@ CELERY_RESULT_SERIALIZER = "json"
 CELERY_TASK_SERIALIZER = "json"
 
 MANAGER_EMAIL = env("MANAGER_EMAIL")
+
+
+# channels
+ASGI_APPLICATION = "ticsys.routing.application"
+CHANNEL_LAYERS = {
+    "default": {
+        "BACKEND": "channels_redis.core.RedisChannelLayer",
+        "CONFIG": {
+            "hosts": [(RABBIT_HOST, 6379)],
+        },
+    }
+}

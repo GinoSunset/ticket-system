@@ -14,6 +14,8 @@ class CustomerProfileFactory(factory.django.DjangoModelFactory):
     class Meta:
         model = CustomerProfile
 
+    company = factory.Sequence(lambda n: "Company%03d" % n)
+
 
 class CustomerFactory(factory.django.DjangoModelFactory):
     class Meta:
