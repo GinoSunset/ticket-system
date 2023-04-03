@@ -5,6 +5,7 @@ from asgiref.sync import sync_to_async
 
 from django.template import loader
 from .models import Ticket
+from users.models import User
 
 
 class MainTableConsumer(AsyncJsonWebsocketConsumer):
@@ -13,11 +14,22 @@ class MainTableConsumer(AsyncJsonWebsocketConsumer):
     async def connect(self):
         await self.accept()
         if self.scope["user"]:  # is not AnonymousUser:
-            self.user = self.scope["user"]
-            self.user_id = self.user.id
+            user: User = self.scope["user"]
+            self.user = await database_sync_to_async(user.get_role_user)()
+            self.user_id = self.user.pk
 
             if self.user.is_operator:
                 await self.channel_layer.group_add(f"operators", self.channel_name)
+                return
+            if self.user.is_customer:
+                await self.channel_layer.group_add(
+                    f"customer_{self.user.pk}", self.channel_name
+                )
+                return
+            if self.user.is_contractor:
+                await self.channel_layer.group_add(
+                    f"contractor_{self.user.pk}", self.channel_name
+                )
                 return
             await self.channel_layer.group_add("common", self.channel_name)
 
