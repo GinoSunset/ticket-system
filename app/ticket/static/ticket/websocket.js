@@ -1,4 +1,4 @@
-const protocol = window.location.protocol === 'https:' ? 'wss' : 'ws';
+const protocol = window.location.protocol === 'https:' ? 'wss://' : 'ws://';
 
 const chatSocket = new WebSocket(
     protocol
