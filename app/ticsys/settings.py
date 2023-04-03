@@ -17,6 +17,8 @@ env = environ.Env(
     RABBIT_PASSWORD=(str, "guest"),
     RABBIT_VHOST=(str, "/"),
     MANAGER_EMAIL=(str, "manager@localhost"),
+    REDIS_HOST=(str, "localhost"),
+    REDIS_PORT=(int, 6379),
 )
 BASE_DIR = Path(__file__).resolve().parent.parent
 
@@ -146,12 +148,14 @@ MANAGER_EMAIL = env("MANAGER_EMAIL")
 
 
 # channels
+REDIS_HOST = env("REDIS_HOST")
+REDIS_PORT = env("REDIS_PORT")
 ASGI_APPLICATION = "ticsys.routing.application"
 CHANNEL_LAYERS = {
     "default": {
         "BACKEND": "channels_redis.core.RedisChannelLayer",
         "CONFIG": {
-            "hosts": [(RABBIT_HOST, 6379)],
+            "hosts": [(REDIS_HOST, REDIS_PORT)],
         },
     }
 }
