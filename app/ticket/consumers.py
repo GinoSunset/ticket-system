@@ -34,11 +34,18 @@ class MainTableConsumer(AsyncJsonWebsocketConsumer):
             await self.channel_layer.group_add("common", self.channel_name)
 
     async def send_info_to_user_group(self, event):
-        ticket = await self.get_ticket_by_id(event["ticket_id"])
+        ticket: Ticket = await self.get_ticket_by_id(event["ticket_id"])
         render_ticket = await sync_to_async(
             loader.get_template("ticket/ticket_row.html").render
         )({"ticket": ticket})
-        ticket_json = {"ticket": render_ticket}
+        ticket_json = {
+            "ticket": render_ticket,
+            "info": {
+                "id": ticket.pk,
+                "customer": str(ticket.customer),
+                "sap": ticket.sap_id,
+            },
+        }
         await self.send_json(ticket_json)
 
     async def hello(self, event):
