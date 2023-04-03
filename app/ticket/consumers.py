@@ -18,7 +18,7 @@ class MainTableConsumer(AsyncJsonWebsocketConsumer):
             self.user = await database_sync_to_async(user.get_role_user)()
             self.user_id = self.user.pk
 
-            if self.user.is_operator or self.user.is_admin:
+            if self.user.is_operator or self.user.is_staff:
                 await self.channel_layer.group_add(f"operators", self.channel_name)
                 return
             if self.user.is_customer:
@@ -37,7 +37,7 @@ class MainTableConsumer(AsyncJsonWebsocketConsumer):
         ticket: Ticket = await self.get_ticket_by_id(event["ticket_id"])
         render_ticket = await sync_to_async(
             loader.get_template("ticket/ticket_row.html").render
-        )({"ticket": ticket})
+        )({"ticket": ticket, "user": self.user})
         ticket_json = {
             "ticket": render_ticket,
             "info": {
