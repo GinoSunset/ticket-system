@@ -5,7 +5,7 @@ services:
     user: "1000:1000"
     build: ./app
     restart: always
-    command: daphne -b 0.0.0.0 -p 8000  --access-log=logs/daphne.access.log
+    command: daphne -b 0.0.0.0 -p 8000 ticsys.asgi:application --access-log=logs/daphne.access.log
     volumes:
       - ./app/:/usr/src/app/
     ports:
