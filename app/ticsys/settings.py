@@ -1,5 +1,6 @@
 import environ
 from pathlib import Path
+import sentry_sdk
 
 env = environ.Env(
     DEBUG=(bool, False),
@@ -19,6 +20,8 @@ env = environ.Env(
     MANAGER_EMAIL=(str, "manager@localhost"),
     REDIS_HOST=(str, "localhost"),
     REDIS_PORT=(int, 6379),
+    SENTRY_DSN=(str, ""),
+    APP_ENV_SENTRY=(str, "development"),
 )
 BASE_DIR = Path(__file__).resolve().parent.parent
 
@@ -159,3 +162,11 @@ CHANNEL_LAYERS = {
         },
     }
 }
+
+
+# Sentry
+sentry_sdk.init(
+    dsn=env("SENTRY_DSN"),
+    traces_sample_rate=1.0,
+    environment=env("APP_ENV_SENTRY"),
+)
