@@ -69,17 +69,25 @@
         }
     });
 
+    $('#tableContractor tbody').on('dblclick', 'tr', function () {
+       
+        table.$('tr.selected').removeClass('selected');
+        $(this).addClass('selected');
+        $('#apply').click();
+    });
+
     $('#apply').click(function () {
         if (table.$('tr.selected').length === 0) {
             $.toast({
                 class: 'error',
-                message: `Исполнитель не выбран !`
+                message: `Исполнитель не выбран!`
               })
               return false;
             }
-        $('[name="{{ widget.name }}"]').val(table.rows('.selected').data()[0][0]);
+        set_value_to_input(table.rows('.selected').data()[0][0]);
 
     });
+
 
     const selects =  document.getElementById('{{ widget.name }}_id')
 
@@ -88,7 +96,13 @@
 
     function dropDown(e) {
     e.preventDefault();
+    }
 
-
+    function set_value_to_input(value) {
+        $.toast({
+            class: 'info',
+            message: `Исполнитель выбран!`
+          })
+        $('[name="{{ widget.name }}"]').val(value);
     }
 </script>
