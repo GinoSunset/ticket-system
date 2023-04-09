@@ -50,6 +50,7 @@ class TestDMParser:
             ("Москва, ул. Святоозёрская, д.5", "Москва"),
             ("МО, п. Малаховка, Михневское ш.,3", "Малаховка"),
             ("МО го Солнечногорск, д.Голубое пр-д Тверецкий стр. 18А", "Голубое"),
+            ("Щелково, мкр. Радиоцентра, 5 (Московская обл.)", "Щелково"),
         ],
     )
     def test_city_extractor(self, address, expected):
@@ -64,6 +65,16 @@ class TestDMParser:
         message_info = DMParser().parse(text_dm_3)
         assert message_info
 
+    def test_parser_dm_without_colon(self, text_dm_without_colon):
+        message_info = DMParser().parse(text_dm_without_colon)
+        assert message_info["sap_id"]
+        assert message_info["address"]
+
     def test_parser_dm2_not_sign_img(self, text_dm_2):
         message_info = DMParser().parse(text_dm_2)
         assert "[cid:image004.png@01D92A6D.90491210]" not in message_info["description"]
+
+    def test_get_info_from_text(self, text_dm_2):
+        info = DMParser().get_info_from_message(text_dm_2)
+        assert info
+        assert len(info.splitlines()) == 7

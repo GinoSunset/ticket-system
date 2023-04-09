@@ -18,6 +18,20 @@ class BaseParser:
 
 
 class DMParser(BaseParser):
+    def __init__(self):
+        self.sap_str = "SAP"
+        self.sap_delimiter = ":"
+
+        self.meta_data_map = {
+            "Магазин/Департамент": "shop_id",
+            "Регион": "address",
+            "Должность": "position",
+            "Ф.И.О.": "full_name",
+            "Телефон": "phone",
+            "SAP": "sap_id",
+            "Имя/IP адрес ПК": "metadata",
+        }
+
     def parse(self, text) -> dict:
         """
 
@@ -46,44 +60,70 @@ class DMParser(BaseParser):
         message_info["address"] == shop_address
         message_info["sap_id"] == sap_number
         """
+        self.sap_delimiter = ":" if "SAP:" in text else " "
 
-        descriptor = text[: text.find("\nТелефон:") + 1]
-        info = text[text.find("\nТелефон:") + 1 : text.find("SAP:")]
-
-        index_start_sap_line, index_end_sap_line = self.get_indexes_sap(text)
-
-        sap = self.get_sap(text, index_start_sap_line, index_end_sap_line)
-
-        index_sign = text.find("С уважением")
-
-        additional_text = self.get_additional_text(text, index_end_sap_line, index_sign)
+        descriptor, info, additional_text = self.split_text_to_parts(text)
 
         meta_data = self.get_metadata(info)
+
+        if not "sap_id" in meta_data:
+            meta_data["sap_id"] = self.get_sap_id_from_text(text)
+
         result = {
             "description": (descriptor + additional_text).strip(),
-            "sap_id": sap,
+            "sap_id": meta_data["sap_id"],
         }
         result.update(meta_data)
         return result
 
-    def get_additional_text(self, text, index_end_sap_line, index_sign):
-        additional_text = text[index_end_sap_line:index_sign]
+    def split_text_to_parts(self, text):
+        info = self.get_info_from_message(text)
+        description = self.get_description_from_message(text, info)
+        additional_text = self.get_additional_text_from_message(text, info, description)
+        return description, info, additional_text
+
+    def get_description_from_message(self, text, info):
+        first_info_line = info.splitlines()[0]
+        index_info = text.find(first_info_line)
+        if index_info == -1:
+            return ""
+        description = text[:index_info]
+        return description
+
+    def get_additional_text_from_message(self, text, info, description):
+        last_info_line = info.splitlines()[-1]
+        last_start_index = text.rfind(last_info_line)
+        index = last_start_index + len(last_info_line)
+        index_sign = text.find("С уважением")
+        if index_sign == -1:
+            additional_text = text[index:]
+        else:
+            additional_text = text[index:index_sign]
         text = self.remove_cid_lines(additional_text)
         return text
+
+    def get_info_from_message(self, text):
+        lines = text.splitlines()
+        info = [
+            line
+            for line in lines
+            if ":" in line and line.split(":")[0].strip() in self.meta_data_map
+        ]
+        return "\r\n".join(info)
 
     def remove_cid_lines(self, text):
         lines = text.splitlines()
         lines = [line for line in lines if "[cid:" not in line]
         return "\r\n".join(lines)
 
-    def get_sap(self, text, index_start_sap_line, index_end_sap_line):
+    def get_sap_id_from_text(self, text):
+        index_start_sap_line, index_end_sap_line = self.get_indexes_sap(text)
         sap = text[index_start_sap_line:index_end_sap_line]
-        sap = sap.split(":")[1].strip()
+        sap = sap.split(self.sap_delimiter)[1].strip()
         return sap
 
     def get_indexes_sap(self, text):
-        index_start_sap_line = text.find("SAP:")
-
+        index_start_sap_line = text.find(self.sap_str)
         index_end_sap_line = text[index_start_sap_line:].find("\n")
         if index_end_sap_line == -1:
             index_end_sap_line = text[index_start_sap_line:].find("</p>")
@@ -91,14 +131,7 @@ class DMParser(BaseParser):
         return index_start_sap_line, index_end_sap_line
 
     def get_metadata(self, info: str) -> dict:
-        meta_data_map = {
-            "Магазин/Департамент": "shop_id",
-            "Регион": "address",
-            "Должность": "position",
-            "Ф.И.О.": "full_name",
-            "Телефон": "phone",
-            "SAP": "sap_id",
-        }
+
         lines = info.splitlines()
         if len(lines) == 1:
             lines = info.split("</p>")
@@ -113,11 +146,14 @@ class DMParser(BaseParser):
                 key, value = line.split(":")
             else:
                 key, value = line.split(" ", maxsplit=1)
-            if key in meta_data_map:
-                result[meta_data_map[key]] = value.strip()
+            if key in self.meta_data_map:
+                if self.meta_data_map[key] == "metadata":
+                    result[self.meta_data_map[key]] += line
+                    continue
+                result[self.meta_data_map[key]] = value.strip()
                 continue
 
-            result["other_meta_info"] += line
+            result["metadata"] += line
         if result["address"]:
             try:
                 result["city"] = self.get_city_from_address(result["address"])
@@ -135,10 +171,18 @@ class DMParser(BaseParser):
                 return "Москва"
             address = f"{region} г. {address_2}"
         morph_vocab = MorphVocab()
+        city = self.morph_city(address, morph_vocab)
+        if not city:
+            address = f"г. {region}"
+            city = self.morph_city(address, morph_vocab)
+        return city
+
+    def morph_city(self, address, morph_vocab):
+
         extractor = AddrExtractor(morph_vocab)
         matches = extractor(address)
         tokens = list(matches)
         for token in tokens:
             if token.fact.type in ("город", "посёлок", "деревня"):
-                return token.fact.value
-        return None
+                city = token.fact.value
+                return city
