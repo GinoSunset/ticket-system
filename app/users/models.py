@@ -102,6 +102,8 @@ class User(AbstractUser):
 class Customer(User):
     class Meta:
         proxy = True
+        verbose_name = "Заказчик"
+        verbose_name_plural = "Заказчики"
 
     base_role = User.Role.CUSTOMER
     objects = CustomerManager()
@@ -128,6 +130,8 @@ class Customer(User):
 class Operator(User):
     class Meta:
         proxy = True
+        verbose_name = "Оператор"
+        verbose_name_plural = "Операторы"
 
     base_role = User.Role.OPERATOR
     objects = OperatorManager()
@@ -146,6 +150,8 @@ class Operator(User):
 class Contractor(User):
     class Meta:
         proxy = True
+        verbose_name = "Исполнитель"
+        verbose_name_plural = "Исполнители"
 
     base_role = User.Role.CONTRACTOR
     objects = ContractorManager()
@@ -163,14 +169,18 @@ class CustomerProfile(models.Model):
     create in signals
     """
 
+    class Meta:
+        verbose_name = "Профиль заказчика"
+        verbose_name_plural = "Профили заказчиков"
+
     user = models.OneToOneField(
         Customer, on_delete=models.CASCADE, related_name="profile"
     )
     linked_operators = models.ManyToManyField(
         Operator,
-        help_text="Операторы",
-        verbose_name="Операторы <-> Заказчики",
+        verbose_name="Операторы заказчика",
         related_name="customers",
+        help_text="Какие операторы могут работать с этим заказчиком",
         null=True,
         blank=True,
     )
