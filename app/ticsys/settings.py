@@ -47,6 +47,7 @@ INSTALLED_APPS = [
     "notifications",
     "reports",
     "channels",
+    "share",
 ]
 
 SITE_ID = 1
