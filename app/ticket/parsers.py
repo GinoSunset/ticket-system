@@ -1,6 +1,10 @@
+import re
+
 from collections import defaultdict
 from natasha import AddrExtractor, MorphVocab
 import logging
+
+RE_IDENTIFIER_CITY = re.compile(r"(?<!\w)г\.|(?<!\w)город\s")
 
 
 class BaseParser:
@@ -131,7 +135,6 @@ class DMParser(BaseParser):
         return index_start_sap_line, index_end_sap_line
 
     def get_metadata(self, info: str) -> dict:
-
         lines = info.splitlines()
         if len(lines) == 1:
             lines = info.split("</p>")
@@ -156,7 +159,8 @@ class DMParser(BaseParser):
             result["metadata"] += line
         if result["address"]:
             try:
-                result["city"] = self.get_city_from_address(result["address"])
+                if city := self.get_city_from_address(result["address"]):
+                    result["city"] = city
             except Exception as e:
                 logging.error(f"Error in get city from address: {e}")
         return result
@@ -165,20 +169,20 @@ class DMParser(BaseParser):
         return list(filter(lambda x: str in x, list_str))[0]
 
     def get_city_from_address(self, address):
-        if "г." not in address and "город " not in address:
-            region, address_2 = address.split(" ", maxsplit=1)
+        region, address_2 = address.split(" ", maxsplit=1)
+        if not RE_IDENTIFIER_CITY.search(address):
             if "москва" in region.lower():
                 return "Москва"
             address = f"{region} г. {address_2}"
         morph_vocab = MorphVocab()
         city = self.morph_city(address, morph_vocab)
         if not city:
+            region, address_2 = address.split(" ", maxsplit=1)
             address = f"г. {region}"
             city = self.morph_city(address, morph_vocab)
         return city
 
     def morph_city(self, address, morph_vocab):
-
         extractor = AddrExtractor(morph_vocab)
         matches = extractor(address)
         tokens = list(matches)
