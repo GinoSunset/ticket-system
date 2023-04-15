@@ -11,7 +11,7 @@
         {% endif %}
       </span>
       <div class="metadata">
-        <span class="date">{{comment.date_create|date}}</span>
+        <span class="date">{{comment.date_create|date:"Y-m-d H:i:s"}}</span>
         {% if comment.is_changed %}
         <i class="pen icon"></i>
         {% endif %}

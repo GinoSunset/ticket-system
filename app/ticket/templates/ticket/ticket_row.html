@@ -1,6 +1,6 @@
 <tr>
     <td data-label="id">{{ticket.pk}}</td>
-    <td data-label="date_create">{{ticket.date_create| date:"Y-m-d"}}</td>
+    <td data-label="date_create">{{ticket.date_create| date:"Y-m-d H:i:s"}}</td>
     <td data-label="sap_id">{% firstof ticket.sap_id %}</td>
     <td data-label="type_ticket">{% firstof ticket.type_ticket %}</td>
     <td data-label="customer">{% firstof ticket.customer.get_role_user %}</td>
