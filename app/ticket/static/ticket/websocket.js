@@ -1,12 +1,12 @@
 const protocol = window.location.protocol === 'https:' ? 'wss://' : 'ws://';
 
-const chatSocket = new WebSocket(
+const ticketSocket = new WebSocket(
     protocol
     + window.location.host
     + '/ws/'
 );
 
-chatSocket.onmessage = function (e) {
+function onmessage(e) {
     let data = JSON.parse(e.data);
     let ticket = data.info;
     let t = $('#tableTickets').DataTable();
@@ -24,6 +24,43 @@ chatSocket.onmessage = function (e) {
     t.row.add(node).draw(false);
 };
 
-chatSocket.onclose = function (e) {
-    console.error('Socket closed unexpectedly');
+
+function reconnect(e) {
+
+    interval = setInterval(function () {
+        localSocket = new WebSocket(
+            protocol
+            + window.location.host
+            + '/ws/'
+        );
+        setTimeout(function () {
+
+            if (localSocket.readyState === WebSocket.OPEN) {
+                clearInterval(interval)
+                localSocket.onmessage = function (e) {
+                    onmessage(e);
+                }
+                localSocket.onclose = function (e) {
+                    localSocket.close();
+                    reconnect(e);
+                }
+                console.log('Reconnected!');
+            }
+            else {
+                localSocket.close();
+            }
+        }, 2500);
+    }
+        , 5000);
 };
+
+ticketSocket.onmessage = function (e) {
+    onmessage(e);
+}
+
+ticketSocket.onclose = function (e) {
+    console.error('Chat socket closed unexpectedly, reconnecting...');
+    ticketSocket.close();
+    reconnect(e);
+}
+
