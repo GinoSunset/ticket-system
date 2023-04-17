@@ -79,7 +79,7 @@ def test_delete_share(client, share_factory):
     customer.profile.linked_operators.add(operator)
     client.force_login(operator)
     res = client.post(
-        reverse("delete-share", kwargs={"pk": share.pk}),
+        reverse("delete-share", kwargs={"pk": ticket_id}),
         format="json",
     )
     assert Share.objects.filter(pk=share.pk).exists() is False

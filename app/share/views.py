@@ -1,4 +1,5 @@
-from django.http import JsonResponse
+from django.utils.translation import gettext as _
+from django.http import Http404, JsonResponse
 from django.views.generic import CreateView, DeleteView
 from django.urls import reverse, reverse_lazy
 
@@ -38,9 +39,7 @@ class ShareCreateView(
         share.creator = self.request.user
         share.save()
 
-        return JsonResponse(
-            {"data": {"uuid": share.uuid, "link": share.get_absolute_url()}}
-        )
+        return JsonResponse({"uuid": share.uuid, "link": share.get_absolute_url()})
 
 
 class DeleteShareView(
@@ -48,6 +47,17 @@ class DeleteShareView(
 ):
     model = Share
     success_url = reverse_lazy("create-share")
+    queryset = Ticket.objects.all()
+
+    def get_object(self):
+        ticket = super().get_object()
+        if ticket.share:
+            obj = ticket.share
+            return obj
+        raise Http404(
+            _("No %(verbose_name)s found matching the query")
+            % {"verbose_name": queryset.model._meta.verbose_name}
+        )
 
     def form_valid(self, form):
         if not self.check_access(self.object.ticket):
