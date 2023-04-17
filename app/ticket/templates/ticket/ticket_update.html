@@ -84,6 +84,24 @@
             <a href="{% url 'act-create' ticket.pk %}">Создать акт</a>
           </div>
         </div>
+        <div class="ui dropdown button basic share" id="shareBtn">
+          <div class="text">Поделиться</div>
+          <i class="dropdown  icon"></i>
+          <div class="menu">
+            <div class="header">
+              
+              <div class="ui toggle checkbox share">
+                <input type="checkbox" >
+                <label>Включить ссылку публичного доступа</label>
+              </div>
+            </div>
+            <div class="item">
+            </div>
+
+           
+          </div>
+            
+        </div>
       {% endif %}
       
       {% endif %}
@@ -221,8 +239,45 @@
         date: 'DD.MM.YYYY'
       },
   });
-  $('.ui.dropdown').dropdown();
-  $('.circle.icon').popup()
-;
+  $('.ui.dropdown').not($('#shareBtn')).dropdown();
+  $('.circle.icon').popup();
+
+  $('#shareBtn').dropdown({  
+    action: 'select',
+  });
+
+  $('.checkbox.share').checkbox({
+    onChecked: function() {
+      $.ajax({
+        url: "{% url 'create-share' %}",
+        type: "POST",
+        data: {
+          'ticket': '{{ ticket.pk }}',
+          'csrfmiddlewaretoken': '{{ csrf_token }}'
+        },
+        success: function(data){
+          // create element span with text link from json data and with button copy to clipboard
+          var link = $('<span class="ui label" id="link_share">').text(data.link);
+          var btn = $('<button class="ui icon button" id="copyBtn">').html('<i class="copy icon"></i>');
+          // add element to div
+          $('#shareBtn').append(link);
+          $('#shareBtn').append(btn);
+          // add event to button
+          $('#copyBtn').click(function(){
+            var copyText = document.getElementById("link_share");
+            copyText.select();
+            document.execCommand("copy");
+          });
+          
+          
+        },
+        error: function(data){
+          console.log(data);
+        }
+      });
+
+    },
+  })
+
 </script>
 {% endblock script %}
