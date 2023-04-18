@@ -184,3 +184,11 @@ SAP 8001176143
 Регион: Щелково, мкр. Радиоцентра, 5 (Московская обл.)
 Предоставить фото входной группы, расстояния между антенн с рулеткой где видно расстояния.
 Без данного фото работы приняты не будут"""
+
+
+@pytest.fixture
+def email_with_img():
+    with open(settings.BASE_DIR / "ticket/tests/email_with_img.eml", "rb") as f:
+        data = f.read()
+    mail = MailMessage.from_bytes(data)
+    return mail

@@ -25,7 +25,6 @@ def send_ticket_to_channel(sender, instance, created, **kwargs):
         send_ticket_to_operators(instance, channel_layer)
         send_ticket_to_customer(instance, channel_layer)
         send_ticket_to_contractor(instance, channel_layer)
-        async_to_sync(channel_layer.close_pools)()
 
 
 def send_ticket_to_operators(instance, channel_layer):

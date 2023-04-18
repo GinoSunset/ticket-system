@@ -69,7 +69,6 @@ def test_create_comment_from_email(email_ticket, customer_factory, ticket_factor
 
 
 def test_cleanup_comment(text_reply):
-
     assert cleanup_comment_text(text_reply) == "Вот так"
 
 
@@ -100,3 +99,17 @@ def test_creating_comment_from_emails_with_trees(customer_factory, ticket_factor
     status = processing_email(email_ticket)
 
     assert status
+
+
+@pytest.mark.django_db
+def test_create_comment_with_img_from_email(
+    email_with_img, customer_factory, ticket_factory
+):
+    customer = customer_factory(email=email_with_img.from_)
+    customer.refresh_from_db()
+    customer.profile.parser = "DM"
+    customer.profile.save()
+    create_ticket_from_email(email_with_img)
+    assert Ticket.objects.all().count() > 0
+    ticket = Ticket.objects.first()
+    assert ticket.comments.count() == 1
