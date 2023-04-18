@@ -84,35 +84,38 @@
             <a href="{% url 'act-create' ticket.pk %}">Создать акт</a>
           </div>
         </div>
-        <div class="ui dropdown button basic {% if ticket.share %} violet {% endif %} mini share" id="shareBtn">
-          <div class="text">Поделиться</div>
-          <i class="dropdown  icon"></i>
-          <div class="menu">
-            <div class="header">
-              
-              <div class="ui toggle checkbox share">
-                <input type="checkbox" {% if ticket.share %} checked {% endif %}  >
-                <label>Включить ссылку публичного доступа</label>
-              </div>
-              <div id="shareLink">
-                {% if ticket.share %} 
-               <div class="ui fluid input action" id="shareDiv">
-                  <input class="ui label" id="link_share" readonly value="{{ticket.share.get_absolute_url}}">
-                  <button class="ui icon button" id="copyBtn"> <i class="copy icon"></i> </button>
-               </div>
-                {% endif %}
 
-              </div>
-            </div>
-            <div class="item">
-            </div>
-
-           
-          </div>
-            
-        </div>
       {% endif %}
       
+      {% endif %}
+      {% if user.is_operator %}
+      <div class="ui dropdown button basic {% if ticket.share %} violet {% endif %} mini share" id="shareBtn">
+        <div class="text">Поделиться</div>
+        <i class="dropdown  icon"></i>
+        <div class="menu">
+          <div class="header">
+            
+            <div class="ui toggle checkbox share">
+              <input type="checkbox" {% if ticket.share %} checked {% endif %}  >
+              <label>Включить ссылку публичного доступа</label>
+            </div>
+            <div id="shareLink">
+              {% if ticket.share %} 
+             <div class="ui fluid input action" id="shareDiv">
+                <input class="ui label" id="link_share" readonly value="{{ticket.share.get_absolute_url}}">
+                <button class="ui icon button" id="copyBtn"> <i class="copy icon"></i> </button>
+             </div>
+              {% endif %}
+
+            </div>
+          </div>
+          <div class="item">
+          </div>
+
+         
+        </div>
+          
+      </div>
       {% endif %}
 
     </div>
@@ -281,6 +284,7 @@
         div.append(btn);
         // add event to button
         $('#copyBtn').click(function(){
+          // TODO: Check after reload page
           var copyText = document.getElementById("link_share");
           copyText.select();
           document.execCommand("copy");

@@ -1,0 +1,167 @@
+{% extends 'ticsys/base.html' %}
+{% load static %}
+{% block header_style %}
+<link rel="stylesheet" type="text/css" href="{% static 'DataTables/DataTables-1.13.1/css/dataTables.semanticui.min.css' %}"/> 
+<script type="text/javascript" src="{% static 'DataTables/DataTables-1.13.1/js/jquery.dataTables.min.js' %}"></script>
+<script type="text/javascript" src="{% static 'DataTables/DataTables-1.13.1/js/dataTables.semanticui.min.js' %}"></script>
+<style>
+body:{
+  background: -webkit-linear-gradient(to right, #E2E2E2, #C9D6FF);
+  background: linear-gradient(to right, #E2E2E2, #C9D6FF);
+}
+</style>
+{% endblock %}
+{% block common_content %}
+<div class="ui container segment">
+    
+  <h1>Заявка №{{ticket.pk}}</h1>
+
+  <div class="ui grid container">
+    <div class="four wide column">
+      <div class="ui list">
+        {% if ticket.phone %}
+        <div class="item">
+          <i class="phone icon"></i>
+          <div class="content">
+            {% for phone  in phones %}
+              <a href="tel:{{phone}}"> {{phone}}</a>
+            {% endfor %}
+          </div>
+        </div>
+        {%endif%}
+        {% if ticket.address%}
+        <div class="item">
+          <i class="marker icon"></i>
+          <div class="content">
+            {{ticket.address}}
+          </div>
+        </div>
+        {%endif%}
+        {% if ticket.shop_id%}
+        <div class="item">
+          <i class="store alternate icon"></i>
+          <div class="content">
+            {{ticket.shop_id}}
+          </div>
+        </div>
+        {%endif%}
+        {% if ticket.full_name%}
+        <div class="item">
+          <i class="user icon"></i>
+          <div class="content">
+            {{ticket.full_name}}
+          </div>
+        </div>
+        {%endif%}
+        {% if ticket.position%}
+        <div class="item">
+          <i class="id badge icon"></i>
+          <div class="content">
+            {{ticket.position}}
+          </div>
+        </div>
+        {%endif%}
+        {% if ticket.sap_id%}
+        <div class="item">
+          <i class="ticket icon"></i>
+          <div class="content">
+            SAP: {{ticket.sap_id}}
+          </div>
+        </div>
+        {%endif%}
+        {% if ticket.metadata%}
+        <div class="item">
+          <i class="info icon"></i>
+          <div class="content">
+            {{ticket.metadata}}
+          </div>
+        </div>
+        {%endif%}
+        {% if ticket.act.file_doc_act %}
+          <div class="item">
+            <i class="file alternate icon"></i>
+            <div class="content">
+              <a href="{{ticket.act.file_doc_act.url}}" target="_blank">Скачать акт</a>
+            </div>
+          </div>
+        {% else %}
+          <div class="item">
+            <i class="file alternate icon"></i>
+            <div class="content">
+              <a href="{% url 'act-create' ticket.pk %}">Создать акт</a>
+            </div>
+          </div>
+          
+        {% endif %}
+        
+
+      </div>
+    </div>
+    <div class="twelve wide column">
+      <div class="ui   ">
+        <div class="ui horizontal list">    
+          <div class="item"> 
+            <div class="header"> Тип</div> 
+            {% firstof ticket.type_ticket "<i>Не назначен</i>"%}
+
+          </div>
+          <div class="item"> 
+            <div class="header"> Заказчик</div> 
+            {{ticket.customer.get_role_user}} ({{ticket.customer.first_name}} {{ticket.customer.last_name}})
+          </div>
+          <div class="item"> 
+            <div class="header"> Исполнитель</div> 
+            {% if ticket.contractor %}
+            {{ticket.contractor}}
+            {% if ticket.contractor.phone %}
+            <a href="tel:{{ticket.contractor.phone}}">{{ticket.contractor.phone}}</a>
+            {% endif %}
+            {% else %}
+            <i>Не назначен</i>
+            {% endif %}
+          </div>
+          <div class="item"> 
+            <div class="header"> Статус</div> 
+            {% if ticket.status %} <div class="ui {{ticket.get_color_status}} label">{{ticket.status}}</div>{% endif %}
+          </div>
+          <div class="item"> 
+            <div class="header"> Плановая дата выезда/исполнения</div> 
+            {% if ticket.planned_execution_date %}
+            {{ticket.planned_execution_date}}
+            {% else%}
+            <i>Не назначена</i>
+            {% endif %}
+          </div>
+        </div>
+        <div class=" ui list ">
+          <div class="item"> 
+            <div class="header"> Описание</div> 
+            <div class="ui large text">
+            {{ticket.description|safe|linebreaksbr|urlize }}
+            </div>
+          </div>
+        </div>
+        <div class="ui grid container">
+
+          <div class="two wide column">
+            <a href="{% url 'comment-create' ticket.pk %}" class="ui right floated info button ">Добавить комментарий</a>
+          </div>
+
+      </div>
+    </div>
+  <div class="ui comments">
+  {% for comment in ticket.comments.all %}
+    {% include "ticket/ticket_comment_list.html" %}
+  {% endfor %}
+  </div>
+</div>
+{% endblock common_content %}
+{% block script %}
+<script>
+  
+  
+  $('.circle.icon').popup();
+
+
+</script>
+{% endblock script %}

@@ -83,3 +83,10 @@ def test_delete_share(client, share_factory):
         format="json",
     )
     assert Share.objects.filter(pk=share.pk).exists() is False
+
+
+@pytest.mark.django_db
+def test_detail_share(client, share_factory):
+    share = share_factory()
+    res = client.get(reverse("detail-share", kwargs={"pk": share.pk}))
+    assert res.status_code == 200

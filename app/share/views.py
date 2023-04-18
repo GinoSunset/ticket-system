@@ -1,6 +1,7 @@
+from django.shortcuts import get_object_or_404
 from django.utils.translation import gettext as _
 from django.http import Http404, JsonResponse
-from django.views.generic import CreateView, DeleteView
+from django.views.generic import CreateView, DeleteView, DetailView
 from django.urls import reverse, reverse_lazy
 
 from ticket.mixin import AccessOperatorMixin
@@ -67,3 +68,20 @@ class DeleteShareView(
 
     def form_invalid(self, form):
         return JsonResponse({"status": "error"}, status_code=400)
+
+
+class DetailShareView(DetailView):
+    model = Ticket
+    template_name = "share/detail.html"
+
+    def get_context_data(self, **kwargs):
+        kwargs = super().get_context_data(**kwargs)
+
+        if self.object.phone:
+            kwargs["phones"] = self.object.phone.splitlines()
+
+        return kwargs
+
+    def get_object(self, *args, **kwargs):
+        ticket = get_object_or_404(Ticket, share=self.kwargs["pk"])
+        return ticket
