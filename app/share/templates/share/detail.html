@@ -158,8 +158,17 @@ body:{
 {% endblock common_content %}
 {% block script %}
 <script>
+    const fpPromise = import("{% static 'share/js/v3.js' %}")
+      .then(FingerprintJS => FingerprintJS.load())
   
-  
+    fpPromise
+      .then(fp => fp.get())
+      .then(result => {
+        const visitorId = result.visitorId
+        console.log(visitorId)
+      })
+      .catch(error => console.error(error))
+
   $('.circle.icon').popup();
 
 

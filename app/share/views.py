@@ -1,13 +1,16 @@
+from django.contrib.auth.mixins import LoginRequiredMixin
 from django.shortcuts import get_object_or_404
 from django.utils.translation import gettext as _
 from django.http import Http404, JsonResponse
 from django.views.generic import CreateView, DeleteView, DetailView
-from django.urls import reverse, reverse_lazy
+from django.urls import reverse_lazy
+from ticket.utils import is_image
 
+from ticket.models import Comment, CommentImage, CommentFile
 from ticket.mixin import AccessOperatorMixin
-from django.contrib.auth.mixins import LoginRequiredMixin
+from users.models import User
 from .models import Share
-from .forms import ShareForm
+from .forms import ShareForm, CommentShareForm
 
 from ticket.models import Ticket
 
@@ -85,3 +88,50 @@ class DetailShareView(DetailView):
     def get_object(self, *args, **kwargs):
         ticket = get_object_or_404(Ticket, share=self.kwargs["pk"])
         return ticket
+
+
+class ShareCommentCreateView(CreateView):
+    model = Comment
+    form_class = CommentShareForm
+
+    def form_valid(self, form):
+        ticket: Ticket = Ticket.objects.get(pk=self.kwargs.get("ticket_pk"))
+        self.object: Comment = form.save(commit=False)
+        files = self.request.FILES.getlist("files")
+
+        self.object.ticket = ticket
+        self.object.author = self.get_or_create_user(
+            form.cleaned_data.get("user_fingerprint")
+        )
+        self.object: Comment = form.save()
+        for file in files:
+            if is_image(file):
+                CommentImage.objects.create(image=file, comment=self.object)
+                continue
+            CommentFile.objects.create(file=file, comment=self.object)
+        return super().form_valid(form)
+
+    def get_or_create_user(self, fingerprint):
+        if not fingerprint:
+            user = User.objects.create(
+                username="without_fingerprint",
+                is_active=False,
+                first_name="Неопознанный",
+                last_name="Пользователь",
+            )
+            user.last_name = "Пользователь %s" % user.pk
+            user.save(update_fields=["last_name"])
+            return user
+        user, created = User.objects.get_or_create(
+            username=fingerprint,
+            defaults={
+                "is_active": False,
+                "first_name": "Неопознанный",
+                "last_name": "Пользователь",
+                "role": User.Role.OTHER,
+            },
+        )
+        if not created:
+            user.last_name = "Пользователь %s" % user.pk
+            user.save(update_fields=["last_name"])
+        return user
