@@ -95,7 +95,7 @@
         <div class="menu">
           <div class="header">
             
-            <div class="ui toggle checkbox share">
+            <div class="ui toggle checkbox share" style="margin-bottom: 1rem;">
               <input type="checkbox" {% if ticket.share %} checked {% endif %}  >
               <label>Включить ссылку публичного доступа</label>
             </div>
@@ -282,18 +282,8 @@
         $('#shareLink').append(div);
         div.append(link);
         div.append(btn);
-        // add event to button
-        $('#copyBtn').click(function(){
-          // TODO: Check after reload page
-          var copyText = document.getElementById("link_share");
-          copyText.select();
-          document.execCommand("copy");
-          $.toast({
-            class: 'info',
-            message: "Ссылка скопирована"
-    
-          }); 
-        });
+        add_copy_func_to_btn();
+        add_copy_all_to_input();
         $("#shareBtn").addClass("violet");
         
       },
@@ -307,6 +297,25 @@
     });
 
   };
+  function add_copy_func_to_btn(){
+    $('#copyBtn').click(function(){
+      var copyText = document.getElementById("link_share");
+      copyText.select();
+      document.execCommand("copy");
+      $.toast({
+        class: 'info',
+        message: "Ссылка скопирована"
+
+      }); 
+    });
+  };
+
+  function add_copy_all_to_input(){
+    $("#link_share").click(function(){
+      this.select();
+    });
+
+  }
 
   function delete_share(){
     $.ajax({
@@ -330,5 +339,9 @@
     });
 
   }
+  {% if ticket.share %} 
+  add_copy_func_to_btn();
+  add_copy_all_to_input();
+  {% endif %}
 </script>
 {% endblock script %}
