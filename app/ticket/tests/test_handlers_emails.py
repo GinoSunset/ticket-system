@@ -1,5 +1,6 @@
 import pytest
 from django.conf import settings
+from django.db.models import signals
 from imap_tools.message import MailMessage
 from ticket.handlers import (
     create_ticket_from_email,
@@ -8,6 +9,7 @@ from ticket.handlers import (
     processing_email,
 )
 from ticket.models import Ticket
+import factory
 
 
 @pytest.mark.django_db

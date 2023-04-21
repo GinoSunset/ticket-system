@@ -16,12 +16,11 @@ def test_create_share_ticket(
     operator = operator_factory()
     customer.profile.linked_operators.add(operator)
 
-    ticket = ticket_factory(creator=customer)
+    ticket = ticket_factory(customer=customer)
     url = reverse("create-share")
     client.force_login(operator)
     response = client.post(url, data={"ticket": ticket.id}, format="json")
     data = json.loads(response.content)
-    data = data.get("data")
     ticket.refresh_from_db()
     assert response.status_code == 200
     assert data.get("uuid") == str(ticket.share.uuid)
