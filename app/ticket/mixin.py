@@ -46,3 +46,11 @@ class AccessAuthorMixin(UserPassesTestMixin):
         if author is None:
             return False
         return author == user
+
+
+class ShareMixin(UserPassesTestMixin):
+    def test_func(self):
+        self.object = self.get_object()
+        if hasattr(self.object, "share"):
+            return bool(self.object.share)
+        return False
