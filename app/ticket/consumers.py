@@ -13,7 +13,7 @@ class MainTableConsumer(AsyncJsonWebsocketConsumer):
 
     async def connect(self):
         await self.accept()
-        if self.scope["user"]:  # is not AnonymousUser:
+        if self.scope["user"] and not self.scope["user"]:  # is not AnonymousUser:
             user: User = self.scope["user"]
             self.user = await database_sync_to_async(user.get_role_user)()
             self.user_id = self.user.pk
