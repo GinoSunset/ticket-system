@@ -1,6 +1,6 @@
 import pytest
 
-from ticket.mixin import AccessAuthorMixin, ShareMixin
+from ticket.mixin import AccessAuthorMixin
 
 
 class TestAccessAuthorMixin:
@@ -39,36 +39,3 @@ class TestAccessAuthorMixin:
         request.user = user
         view = self.MockView(author=user1, request=request)
         assert not view.test_func()
-
-
-class TestShareMixin:
-    class MockView(ShareMixin):
-        def __init__(self, request=None):
-            self.request = request
-            self.object = None
-
-        def get_object(self):
-            return self.object
-
-    @pytest.mark.django_db
-    def test_access_share_mixin_with_share_ticket(
-        self, rf, ticket_factory, share_factory
-    ):
-        request = rf.get("/")
-        share = share_factory()
-        view = self.MockView(request=request)
-        view.object = share.ticket
-
-        assert view.test_func()
-
-    @pytest.mark.django_db
-    def test_access_without_share(self, rf, ticket_factory):
-        request = rf.get("/")
-        ticket = ticket_factory()
-        view = self.MockView(request=request)
-        view.object = ticket
-
-        assert not view.test_func()
-
-    @pytest.mark.django_db
-    def test_access_share_mixin_without_but_operator(
