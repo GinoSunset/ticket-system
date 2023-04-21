@@ -13,6 +13,7 @@ from users.factory import (
     ContractorFactory,
 )
 from reports.factories import ReportFactory, ActFactory
+from share.factories import ShareFactory
 
 register(TicketFactory)
 register(UserFactory)
@@ -23,6 +24,7 @@ register(NotificationFactory)
 register(ReportFactory)
 register(ActFactory)
 register(CommentFactory)
+register(ShareFactory)
 
 
 @pytest.fixture

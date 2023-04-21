@@ -1,13 +1,13 @@
 from django.contrib.auth.mixins import UserPassesTestMixin
 from users.models import User, Operator
 
-from .models import Comment
-
 
 class AccessTicketMixin(UserPassesTestMixin):
     def test_func(self):
         user: User = self.request.user
         ticket = self.get_object()
+        if user.is_anonymous:
+            return False
         if user.is_staff:
             return True
         if user.is_customer:
@@ -25,6 +25,8 @@ class AccessTicketMixin(UserPassesTestMixin):
 class AccessOperatorMixin(UserPassesTestMixin):
     def test_func(self):
         user: User = self.request.user
+        if user.is_anonymous:
+            return False
         if user.is_staff:
             return True
         if user.is_operator:
