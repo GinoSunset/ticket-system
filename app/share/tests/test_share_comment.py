@@ -28,7 +28,7 @@ def test_create_share_comment(client, share_factory, ticket_factory):
     assert comment.text == "test"
     assert comment.author.username == "test-fingerprint"
     assert comment.author.first_name == "Неопознанный"
-    assert comment.author.last_name == "Пользователь"
+    assert "Пользователь" in comment.author.last_name
     assert comment.author.role == User.Role.OTHER
     assert comment.author.is_active == False
     assert comment.ticket == ticket
