@@ -3,7 +3,7 @@ from django.shortcuts import get_object_or_404
 from django.utils.translation import gettext as _
 from django.http import Http404, JsonResponse
 from django.views.generic import CreateView, DeleteView, DetailView
-from django.urls import reverse_lazy
+from django.urls import reverse_lazy, reverse
 from ticket.utils import is_image
 
 from ticket.models import Comment, CommentImage, CommentFile
@@ -93,6 +93,15 @@ class DetailShareView(DetailView):
 class ShareCommentCreateView(CreateView):
     model = Comment
     form_class = CommentShareForm
+    template_name = "share/comment_modal_form.html"
+
+    def get_context_data(self, **kwargs):
+        kwargs = super().get_context_data(**kwargs)
+        kwargs.update({"share": Share.objects.get(pk=self.kwargs.get("pk"))})
+        return kwargs
+
+    def get_success_url(self) -> str:
+        return reverse("detail-share", kwargs={"pk": self.kwargs.get("pk")})
 
     def form_valid(self, form):
         ticket: Ticket = Ticket.objects.get(pk=self.kwargs.get("ticket_pk"))
@@ -112,6 +121,8 @@ class ShareCommentCreateView(CreateView):
         return super().form_valid(form)
 
     def get_or_create_user(self, fingerprint):
+        if self.request.user and not self.request.user.is_anonymous:
+            return self.request.user
         if not fingerprint:
             user = User.objects.create(
                 username="without_fingerprint",
@@ -131,7 +142,7 @@ class ShareCommentCreateView(CreateView):
                 "role": User.Role.OTHER,
             },
         )
-        if not created:
+        if created:
             user.last_name = "Пользователь %s" % user.pk
             user.save(update_fields=["last_name"])
         return user

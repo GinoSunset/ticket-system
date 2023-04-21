@@ -13,9 +13,11 @@ body:{
 {% endblock %}
 {% block common_content %}
 <div class="ui container segment">
-    
+  {% if request.user.is_anonymous %}
   <h1>Заявка №{{ticket.pk}}</h1>
-
+  {% else %}
+  <a href={% url 'ticket-update' ticket.pk %}> <h1> Заявка №{{ticket.pk}}</h1> </a>
+  {% endif %}
   <div class="ui grid container">
     <div class="four wide column">
       <div class="ui list">
@@ -144,11 +146,12 @@ body:{
         <div class="ui grid container">
 
           <div class="two wide column">
-            <a href="{% url 'comment-create' ticket.pk %}" class="ui right floated info button ">Добавить комментарий</a>
+            <button class="ui right floated info button" id="showCommentModalBtn"> Добавить комментарий</button>
           </div>
 
       </div>
     </div>
+    
   <div class="ui comments">
   {% for comment in ticket.comments.all %}
     {% include "ticket/ticket_comment_list.html" %}
@@ -158,18 +161,36 @@ body:{
 {% endblock common_content %}
 {% block script %}
 <script>
+  var visitorId = ""
     const fpPromise = import("{% static 'share/js/v3.js' %}")
       .then(FingerprintJS => FingerprintJS.load())
   
     fpPromise
       .then(fp => fp.get())
       .then(result => {
-        const visitorId = result.visitorId
-        console.log(visitorId)
+        visitorId = result.visitorId
       })
       .catch(error => console.error(error))
 
   $('.circle.icon').popup();
+  
+
+  fetch('{% url "comment-share" ticket.share.uuid ticket.pk %}')
+    .then(res => res.text())
+    .then(result => {
+      let div = document.createElement('div');
+      $(div).html(result);
+      document.body.append(div);
+      $("#CommentShareFormModal")
+      .modal({
+        onShow: ()=>{
+          $("#id_user_fingerprint").val(visitorId)
+        }
+      })
+      .modal("attach events", "#showCommentModalBtn", "show");
+      
+    });    
+
 
 
 </script>

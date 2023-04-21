@@ -1,0 +1,22 @@
+<div class="ui modal" id="CommentShareFormModal">
+    <i class="close icon"></i>
+    <div class="header">Добавить комментарий</div>
+    <div class="content">
+      <form class="ui form" method="post" enctype="multipart/form-data" action={% url 'comment-share' share.uuid  share.ticket.pk %} >
+          {{ form.non_field_errors }}
+          {% csrf_token %}
+          {% for field in form %}
+          <div class="field">
+              {{ field.errors }}
+              {% if not field.is_hidden%}
+              {{ field.label_tag }} 
+              {% endif %}
+              {{ field }}
+          </div>
+          {% endfor %}
+          <button class="ui button positive" type="submit">Изменить</button>
+  
+      </form>
+    </div>
+
+</div>
