@@ -108,6 +108,10 @@ body:{
 
           </div>
           <div class="item"> 
+            <div class="header"> Заказчик</div> 
+            {{ticket.customer.get_role_user}}
+          </div>
+          <div class="item"> 
             <div class="header"> Исполнитель</div> 
             {% if ticket.contractor %}
             {{ticket.contractor}}
