@@ -40,7 +40,7 @@ def processing_email(email):
 
 
 def is_email_for_processing(email: MailMessage) -> bool:
-    if settings.SUBJECT_TO_TICKET not in email.subject.lower():
+    if not is_subject_for_ticket(email.subject):
         return False
     user_email = email.from_
     is_user_exist = User.objects.filter(email__iregex=user_email).exists()
@@ -48,6 +48,12 @@ def is_email_for_processing(email: MailMessage) -> bool:
         logging.info(f"User with email {user_email} not found")
         return False
     return True
+
+
+def is_subject_for_ticket(subject: str) -> bool:
+    if any([i in subject.lower() for i in settings.SUBJECT_TO_TICKET]):
+        return True
+    return False
 
 
 def is_reply_message(email: MailMessage) -> bool:

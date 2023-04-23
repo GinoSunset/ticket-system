@@ -16,6 +16,7 @@ class BaseParser:
         parsers = {
             "base": BaseParser(),
             "DM": DMParser(),
+            "DMV2": DMV2Parser(),
         }
 
         return parsers.get(parser_name, BaseParser())
@@ -25,6 +26,7 @@ class DMParser(BaseParser):
     def __init__(self):
         self.sap_str = "SAP"
         self.sap_delimiter = ":"
+        self.sign_text = "С уважением"
 
         self.meta_data_map = {
             "Магазин/Департамент": "shop_id",
@@ -37,33 +39,6 @@ class DMParser(BaseParser):
         }
 
     def parse(self, text) -> dict:
-        """
-
-        Добрый день
-        Прошу принять в работу заявку:
-        Ложное срабатывание антикражных рамок и интервалом в 1 минуту.
-
-        Телефон:8-888-999-99-99
-        Ф.И.О.: Корпатов Иван Иванович
-        Должность: Директор магазина
-        Магазин/Департамент: VM Рыбинск Космос 3111
-        Регион: Центр Рыбинск, ул. Кирилла Николаева, д.11 (Ярославская обл.)
-        SAP: 80011121111
-
-        Предоставить фото входной группы, расстояния между антенн с рулеткой где
-        видно расстояния.
-        Без данного фото работы приняты не будут
-
-        С уважением,
-        Коратов Виктор Александрович
-        Менеджер по системам безопасности и видеонаблюдению
-        Департамента по ИТ ПАО "VIM".
-
-        message_info["description"] == descriptor + added_descriptor
-        message_info["metadata"] == shop_id
-        message_info["address"] == shop_address
-        message_info["sap_id"] == sap_number
-        """
         self.sap_delimiter = ":" if "SAP:" in text else " "
 
         descriptor, info, additional_text = self.split_text_to_parts(text)
@@ -98,7 +73,7 @@ class DMParser(BaseParser):
         last_info_line = info.splitlines()[-1]
         last_start_index = text.rfind(last_info_line)
         index = last_start_index + len(last_info_line)
-        index_sign = text.find("С уважением")
+        index_sign = text.find(self.sign_text)
         if index_sign == -1:
             additional_text = text[index:]
         else:
@@ -107,7 +82,9 @@ class DMParser(BaseParser):
         return text
 
     def get_info_from_message(self, text):
-        lines = text.splitlines()
+        text_before_sign = text.split(self.sign_text)[0]
+
+        lines = text_before_sign.splitlines()
         info = [
             line
             for line in lines
@@ -128,6 +105,7 @@ class DMParser(BaseParser):
 
     def get_indexes_sap(self, text):
         index_start_sap_line = text.find(self.sap_str)
+
         index_end_sap_line = text[index_start_sap_line:].find("\n")
         if index_end_sap_line == -1:
             index_end_sap_line = text[index_start_sap_line:].find("</p>")
@@ -146,7 +124,7 @@ class DMParser(BaseParser):
                 continue
             line = line.strip()
             if ":" in line:
-                key, value = line.split(":")
+                key, value = line.split(":", maxsplit=1)
             else:
                 key, value = line.split(" ", maxsplit=1)
             if key in self.meta_data_map:
@@ -190,3 +168,65 @@ class DMParser(BaseParser):
             if token.fact.type in ("город", "посёлок", "деревня"):
                 city = token.fact.value
                 return city
+
+
+class DMV2Parser(DMParser):
+    def __init__(self):
+        self.sap_str = "сервисный запрос"
+        self.sap_delimiter = "под номером "
+        self.meta_data_map = {
+            "Магазин/Департамент": "shop_id",
+            "Регион": "address",
+            "Должность": "position",
+            "Ф.И.О.": "full_name",
+            "Телефон": "phone",
+            "SAP": "sap_id",
+            "Имя/IP адрес ПК": "metadata",
+            "Дата регистрации": "metadata",
+        }
+        self.sign_text = (
+            "Это сообщение создано автоматически, пожалуйста, не отвечайте на него."
+        )
+
+    def parse(self, text) -> dict:
+        descriptor, info, additional_text = self.split_text_to_parts(text)
+
+        meta_data = self.get_metadata(info)
+
+        if not "sap_id" in meta_data:
+            meta_data["sap_id"] = self.get_sap_id_from_text(text)
+
+        result = {
+            "description": (descriptor + additional_text).strip(),
+            "sap_id": meta_data["sap_id"],
+        }
+        result.update(meta_data)
+        return result
+
+    def split_text_to_parts(self, text):
+        info = self.get_info_from_message(text)
+        description = self.get_description_from_message(text, info)
+        additional_text = self.get_additional_text_from_message(text, info, description)
+        return description, info, additional_text
+
+    def get_description_from_message(self, text, info):
+        theme = self.get_theme_from_message(text)
+        description = self.get_description_lines(text)
+        return f"{theme}\r\n{description}"
+
+    def get_theme_from_message(self, text):
+        theme_line = [line for line in text.splitlines() if "Тема:" in line][0]
+        theme = theme_line.split("Тема:")[1].strip()
+        return theme
+
+    def get_description_lines(self, text):
+        index_start = text.index("Описание:")
+        dup_empty_line = "\r\n\r\n"
+        end_index = text[index_start:].find(dup_empty_line)
+        if end_index == -1:
+            end_index = text[index_start:].find("\n\n")
+        if end_index == -1:
+            end_index = text[index_start:].index("\n")
+
+        description_lines = text[index_start : index_start + end_index]
+        return description_lines.split("Описание:")[1].strip()

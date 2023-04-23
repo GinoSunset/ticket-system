@@ -74,13 +74,26 @@ def test_cleanup_comment(text_reply):
     assert cleanup_comment_text(text_reply) == "Вот так"
 
 
+@pytest.mark.django_db
+def test_create_ticket(monkeypatch, email_with_img, customer_factory):
+    from ticket.handlers import save_tickets_from_emails
+
+    customer_factory(email=email_with_img.from_)
+
+    def mock_get_new_emails():
+        return [email_with_img]
+
+    monkeypatch.setattr("ticket.handlers.get_new_emails", mock_get_new_emails)
+    assert save_tickets_from_emails()
+
+
 @pytest.mark.skip
 @pytest.mark.django_db
 def test_load_ticket(customer_factory):
     from ticket.handlers import save_tickets_from_emails
 
     user = customer_factory(email="gino-sunset@yandex.ru")
-    user.profile.parser = "DM"
+    user.profile.parser = "DMV2"
     user.profile.save()
 
     result = save_tickets_from_emails()
