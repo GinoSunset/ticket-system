@@ -1,6 +1,6 @@
 import pytest
 
-from ticket.parsers import DMParser
+from ticket.parsers import DMParser, DMV2Parser
 
 
 class TestDMParser:
@@ -79,3 +79,19 @@ class TestDMParser:
         info = DMParser().get_info_from_message(text_dm_2)
         assert info
         assert len(info.splitlines()) == 7
+
+
+class TestDMV2Parser:
+    def test_get_info_from_text_dm_ver_2(self, text_dm_ver_2):
+        info = DMV2Parser().parse(text_dm_ver_2)
+        assert info
+        assert info["sap_id"] == "8001123123"
+        assert info["address"]
+        assert info["description"]
+
+    def test_get_description_from_message(self, text_dm_ver_2):
+        description = DMV2Parser().get_description_from_message(text_dm_ver_2, "")
+        assert (
+            description
+            == "Пищат кассы\r\nПосле скачка напряжения,  пищат с разницей в 1 - 2 минуты.\nФото входной зоны и фото с замером прилагаю"
+        )
