@@ -12,13 +12,15 @@ class BaseParser:
         return {"description": text}
 
     @classmethod
-    def get_parser(cls, parser_name: str) -> "BaseParser":
+    def get_parser(cls, parser_name: str, is_html: bool) -> "BaseParser":
         parsers = {
             "base": BaseParser(),
             "DM": DMParser(),
             "DMV2": DMV2Parser(),
+            "DMV2_html": DMV2ParseHTML(),
         }
-
+        if is_html:
+            return parsers.get(f"{parser_name}_html", BaseParser())
         return parsers.get(parser_name, BaseParser())
 
 
@@ -212,6 +214,8 @@ class DMV2Parser(DMParser):
     def get_description_from_message(self, text, info):
         theme = self.get_theme_from_message(text)
         description = self.get_description_lines(text)
+        if theme.lower() in description.lower():
+            return description
         return f"{theme}\r\n{description}"
 
     def get_theme_from_message(self, text):
@@ -230,3 +234,25 @@ class DMV2Parser(DMParser):
 
         description_lines = text[index_start : index_start + end_index]
         return description_lines.split("Описание:")[1].strip()
+
+
+class DMV2ParseHTML(DMV2Parser):
+    def __init__(self):
+        super().__init__()
+        self.html: str = ""
+
+    def parse(self, html):
+        self.html = html
+        text = self.html_to_text()
+        return super().parse(text)
+
+    def html_to_text(self) -> str:
+        text = self.convert_br()
+        text = self.remove_header_html(text)
+        return text
+
+    def remove_header_html(self, text: str) -> str:
+        return text.replace("<html>", "").replace("</html>", "")
+
+    def convert_br(self) -> str:
+        return self.html.replace("<br>", "\r\n")

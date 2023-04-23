@@ -141,11 +141,17 @@ def create_ticket_from_email(email: MailMessage) -> bool:
         logging.info(f"User {user} is not customer and can't create ticket from email")
         return False
     customer = user.get_role_user()
-    message = email.text or email.html
-    message = remove_duplicate_new_lines(message)
+    if not email.text:
+        message = email.html
+        is_html = True
+    else:
+        message = email.text
+        message = remove_duplicate_new_lines(message)
+        is_html = False
+
     id_email_message = email.headers.get("message-id")[0].strip()
     reply_to = email.cc
-    ticket_info = get_info_from_message(message, customer)
+    ticket_info = get_info_from_message(message, customer, is_html)
     creator = User.objects.get(username=settings.TICKET_CREATOR_USERNAME)
     status = Dictionary.get_status_ticket("new")
     type_ticket = Dictionary.get_type_ticket(Ticket.default_type_code)
@@ -163,9 +169,9 @@ def create_ticket_from_email(email: MailMessage) -> bool:
     return True
 
 
-def get_info_from_message(message: str, customer: Customer) -> dict:
+def get_info_from_message(message: str, customer: Customer, is_html=False) -> dict:
     parser_name = customer.get_parser()
-    parser = BaseParser.get_parser(parser_name)
+    parser = BaseParser.get_parser(parser_name, is_html)
     try:
         info = parser.parse(message)
     except Exception as e:
@@ -203,7 +209,7 @@ def remove_duplicate_new_lines(text: str) -> str:
     return text
 
 
-def save_attachment(email: MailBox, ticket: Ticket, user, comment: Comment = None):
+def save_attachment(email: MailMessage, ticket: Ticket, user, comment: Comment = None):
     if not email.attachments:
         return
     if not comment:
