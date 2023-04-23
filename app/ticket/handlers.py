@@ -169,7 +169,7 @@ def get_info_from_message(message: str, customer: Customer) -> dict:
     try:
         info = parser.parse(message)
     except Exception as e:
-        logging.error(f"Error parsing with: {type(e)} {str(e)}. Try default parser")
+        logging.exception(f"Error parsing with: {type(e)} {str(e)}. Try default parser")
         return BaseParser().parse(message)
     return info
 
