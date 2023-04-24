@@ -31,6 +31,19 @@ class Notification(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
     subject = models.CharField(max_length=255, blank=True, null=True)
     bcc_email = models.EmailField(verbose_name="Скрытая копия", blank=True, null=True)
+    _cc_emails = models.CharField(
+        "Копии", max_length=500, blank=True, null=True, db_column="cc_emails"
+    )
+
+    @property
+    def cc_emails(self):
+        if not self._cc_emails:
+            return []
+        return [i.strip() for i in self._cc_emails.split(",")]
+
+    @cc_emails.setter
+    def cc_emails(self, value: list):
+        self._cc_emails = ",".join(value)
 
     type_notify = models.CharField(
         "Тип оповещения",
@@ -111,6 +124,9 @@ class Notification(models.Model):
             "notifications/customer_ticket_to_work.txt"
         ).render({"ticket": ticket, "link": link})
         user = ticket.customer
+        cc_emails = []
+        if user.is_customer and user.profile:
+            cc_emails = user.profile.emails
         cls.objects.create(
             user=user,
             message=message,
@@ -118,6 +134,7 @@ class Notification(models.Model):
             emails=ticket._reply_to_emails,
             ticket=ticket,
             bcc_email=settings.MANAGER_EMAIL,
+            cc_emails=cc_emails,
         )
 
     @classmethod
@@ -132,6 +149,9 @@ class Notification(models.Model):
             }
         )
         user = ticket.customer
+        cc_emails = []
+        if user.is_customer and user.profile:
+            cc_emails = user.profile.emails
         notify = cls.objects.create(
             user=user,
             message=message,
@@ -140,6 +160,7 @@ class Notification(models.Model):
             ticket=ticket,
             subject=f"Заявка №{ticket.sap_id or ticket.pk} выполнена",
             bcc_email=settings.MANAGER_EMAIL,
+            cc_emails=cc_emails,
         )
         return notify
 
@@ -157,6 +178,10 @@ class Notification(models.Model):
             }
         )
         user = ticket.customer
+        cc_emails = []
+        if user.is_customer and user.profile:
+            cc_emails = user.profile.emails
+
         notify = cls.objects.create(
             user=user,
             message=message,
@@ -165,5 +190,6 @@ class Notification(models.Model):
             ticket=ticket,
             subject=f"Заявка №{ticket.sap_id or ticket.pk} отменена",
             bcc_email=settings.MANAGER_EMAIL,
+            cc_emails=cc_emails,
         )
         return notify

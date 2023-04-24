@@ -36,6 +36,9 @@ def send_email(notification_pk: int) -> int:
     if notification.bcc_email:
         email.bcc = [notification.bcc_email]
 
+    if notification.cc_emails:
+        email.cc = notification.cc_emails
+
     status = email.send()
     return status
 

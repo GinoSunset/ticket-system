@@ -188,9 +188,26 @@ class CustomerProfile(models.Model):
     company = models.CharField(
         verbose_name="Компания", max_length=100, null=True, blank=True
     )
+    _emails = models.CharField(
+        verbose_name="Адреса, которые должны быть в копии",
+        max_length=500,
+        null=True,
+        blank=True,
+        db_column="emails",
+    )
 
     def __str__(self) -> str:
         return str(self.user)
+
+    @property
+    def emails(self) -> list:
+        if not self._emails:
+            return []
+        return [i.strip() for i in self._emails.split(",")]
+
+    @emails.setter
+    def emails(self, value: list):
+        self._emails = ",".join(value)
 
 
 class ContractorProfile(models.Model):

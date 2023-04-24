@@ -11,7 +11,6 @@ from django.core import mail
 class TestUpdateTicket:
     @pytest.mark.django_db
     def test_save_comment_update_status(self, ticket_factory, client, operator_factory):
-
         user = operator_factory(first_name="John", last_name="Smit")
         status = Dictionary.objects.get(code="work")
         new_status = Dictionary.objects.get(code="done")
@@ -44,7 +43,6 @@ class TestUpdateTicket:
         operator_factory,
         monkeypatch_delay_send_email_on_celery,
     ):
-
         user = operator_factory()
         contractor = contractor_factory()
         status = Dictionary.objects.get(code="work")
@@ -112,3 +110,38 @@ class TestUpdateTicket:
 
         assert notify.user == customer
         assert emails == set(mail.outbox[0].to)
+
+    @pytest.mark.django_db
+    @pytest.mark.parametrize(
+        "url", ["ticket-to-work", "ticket-to-done", "ticket-to-cancel"]
+    )
+    def test_update_status_create_notify_with_all_user_emails_to_copy(
+        self,
+        ticket_factory,
+        operator_factory,
+        customer_factory,
+        client,
+        url,
+        monkeypatch_delay_send_email_on_celery,
+    ):
+        emails = {"cust2@email.com", "cust3@email.com"}
+        user = operator_factory(first_name="John", last_name="Smit")
+        status = Dictionary.objects.get(code="new")
+        customer = customer_factory(email="cust1@email.com")
+        customer.refresh_from_db()
+        customer.profile.emails = emails
+        customer.profile.save()
+        ticket: Ticket = ticket_factory(
+            creator=user,
+            status=status,
+            customer=customer,
+        )
+        client.force_login(user=user)
+
+        res = client.get(reverse(url, kwargs={"pk": ticket.pk}))
+        assert res.status_code == 302
+
+        notify = Notification.objects.first()
+
+        assert notify.user == customer
+        assert emails == set(mail.outbox[0].cc)
