@@ -128,3 +128,18 @@ def test_create_comment_with_img_from_email(
     assert Ticket.objects.all().count() > 0
     ticket = Ticket.objects.first()
     assert ticket.comments.count() == 1
+
+
+@pytest.mark.django_db
+def test_proceeding_html_text(customer_factory):
+    with open(settings.BASE_DIR / "ticket/tests/dmv2.eml", "rb") as f:
+        data = f.read()
+    mail = MailMessage.from_bytes(data)
+    customer = customer_factory(email=mail.from_)
+    customer.refresh_from_db()
+    customer.profile.parser = "DMV2"
+    customer.profile.save()
+    create_ticket_from_email(email=mail)
+    ticket = Ticket.objects.all().get()
+    assert ticket.sap_id
+    assert ticket.address
