@@ -5,6 +5,8 @@ from django.conf import settings
 
 from notifications.models import Notification
 
+import logging
+
 
 @celery_app.task
 def send_email_task(notification_pk):
@@ -35,9 +37,11 @@ def send_email(notification_pk: int) -> int:
 
     if notification.bcc_email:
         email.bcc = [notification.bcc_email]
+        logging.info(f"add bcc email: {notification.bcc_email} id={notification.pk}")
 
     if notification.cc_emails:
         email.cc = notification.cc_emails
+        logging.info(f"add cc email: {email.cc } id={notification.pk}")
 
     status = email.send()
     return status
