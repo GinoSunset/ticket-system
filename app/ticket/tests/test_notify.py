@@ -135,6 +135,7 @@ class TestUpdateTicket:
             creator=user,
             status=status,
             customer=customer,
+            shop_id="ЗВ Пушкин Константиновский 112211",
         )
         client.force_login(user=user)
 
@@ -145,3 +146,4 @@ class TestUpdateTicket:
 
         assert notify.user == customer
         assert emails == set(mail.outbox[0].cc)
+        assert f"{ticket.shop_id}" in mail.outbox[0].subject

@@ -127,11 +127,15 @@ class Notification(models.Model):
         cc_emails = []
         if user.is_customer and user.profile:
             cc_emails = user.profile.emails
+        subject = added_shop_id_to_subject(
+            ticket, f"Заявка №{ticket.sap_id or ticket.pk} в работе."
+        )
         cls.objects.create(
             user=user,
             message=message,
             type_notify="ticket_to_work",
             emails=ticket._reply_to_emails,
+            subject=subject,
             ticket=ticket,
             bcc_email=settings.MANAGER_EMAIL,
             cc_emails=cc_emails,
@@ -152,13 +156,18 @@ class Notification(models.Model):
         cc_emails = []
         if user.is_customer and user.profile:
             cc_emails = user.profile.emails
+
+        subject = added_shop_id_to_subject(
+            ticket, f"Заявка №{ticket.sap_id or ticket.pk} выполнена."
+        )
+
         notify = cls.objects.create(
             user=user,
             message=message,
             type_notify="ticket_done",
             emails=ticket._reply_to_emails,
             ticket=ticket,
-            subject=f"Заявка №{ticket.sap_id or ticket.pk} выполнена",
+            subject=subject,
             bcc_email=settings.MANAGER_EMAIL,
             cc_emails=cc_emails,
         )
@@ -181,6 +190,9 @@ class Notification(models.Model):
         cc_emails = []
         if user.is_customer and user.profile:
             cc_emails = user.profile.emails
+        subject = added_shop_id_to_subject(
+            ticket, f"Заявка №{ticket.sap_id or ticket.pk} отменена."
+        )
 
         notify = cls.objects.create(
             user=user,
@@ -188,8 +200,14 @@ class Notification(models.Model):
             type_notify="ticket_cancel",
             emails=ticket._reply_to_emails,
             ticket=ticket,
-            subject=f"Заявка №{ticket.sap_id or ticket.pk} отменена",
+            subject=subject,
             bcc_email=settings.MANAGER_EMAIL,
             cc_emails=cc_emails,
         )
         return notify
+
+
+def added_shop_id_to_subject(ticket, message):
+    if ticket.shop_id:
+        message += f" {ticket.shop_id}"
+    return message
