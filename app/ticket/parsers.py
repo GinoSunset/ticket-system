@@ -225,15 +225,28 @@ class DMV2Parser(DMParser):
 
     def get_description_lines(self, text):
         index_start = text.index("Описание:")
+        end_index = self.get_end_index(text, index_start)
+
+        description_lines = text[index_start:end_index]
+        return description_lines[len("Описание:") :].strip()
+
+    def get_end_index(self, text, index_start):
+        index_start += len("Описание:")
+
+        end_index = text[index_start:].find(":")
+        if end_index != -1:
+            last_line_index = text[index_start : index_start + end_index].rfind("\n")
+            if last_line_index != -1:
+                return last_line_index + index_start
+
         dup_empty_line = "\r\n\r\n"
+
         end_index = text[index_start:].find(dup_empty_line)
         if end_index == -1:
             end_index = text[index_start:].find("\n\n")
         if end_index == -1:
             end_index = text[index_start:].index("\n")
-
-        description_lines = text[index_start : index_start + end_index]
-        return description_lines.split("Описание:")[1].strip()
+        return end_index + index_start
 
 
 class DMV2ParseHTML(DMV2Parser):

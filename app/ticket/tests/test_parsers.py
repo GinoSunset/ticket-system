@@ -95,3 +95,13 @@ class TestDMV2Parser:
             description
             == "Пищат кассы\r\nПосле скачка напряжения,  пищат с разницей в 1 - 2 минуты.\nФото входной зоны и фото с замером прилагаю"
         )
+
+    @pytest.mark.django_db
+    def test_email_with_two_new_line(self, text_dm_with_dup_new_line, customer_factory):
+        description = DMV2Parser().get_description_from_message(
+            text_dm_with_dup_new_line, ""
+        )
+        assert (
+            description
+            == "ОА ТРИКОТАЖ 2-й этаж.\r\nДоброе утро.\r\n\r\nКассы работают частично.\r\n\r\nНе все реагируют на защиту"
+        )
