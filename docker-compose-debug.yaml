@@ -11,12 +11,12 @@ services:
       - 127.0.0.1:8001:8000
     env_file:
       - ./.env
-    entrypoint:
+    environment:
       - RABBIT_HOST=rabbitmq
-      - EMAIL_PORT="1025"
-      - EMAIL_HOST="mailhog"
+      - EMAIL_PORT=1025
+      - EMAIL_HOST=mailhog
       - EMAIL_USE_SSL=off
-      - REDIS_HOST="redis"
+      - REDIS_HOST=redis
 
   beat:
     build: ./app
@@ -26,12 +26,12 @@ services:
       - ./app/:/usr/src/app/
     env_file:
       - ./.env
-    entrypoint:
+    environment:
       - RABBIT_HOST=rabbitmq
-      - EMAIL_PORT="1025"
-      - EMAIL_HOST="mailhog"
+      - EMAIL_PORT=1025
+      - EMAIL_HOST=mailhog
       - EMAIL_USE_SSL=off
-      - REDIS_HOST="redis"
+      - REDIS_HOST=redis
     depends_on:
       - rabbitmq
 
@@ -45,10 +45,11 @@ services:
       - ./.env
     environment:
       - RABBIT_HOST=rabbitmq
-      - EMAIL_PORT="1025"
-      - EMAIL_HOST="mailhog"
+      - EMAIL_PORT=1025
+      - EMAIL_HOST=mailhog
       - EMAIL_USE_SSL=off
-      - REDIS_HOST="redis"
+      - REDIS_HOST=redis
+
     depends_on:
       - rabbitmq
 
