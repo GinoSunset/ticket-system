@@ -1,6 +1,9 @@
 import pytest
 
 from notifications.models import Notification
+from share.models import Share
+import factory
+from django.db.models import signals
 
 
 @pytest.mark.django_db
@@ -37,3 +40,16 @@ def test_notify_to_task_cancel_has_all_comment_for_report(
     assert c1.text in notify.message
     assert c2.text in notify.message
     assert len(notify.message.split("------------")) == 3
+
+
+@factory.django.mute_signals(signals.post_save)
+@pytest.mark.django_db
+def test_create_share_link_to_contractor(
+    share_factory, ticket_factory, contractor_factory
+):
+    contractor = contractor_factory()
+    ticket = ticket_factory(contractor=contractor)
+    share: Share = share_factory(ticket=ticket)
+    Notification.create_notify_update_contractor(ticket=ticket)
+
+    assert share.get_absolute_url() in Notification.objects.first().message

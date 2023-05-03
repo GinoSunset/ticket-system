@@ -1,12 +1,16 @@
 import pytest
 import json
+import factory
 
 from django.urls import reverse
-
+from django.db.models import signals
 from share.models import Share
 from ticket.models import Ticket
 
+from users.models import CustomerProfile
 
+
+@factory.django.mute_signals(signals.pre_save, signals.post_save)
 @pytest.mark.django_db
 def test_create_share_ticket(
     ticket_factory, client, operator_factory, customer_factory
@@ -14,6 +18,7 @@ def test_create_share_ticket(
     customer = customer_factory()
     customer.refresh_from_db()
     operator = operator_factory()
+    CustomerProfile.objects.create(user=customer)
     customer.profile.linked_operators.add(operator)
 
     ticket = ticket_factory(customer=customer)
@@ -60,6 +65,7 @@ def test_operator_can_not_create_share_ticket_for_not_linked_customer(
 
 
 @pytest.mark.django_db
+@factory.django.mute_signals(signals.pre_save, signals.post_save)
 def test_admin_can_create_share(ticket_factory, client, user_factory):
     admin = user_factory(is_staff=True, is_superuser=True)
     ticket = ticket_factory()

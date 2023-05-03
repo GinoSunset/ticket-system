@@ -4,8 +4,6 @@ from django.conf import settings
 from django.contrib.sites.models import Site
 from django.db import models
 
-from ticket.models import Ticket
-
 
 class Share(models.Model):
     class Meta:
@@ -15,7 +13,7 @@ class Share(models.Model):
 
     uuid = models.UUIDField(primary_key=True, editable=False, default=uuid.uuid4)
     ticket = models.OneToOneField(
-        Ticket, on_delete=models.CASCADE, related_name="share"
+        "ticket.Ticket", on_delete=models.CASCADE, related_name="share"
     )
     creator = models.ForeignKey(
         "users.User", on_delete=models.CASCADE, related_name="shares"

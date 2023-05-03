@@ -12,6 +12,7 @@ from users.models import Operator, Customer, User, Contractor
 from additionally.models import Dictionary
 
 from notifications.models import Notification
+from share.logics import create_share, remove_share, processing_share
 from .models import Ticket, Comment, CommentFile, CommentImage
 from .forms import TicketsForm, CommentForm, TicketsFormCustomer
 from .mixin import AccessTicketMixin, AccessAuthorMixin, AccessOperatorMixin
@@ -108,6 +109,7 @@ class TicketUpdateView(LoginRequiredMixin, AccessTicketMixin, UpdateView):
         result = super().form_valid(form)
         if form.changed_data:
             self.create_comment_from_change_ticket(form)
+            processing_share(self.object, self.request.user)
         return result
 
     def create_comment_from_change_ticket(self, form):
@@ -230,6 +232,7 @@ class TicketToWorkView(LoginRequiredMixin, AccessOperatorMixin, View):
 
         Notification.create_notify_for_customer_when_ticket_to_work(ticket)
         Comment.create_update_system_comment(message, ticket, user)
+        create_share(ticket, request.user)
 
         return redirect("ticket-update", pk=ticket.pk)
 
@@ -250,7 +253,7 @@ class TicketToDoneView(LoginRequiredMixin, AccessOperatorMixin, View):
 
         Notification.create_notify_for_customer_when_ticket_to_done(ticket)
         Comment.create_update_system_comment(message, ticket, user)
-
+        remove_share(ticket=ticket)
         return redirect("ticket-update", pk=ticket.pk)
 
 
@@ -270,6 +273,7 @@ class TicketToCancelView(LoginRequiredMixin, AccessOperatorMixin, View):
 
         Notification.create_notify_for_customer_when_ticket_to_cancel(ticket)
         Comment.create_update_system_comment(message, ticket, user)
+        remove_share(ticket=ticket)
 
         return redirect("ticket-update", pk=ticket.pk)
 

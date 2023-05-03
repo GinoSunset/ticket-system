@@ -14,3 +14,7 @@
 
 
 Перейти к заявке: {{link}}
+{% if ticket.share %}
+Для просмотра без регистрации можете перейти по ссылке:
+{{ticket.share.get_absolute_url}}
+{% endif %}
