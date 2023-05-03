@@ -170,20 +170,30 @@ class Ticket(models.Model):
         self, force_insert=False, force_update=False, using=None, update_fields=None
     ):
         if self.pk:
-            if (
-                self.status == Dictionary.objects.get(code="done")
-                and not self.completion_date
-            ):
-                self.completion_date = timezone.now()
-            if self.status == Dictionary.objects.get(code="work"):
-                if not self.date_to_work:
-                    self.date_to_work = timezone.now()
-                    self.save()
-                if not hasattr(self, "act"):
-                    self.act = create_act_for_ticket(ticket=self)
-                if not self.act.file_doc_act:
-                    self.act.create_act()
+            self.processing_status()
+
         return super().save(force_insert, force_update, using, update_fields)
+
+    def processing_status(self):
+        self.setup_completion_date()
+        if self.status == Dictionary.objects.get(code="work"):
+            self.processing_work_status()
+
+    def setup_completion_date(self):
+        status_done = Dictionary.objects.get(code="done")
+        if self.status == status_done and not self.completion_date:
+            self.completion_date = timezone.now()
+        if self.status != status_done and self.completion_date:
+            self.completion_date = None
+
+    def processing_work_status(self):
+        if not self.date_to_work:
+            self.date_to_work = timezone.now()
+            self.save()
+        if not hasattr(self, "act"):
+            self.act = create_act_for_ticket(ticket=self)
+        if not self.act.file_doc_act:
+            self.act.create_act()
 
 
 class Comment(models.Model):
@@ -265,7 +275,6 @@ class Comment(models.Model):
 
     @classmethod
     def get_text_system_comment(cls, changed_data, initial_data, named_field, ticket):
-
         text = ""
         for field in changed_data:
             value = getattr(ticket, field)

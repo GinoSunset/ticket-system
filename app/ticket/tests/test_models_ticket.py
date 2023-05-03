@@ -77,3 +77,19 @@ def test_comment_for_report_has_comment_with_empty_text(comment_factory):
     image = comment.images.create(image=SimpleUploadedFile("test.jpg", b"test"))
 
     assert comment in comment.ticket.get_comments_for_report()
+
+
+@pytest.mark.django_db
+@pytest.mark.parametrize(
+    "status_stage", ["work", "search_contractor", "consideration", "revision"]
+)
+def test_remove_completion_date_on_work_status(ticket_factory, status_stage):
+    ticket = ticket_factory()
+    ticket.status = Dictionary.objects.get(code="done")
+    ticket.save()
+    assert ticket.completion_date is not None
+
+    ticket.status = Dictionary.objects.get(code=status_stage)
+    ticket.save()
+    ticket.refresh_from_db()
+    assert ticket.completion_date is None
