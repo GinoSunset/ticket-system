@@ -10,6 +10,7 @@ from django.urls import reverse
 from django.utils import timezone
 from reports.utils import create_act_for_ticket
 from users.models import Operator
+from share.models import Share
 
 
 User = get_user_model()
