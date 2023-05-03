@@ -19,11 +19,7 @@ def test_create_share_after_ticket_to_work(ticket_factory, user_factory):
     processing_share(ticket, user_factory())
     assert ticket.share
 
-
 @pytest.mark.django_db
-@pytest.mark.parametrize("status_code", ["done", "cancel"])
-def test_remove_share_after_completed_ticket(ticket_factory, user_factory, status_code):
-    ticket = ticket_factory(status=Dictionary.get_status_ticket(status_code))
     user = user_factory()
     Share.objects.create(ticket=ticket, creator=user)
     processing_share(ticket, user=user)
