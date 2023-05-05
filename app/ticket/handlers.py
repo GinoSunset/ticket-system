@@ -9,6 +9,7 @@ import logging
 
 from users.models import Customer, User
 from additionally.models import Dictionary
+from notifications.services import create_operator_notify_for_create_comment
 from .models import Ticket, Comment
 from .parsers import BaseParser
 from .utils import is_image
@@ -64,12 +65,13 @@ def is_reply_message(email: MailMessage) -> bool:
     return False
 
 
-def create_comment_from_email(email: MailMessage) -> bool:
+def create_comment_from_email(email: MailMessage, sap_id=None) -> bool:
     email_customer = email.from_
     user = User.objects.get(email__iregex=email_customer)
 
     id_email_message = email.headers.get("message-id")[0].strip()
-    ticket = get_ticket_from_email(email)
+
+    ticket = get_ticket_from_email(email, sap_id)
     if not ticket:
         return False
     message = email.text or email.html
@@ -81,10 +83,14 @@ def create_comment_from_email(email: MailMessage) -> bool:
         id_email_message=id_email_message,
     )
     save_attachment(email, ticket, user, comment)
-    return True
+    return comment
 
 
-def get_ticket_from_email(email):
+def get_ticket_from_email(email, sap_id=None):
+    if sap_id:
+        ticket = Ticket.objects.filter(sap_id=sap_id).last()
+        if ticket:
+            return ticket
     ticket = None
 
     id_email_message_in_reply_to = email.headers.get("in-reply-to")
@@ -109,7 +115,6 @@ def get_sap_id_from_subject(subject: str) -> str:
     match = re.search(r"\d{10}", subject)
     if match:
         return match.group(0)
-    return None
 
 
 def get_ticket_by_message_id_reply(id_email_message_in_reply_to):
@@ -134,6 +139,17 @@ def get_new_emails():
             yield mail
 
 
+def exist_ticket(ticket_info: dict, user: Customer):
+    sap_id = ticket_info.get("sap_id")
+    if not sap_id:
+        return False
+    try:
+        ticket = Ticket.objects.get(sap_id=sap_id, customer=user)
+    except Ticket.DoesNotExist:
+        return False
+    return ticket
+
+
 def create_ticket_from_email(email: MailMessage) -> bool:
     email_customer = email.from_
     user = User.objects.get(email__iregex=email_customer)
@@ -152,6 +168,9 @@ def create_ticket_from_email(email: MailMessage) -> bool:
     id_email_message = email.headers.get("message-id")[0].strip()
     reply_to = email.cc
     ticket_info = get_info_from_message(message, customer, is_html)
+    if ticket := exist_ticket(ticket_info, user):
+        comment = save_email_as_comment(email, ticket, ticket_info)
+        return comment
     creator = User.objects.get(username=settings.TICKET_CREATOR_USERNAME)
     status = Dictionary.get_status_ticket("new")
     type_ticket = Dictionary.get_type_ticket(Ticket.default_type_code)
@@ -167,6 +186,15 @@ def create_ticket_from_email(email: MailMessage) -> bool:
     )
     save_attachment(email, ticket, customer)
     return True
+
+
+def save_email_as_comment(email, ticket, ticket_info):
+    comment = create_comment_from_email(email, sap_id=ticket_info.get("sap_id"))
+    if comment and ticket.status.code in ["cancel", "done"]:
+        ticket.status = Dictionary.get_status_ticket("new")
+        ticket.save()
+        create_operator_notify_for_create_comment(comment)
+    return comment
 
 
 def get_info_from_message(message: str, customer: Customer, is_html=False) -> dict:

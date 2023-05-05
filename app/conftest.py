@@ -41,5 +41,10 @@ def status_done():
 
 
 @pytest.fixture
+def status_new():
+    return Dictionary.get_status_ticket("new")
+
+
+@pytest.fixture
 def status_in_work():
     return Dictionary.get_status_ticket("work")
