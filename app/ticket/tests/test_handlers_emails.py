@@ -11,6 +11,9 @@ from ticket.handlers import (
 from ticket.models import Ticket
 import factory
 
+from users.models import CustomerProfile
+from notifications.models import Notification
+
 
 @pytest.mark.django_db
 def test_creating_ticket_form_emails(email_ticket, customer_factory):
@@ -143,3 +146,34 @@ def test_proceeding_html_text(customer_factory):
     ticket = Ticket.objects.all().get()
     assert ticket.sap_id
     assert ticket.address
+
+
+@pytest.mark.django_db
+@factory.django.mute_signals(signals.post_save)
+def test_create_email_as_comment_if_sap_exists(
+    customer_factory,
+    ticket_factory,
+    email_ticket,
+    status_done,
+    status_new,
+    operator_factory,
+):
+    sap_id = "800111258011"
+    operator = operator_factory()
+    email_ticket.headers.pop("in-reply-to")
+    customer = customer_factory(email=email_ticket.from_)
+    CustomerProfile.objects.create(user=customer)
+    customer.profile.parser = "DM"
+    customer.profile.save()
+    operator.customers.add(customer.profile)
+    ticket = ticket_factory(sap_id=sap_id, customer=customer, status=status_done)
+    processing_email(email_ticket)
+    ticket.refresh_from_db()
+    assert ticket.comments.count() == 1
+    assert ticket.comments.first().text
+    assert ticket.comments.first().author == customer
+    assert ticket.comments.first().author.email == email_ticket.from_
+    assert ticket.status == status_new
+
+    notify = Notification.objects.first()
+    assert notify.message

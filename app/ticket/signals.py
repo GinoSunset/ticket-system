@@ -1,6 +1,6 @@
 from asgiref.sync import async_to_sync
 from django.dispatch import receiver
-from django.db.models.signals import post_save, pre_save
+from django.db.models.signals import post_save
 from django.conf import settings
 from django.contrib.sites.models import Site
 from channels.layers import get_channel_layer
@@ -9,7 +9,9 @@ from channels_redis.core import RedisChannelLayer
 from ticket.models import Ticket
 from notifications.models import Notification
 
-from users.models import User, Customer
+from users.models import Customer
+
+from notifications.services import get_users_for_create_notify
 
 
 @receiver(post_save, sender=Ticket)
@@ -68,15 +70,3 @@ def create_notifications(instance: Ticket):
             message=message,
             type_notify=Notification.TypeNotification.NEW_TICKET,
         )
-
-
-def get_users_for_create_notify(instance):
-    customer: Customer = instance.customer.get_role_user()
-    operators = None
-    if customer.is_customer:
-        operators = customer.get_operators()
-        operator_user = User.objects.filter(id__in=operators)
-    admins = User.objects.filter(is_staff=True)
-    users = operator_user | admins
-
-    return users.distinct()
