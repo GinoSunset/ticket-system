@@ -56,6 +56,10 @@ services:
   rabbitmq:
     image: rabbitmq:3-management
     restart: always
+    environment:
+      - RABBITMQ_DEFAULT_USER=${RABBIT_LOGIN}
+      - RABBITMQ_DEFAULT_PASS=${RABBIT_PASSWORD}
+      - RABBITMQ_DEFAULT_VHOST=${RABBIT_VHOST}
 
   redis:
     image: redis:latest

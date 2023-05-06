@@ -44,7 +44,16 @@ services:
   rabbitmq:
     image: rabbitmq:3-management
     restart: always
+    volumes:
+      - rabbitmq:/var/lib/rabbitmq
+      - ./confs/rabbitmq.conf:/etc/rabbitmq/rabbitmq.conf
+    environment:
+      - RABBITMQ_DEFAULT_USER=${RABBIT_LOGIN}
+      - RABBITMQ_DEFAULT_PASS=${RABBIT_PASSWORD}
+      - RABBITMQ_DEFAULT_VHOST=${RABBIT_VHOST}
 
   redis:
     image: redis:latest
     restart: always
+volumes:
+  rabbitmq:
