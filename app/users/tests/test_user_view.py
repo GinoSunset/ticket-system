@@ -120,5 +120,5 @@ class TestAccountPage:
     def test_account_page_exist(self, client, user_factory):
         user = user_factory()
         client.force_login(user)
-        res = client.get(reverse("account", kwargs={"pk": user.pk}))
+        res = client.get(reverse("account"))
         assert res.status_code == 200

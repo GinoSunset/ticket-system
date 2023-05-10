@@ -30,6 +30,18 @@
         </div>
     </div>
 
+    {% if not user.telegram_id%}
+    <div class="column">
+        <div class="ui segment">
+            <h3>Подключить телеграмм</h3>
+            <p>Для подключения телеграма нажмите на кнопку ниже</p>
+            <a href="{{ telegram_bot_url }}" class="ui button basic positive">Подключить</a>
+            <p>Введите токен в телеграме</p>
+            <pre>{{ user.token }}</pre>
+            <p>Внимание! После подключения телеграма, вы сможете получать уведомления о новых заявках</p>
+        </div>
+    {% endif%}
+
 </div>
 
 {% endblock content %}

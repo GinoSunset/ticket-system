@@ -1,7 +1,10 @@
-from django.urls import reverse, reverse_lazy
+from django.conf import settings
+from django.urls import reverse_lazy
 from django.views.generic import ListView, CreateView, UpdateView, DetailView
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.http import Http404, JsonResponse
+from django.utils.decorators import method_decorator
+from django.views.decorators.csrf import csrf_exempt
 
 from ticket.mixin import AccessOperatorMixin
 from .forms import CustomerForm, ContractorForm
@@ -158,11 +161,13 @@ class Account(LoginRequiredMixin, UpdateView):
         "first_name",
         "last_name",
         "email",
-        "telegram_id",
         "email_notify",
         "telegram_notify",
     ]
     template_name = "users/account.html"
+    extra_context = {
+        "telegram_bot_url": settings.TG_BOT_URL,
+    }
 
     def get_object(self, queryset=None):
         return self.request.user
@@ -179,3 +184,35 @@ class UpdateAvatar(LoginRequiredMixin, UpdateView):
     def form_valid(self, form):
         super().form_valid(form)
         return JsonResponse({"avatar": self.object.avatar.url})
+
+
+class GetUserByTokenView:
+    def get(self, request, token):
+        try:
+            user = User.objects.get(token=token)
+            return JsonResponse({"id": user.id, "first_name": user.first_name})
+        except User.DoesNotExist:
+            return JsonResponse({"id": None})
+
+
+@method_decorator(csrf_exempt, name="dispatch")
+class UpdateUserTelegamId(UpdateView):
+    # csrf_exempt
+
+    model = User
+    fields = ["telegram_id"]
+    template_name = "users/account.html"
+    slug_url_kwarg = "token"
+    slug_field = "token"
+
+    def form_valid(self, form):
+        self.object = form.save()
+        self.object.telegram_notify = True
+        self.object.save()
+        super().form_valid(form)
+        return JsonResponse(
+            {"user": {"id": self.object.id, "first_name": self.object.first_name}}
+        )
+
+    def form_invalid(self, form):
+        return JsonResponse({"user": None})

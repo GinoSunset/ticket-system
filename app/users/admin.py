@@ -5,13 +5,18 @@ from django.utils.translation import gettext_lazy as _
 
 
 class UserAdmin(BaseUserAdmin):
-
     fieldsets = BaseUserAdmin.fieldsets + (
-        ("Дополнительная информация", {"fields": ("avatar", "phone", "role")}),
+        (
+            "Дополнительная информация",
+            {"fields": ("avatar", "phone", "role", "telegram_id")},
+        ),
         ("Оповещения", {"fields": ("email_notify", "telegram_notify")}),
     )
     add_fieldsets = BaseUserAdmin.add_fieldsets + (
-        ("Дополнительная информация", {"fields": ("avatar", "phone", "role")}),
+        (
+            "Дополнительная информация",
+            {"fields": ("avatar", "phone", "role", "telegram_id")},
+        ),
         ("Оповещения", {"fields": ("email_notify", "telegram_notify")}),
     )
     list_filter = BaseUserAdmin.list_filter + ("role",)

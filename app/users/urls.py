@@ -23,4 +23,9 @@ urlpatterns = [
         name="contractor_edit",
     ),
     path("update-avatar/", views.UpdateAvatar.as_view(), name="update-avatar"),
+    path(
+        "set-user-telegram-id/<uuid:token>",
+        views.UpdateUserTelegamId.as_view(),
+        name="set-user-telegram-id",
+    ),
 ]
