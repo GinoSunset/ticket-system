@@ -1,3 +1,4 @@
+import uuid
 from django.contrib.auth.models import AbstractUser, UserManager
 from django.db import models
 from django.conf import settings
@@ -51,6 +52,9 @@ class User(AbstractUser):
     telegram_notify = models.BooleanField("Уведомлять в Telegram", default=False)
 
     base_role = Role.OTHER
+    token = models.UUIDField(
+        editable=False, default=uuid.uuid4, unique=True, db_index=True
+    )
     objects = UserManager()
 
     def save(self, *args, **kwargs):
