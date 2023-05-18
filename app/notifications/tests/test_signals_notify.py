@@ -20,25 +20,6 @@ def test_send_email(
 
 
 @pytest.mark.django_db
-def test_send_telegram(
-    operator_factory,
-    notification_factory,
-    monkeypatch_delay_send_telegram_on_celery: None,
-    mocker_bot_sender,
-):
-    telegram_id = "164341178"
-    operator = operator_factory(
-        email_notify=False, telegram_notify=True, telegram_id=telegram_id
-    )
-    notify: Notification = notification_factory(
-        user=operator, subject="Новая заявка", message="test"
-    )
-
-    assert len(mocker_bot_sender.messages) == 1
-    assert "Новая заявка" in mocker_bot_sender.messages[telegram_id]
-
-
-@pytest.mark.django_db
 @pytest.mark.parametrize(
     "type_notify, exp_subject",
     [

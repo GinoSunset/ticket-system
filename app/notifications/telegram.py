@@ -6,7 +6,7 @@ from django.conf import settings
 
 def create_message(notification: Notification) -> str:
     header_of_message = get_header_of_message(notification)
-    return f"{header_of_message}\n{notification.message}"
+    return f"[{header_of_message}]\n{notification.message}"
 
 
 def get_header_of_message(notification: Notification) -> str:
@@ -30,7 +30,7 @@ def send_telegram_notify_handler(notification_pk) -> bool:
         settings.TG_BOT_NOTIFICATION_URI,
         json={
             "user_id": notification.user.telegram_id,
-            "text": get_header_of_message(notification),
+            "text": create_message(notification),
         },
     )
     if res.status_code == 200:
