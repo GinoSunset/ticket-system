@@ -31,6 +31,8 @@ class OperatorFactory(factory.django.DjangoModelFactory):
 
     username = factory.Sequence(lambda n: "operator%03d" % n)
     email = factory.Sequence(lambda n: "operator%03d@mail.com" % n)
+    telegram_notify = False
+    email_notify = True
 
 
 class ContractorFactory(factory.django.DjangoModelFactory):

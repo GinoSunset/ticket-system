@@ -1,3 +1,4 @@
+from typing import Callable, Literal
 import pytest
 
 from django.core import mail
@@ -9,13 +10,32 @@ from notifications.models import Notification
 
 @pytest.mark.django_db
 def test_send_email(
-    operator_factory, notification_factory, monkeypatch_delay_send_email_on_celery
+    operator_factory, notification_factory, monkeypatch_delay_send_email_on_celery: None
 ):
     operator = operator_factory()
     notify = notification_factory(user=operator, subject="Новая заявка")
 
     assert len(mail.outbox) == 1
     assert "Новая заявка" in mail.outbox[0].subject
+
+
+@pytest.mark.django_db
+def test_send_telegram(
+    operator_factory,
+    notification_factory,
+    monkeypatch_delay_send_telegram_on_celery: None,
+    mocker_bot_sender,
+):
+    telegram_id = "164341178"
+    operator = operator_factory(
+        email_notify=False, telegram_notify=True, telegram_id=telegram_id
+    )
+    notify: Notification = notification_factory(
+        user=operator, subject="Новая заявка", message="test"
+    )
+
+    assert len(mocker_bot_sender.messages) == 1
+    assert "Новая заявка" in mocker_bot_sender.messages[telegram_id]
 
 
 @pytest.mark.django_db
@@ -33,7 +53,7 @@ def test_email_has_needed_subject(
     operator_factory,
     notification_factory,
     ticket_factory,
-    monkeypatch_delay_send_email_on_celery,
+    monkeypatch_delay_send_email_on_celery: None,
     type_notify,
     exp_subject,
 ):
@@ -49,7 +69,7 @@ def test_send_email_to_contractor_if_him_set(
     customer_factory,
     operator_factory,
     notification_factory,
-    monkeypatch_delay_send_email_on_celery,
+    monkeypatch_delay_send_email_on_celery: None,
 ):
     operator = operator_factory()
     email_contractor = "contractor@email.com"
@@ -62,7 +82,7 @@ def test_send_email_to_contractor_if_him_set(
 
 @pytest.mark.django_db
 def test_send_email_to_customer_check_all_emails(
-    notification_factory, monkeypatch_delay_send_email_on_celery, customer_factory
+    notification_factory, monkeypatch_delay_send_email_on_celery: None, customer_factory
 ):
     emails = ["example1@email.com", "example2@email.com", settings.EMAIL_HOST_USER]
     emails_str = ",".join(emails)
@@ -78,7 +98,7 @@ def test_send_email_to_customer_check_all_emails(
 
 @pytest.mark.django_db
 def test_send_email_when_ticket_status_to_done(
-    monkeypatch_delay_send_email_on_celery, comment_factory, ticket_factory
+    monkeypatch_delay_send_email_on_celery: None, comment_factory, ticket_factory
 ):
     ticket = ticket_factory()
     comment = comment_factory(is_for_report=True, ticket=ticket)
@@ -94,7 +114,7 @@ def test_send_email_when_ticket_status_to_done(
 
 @pytest.mark.django_db
 def test_send_email_when_ticket_status_to_cancel(
-    monkeypatch_delay_send_email_on_celery, comment_factory, ticket_factory
+    monkeypatch_delay_send_email_on_celery: None, comment_factory, ticket_factory
 ):
     ticket = ticket_factory()
     comment = comment_factory(is_for_report=True, ticket=ticket)
@@ -118,7 +138,7 @@ def test_send_email_when_ticket_status_to_cancel(
     ],
 )
 def test_notify_change_status_has_bcc_email_manager(
-    monkeypatch_delay_send_email_on_celery, ticket_factory, func
+    monkeypatch_delay_send_email_on_celery: None, ticket_factory, func
 ):
     ticket = ticket_factory()
     func(ticket)

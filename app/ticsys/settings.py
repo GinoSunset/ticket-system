@@ -23,6 +23,7 @@ env = environ.Env(
     SENTRY_DSN=(str, ""),
     APP_ENV_SENTRY=(str, "development"),
     TG_BOT_URL=(str, ""),
+    TG_BOT_NOTIFICATION_URI=(str, ""),
 )
 BASE_DIR = Path(__file__).resolve().parent.parent
 
@@ -175,3 +176,4 @@ sentry_sdk.init(
 
 # Telegram bot
 TG_BOT_URL = env("TG_BOT_URL")
+TG_BOT_NOTIFICATION_URI = env("TG_BOT_NOTIFICATION_URI")
