@@ -22,6 +22,8 @@ env = environ.Env(
     REDIS_PORT=(int, 6379),
     SENTRY_DSN=(str, ""),
     APP_ENV_SENTRY=(str, "development"),
+    TG_BOT_URL=(str, ""),
+    TG_BOT_NOTIFICATION_URI=(str, ""),
 )
 BASE_DIR = Path(__file__).resolve().parent.parent
 
@@ -170,3 +172,8 @@ sentry_sdk.init(
     traces_sample_rate=1.0,
     environment=env("APP_ENV_SENTRY"),
 )
+
+
+# Telegram bot
+TG_BOT_URL = env("TG_BOT_URL")
+TG_BOT_NOTIFICATION_URI = env("TG_BOT_NOTIFICATION_URI")

@@ -1,28 +1,31 @@
 from django.urls import path
 from django.contrib.auth.views import LoginView, LogoutView
 
-from .views import (
-    CreateCustomerView,
-    ListContractorView,
-    ListCustomerView,
-    UpdateCustomer,
-    CreateContractorView,
-    UpdateContractorView,
-    ListContractorJsonView,
-)
+from users import views
 
 urlpatterns = [
+    path("update/", views.Account.as_view(), name="account"),
     path("login/", LoginView.as_view(), name="login"),
     path("logout/", LogoutView.as_view(), name="logout"),
-    path("customer/", CreateCustomerView.as_view(), name="customer-create"),
-    path("contractor/", CreateContractorView.as_view(), name="contractor-create"),
-    path("customers/", ListCustomerView.as_view(), name="list-customers"),
-    path("contractors/", ListContractorView.as_view(), name="list-contractors"),
+    path("customer/", views.CreateCustomerView.as_view(), name="customer-create"),
+    path("contractor/", views.CreateContractorView.as_view(), name="contractor-create"),
+    path("customers/", views.ListCustomerView.as_view(), name="list-customers"),
+    path("contractors/", views.ListContractorView.as_view(), name="list-contractors"),
     path(
         "contractors/json/",
-        ListContractorJsonView.as_view(),
+        views.ListContractorJsonView.as_view(),
         name="contractor-list-ajax",
     ),
-    path("customer/<int:pk>", UpdateCustomer.as_view(), name="customer_edit"),
-    path("contractor/<int:pk>", UpdateContractorView.as_view(), name="contractor_edit"),
+    path("customer/<int:pk>", views.UpdateCustomer.as_view(), name="customer_edit"),
+    path(
+        "contractor/<int:pk>",
+        views.UpdateContractorView.as_view(),
+        name="contractor_edit",
+    ),
+    path("update-avatar/", views.UpdateAvatar.as_view(), name="update-avatar"),
+    path(
+        "set-user-telegram-id/<uuid:token>",
+        views.UpdateUserTelegamId.as_view(),
+        name="set-user-telegram-id",
+    ),
 ]

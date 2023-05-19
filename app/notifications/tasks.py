@@ -4,6 +4,7 @@ from django.template import loader
 from django.conf import settings
 
 from notifications.models import Notification
+from notifications.telegram import send_telegram_notify_handler
 
 import logging
 
@@ -11,6 +12,12 @@ import logging
 @celery_app.task
 def send_email_task(notification_pk):
     status = send_email(notification_pk)
+    return status
+
+
+@celery_app.task
+def send_telegram_notify_task(notification_pk):
+    status = send_telegram_notify_handler(notification_pk)
     return status
 
 

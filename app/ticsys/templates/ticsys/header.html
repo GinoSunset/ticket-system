@@ -19,6 +19,10 @@
     </a>
     {% endif%}
     <div class="right menu">
+      <img class="ui avatar image" id="headerAvatar" src="{{user.get_avatar}}">
+      <a class="item" href={{user.get_absolute_url}} >
+        <span>{{user}} </span>
+      </a>
       <a class="ui item" href="{% url 'logout' %}">
         Выход
       </a>
