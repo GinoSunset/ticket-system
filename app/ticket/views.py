@@ -1,6 +1,8 @@
 from typing import Union
 
 from django.db.models import QuerySet
+from django.forms.models import BaseModelForm
+from django.http import HttpResponse
 from django.views.generic import ListView, UpdateView, DeleteView, View
 from django.views.generic.edit import CreateView
 from django.urls import reverse
@@ -294,3 +296,21 @@ class UpdateCommentForReportView(LoginRequiredMixin, AccessOperatorMixin, View):
         comment.is_for_report = not comment.is_for_report
         comment.save()
         return redirect("ticket-update", pk=comment.ticket.pk)
+
+
+class UpdateContractorView(LoginRequiredMixin, AccessOperatorMixin, UpdateView):
+    model = Ticket
+    fields = ["contractor"]
+    template_name = "ticket/ticket_update.html"
+
+    def get_success_url(self):
+        return reverse("ticket-update", kwargs={"pk": self.object.pk})
+
+    def form_valid(self, form: BaseModelForm) -> HttpResponse:
+        super().form_valid(form)
+        Notification.create_notify_update_contractor(self.object)
+        return HttpResponse(status=200)
+
+    def form_invalid(self, form: BaseModelForm) -> HttpResponse:
+        super().form_invalid(form)
+        return HttpResponse(status=400)

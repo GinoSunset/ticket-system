@@ -1,9 +1,12 @@
 import pytest
+import factory
+
 from django.urls import reverse
-from ticket.models import Comment
-from ticket.models import Ticket
+from django.db.models import signals
+from ticket.models import Comment, Ticket
 from users.models import User, Customer, Contractor
 from additionally.models import Dictionary
+from notifications.models import Notification
 from django.core.files.uploadedfile import SimpleUploadedFile
 from ticket.models import CommentImage, CommentFile
 
@@ -298,3 +301,54 @@ class TestCommentViews:
         assert res.status_code == 302
         comment = Comment.objects.first()
         assert comment.is_for_report
+
+
+class TestUpdateContractorViewPage:
+    @factory.django.mute_signals(signals.post_save)
+    @pytest.mark.django_db
+    def test_update_contractor(
+        self, contractor_factory, operator_factory, client, ticket_factory
+    ):
+        ticket = ticket_factory()
+        user = operator_factory()
+        contractor = contractor_factory()
+        client.force_login(user=user)
+        res = client.post(
+            reverse("update-contractor", kwargs={"pk": ticket.pk}),
+            data={"contractor": contractor.pk},
+        )
+        assert res.status_code == 200
+        ticket.refresh_from_db()
+        assert ticket.contractor == contractor
+
+    @factory.django.mute_signals(signals.post_save)
+    @pytest.mark.django_db
+    def test_failed_update_contractor_return_400(
+        self, operator_factory, client, ticket_factory
+    ):
+        ticket = ticket_factory()
+        user = operator_factory()
+        client.force_login(user=user)
+        res = client.post(
+            reverse("update-contractor", kwargs={"pk": ticket.pk}),
+            data={"contractor": 1000000},
+        )
+        assert res.status_code == 400
+
+    @pytest.mark.django_db
+    @factory.django.mute_signals(signals.post_save)
+    def test_create_notify_after_save_new_contractor(
+        self, ticket_factory, contractor_factory, operator_factory, client
+    ):
+        ticket = ticket_factory()
+        user = operator_factory()
+        contractor = contractor_factory()
+        client.force_login(user=user)
+        res = client.post(
+            reverse("update-contractor", kwargs={"pk": ticket.pk}),
+            data={"contractor": contractor.pk},
+        )
+        assert res.status_code == 200
+        assert Notification.objects.filter(
+            ticket=ticket, type_notify=Notification.TypeNotification.SET_CONTRACTOR
+        ).exists()

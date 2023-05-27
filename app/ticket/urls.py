@@ -39,4 +39,9 @@ urlpatterns = [
         name="ticket-to-cancel",
     ),
     path("act-create/<int:pk>", views.TicketCreateAct.as_view(), name="act-create"),
+    path(
+        "update-contractor/<int:pk>",
+        views.UpdateContractorView.as_view(),
+        name="update-contractor",
+    ),
 ]

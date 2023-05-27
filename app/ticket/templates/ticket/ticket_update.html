@@ -138,9 +138,10 @@
           {{ticket.contractor}}
           {% if ticket.contractor.phone %}
           <a href="tel:{{ticket.contractor.phone}}">{{ticket.contractor.phone}}</a>
+
           {% endif %}
           {% else %}
-          <i>Не назначен</i>
+            <button class="ui button basic mini" id="changeContractor">Не назначен</button>
           {% endif %}
         </div>
         <div class="item"> 
@@ -222,6 +223,7 @@
 </div>
 {% endif %}
 {% include "ticket/ticket_to_quick_status.html" %}
+{% include "ticket/contractor_modal.html" %}
 {% endblock content %}
 {% block script %}
 <script>

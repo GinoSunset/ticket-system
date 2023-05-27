@@ -1,0 +1,101 @@
+{% load static %}
+
+<div class="ui modal choice contractor" id="modalChoiceContractorInModal">
+    <i class="close icon"></i>
+    <div class="header">
+      Выбрать исполнителя
+    </div>
+   <div class="scrolling content">
+        <table id="tableContractorInModal" class="ui table" style="width:100%">
+            <thead>
+                <tr>
+                    <th>id</th>
+                    <th>Имя</th>
+                    <th>Фамилия</th>
+                    <th>Компания</th>
+                    <th>Город</th>
+                    <th>Область</th>
+                    <th>Примечание</th>
+                </tr>
+            </thead>
+        </table>
+    </div>
+    <div class="actions">
+        <div id="applyContractorInModal" class="ui positive right labeled icon button">
+            Выбрать
+            <i class="checkmark icon"></i>
+        </div>
+  </div>
+</div>
+<script>
+    $("#changeContractor").click(function(){
+        $('#modalChoiceContractorInModal').modal('show');
+    });
+
+
+    var tableInModal  = $('#tableContractorInModal').DataTable({
+        ajax: {
+            url: "{% url 'contractor-list-ajax' %}",
+        },
+        paging: false,
+        bPaginate: false,
+        language: {
+            url: "{% static 'DataTables/ru.json'%}"
+        }
+    })
+    $('#tableContractorInModal tbody').on('click', 'tr', function () {
+        if ($(this).hasClass('selected')) {
+            $(this).removeClass('selected');
+        } else {
+            tableInModal.$('tr.selected').removeClass('selected');
+            $(this).addClass('selected');
+        }
+    });
+
+    $('#tableContractorInModal tbody').on('dblclick', 'tr', function () {
+       
+        tableInModal.$('tr.selected').removeClass('selected');
+        $(this).addClass('selected');
+        $('#applyContractorInModal').click();
+    });
+
+    $('#applyContractorInModal').click(function () {
+        if (tableInModal.$('tr.selected').length === 0) {
+            $.toast({
+                class: 'error',
+                message: `Исполнитель не выбран!`
+              })
+              return false;
+            }
+        save_new_contractor(tableInModal.rows('.selected').data()[0][0]);
+
+    });
+
+
+
+    function save_new_contractor(value) {
+        $.toast({
+            class: 'info',
+            message: `Исполнитель выбран!`
+          })
+        $.ajax({
+            url: "{% url 'update-contractor' ticket.pk %}",
+            type: "POST",
+            data: {
+                'csrfmiddlewaretoken': '{{ csrf_token }}',
+                'contractor': value,
+            },
+            success: function (data) {
+                $('#modalChoiceContractorInModal').modal('hide');
+                $.toast({
+                    class: 'success',
+                    message: `Исполнитель успешно установлен!`
+                  })
+                setTimeout(function () {
+                    location.reload();
+                }, 1000);
+                }
+        });
+        
+    }
+</script>
