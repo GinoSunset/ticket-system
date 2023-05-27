@@ -210,11 +210,10 @@ class Act(models.Model):
     def get_context(self):
         date_start = self.ticket.date_to_work or self.ticket.date_create
         date_str = self.get_str_date(date_start)
-        context = {
-            "ticket": self.ticket,
-            "date": date_str,
-            "org": self.ticket.customer.profile.company or " ",
-        }
+        org = " "
+        if hasattr(self.ticket, "cutomer") and self.ticket.customer.profile.company:
+            org = self.ticket.customer.profile.company
+        context = {"ticket": self.ticket, "date": date_str, "org": org}
         return context
 
     def get_str_date(self, date):
