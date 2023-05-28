@@ -1,3 +1,8 @@
-from django.shortcuts import render
+from django.views.generic import ListView
+from .models import Manufacture
 
-# Create your views here.
+
+class ManufacturesListView(ListView):
+    model = Manufacture
+    template_name = "manufactures_list.html"
+    context_object_name = "manufactures"

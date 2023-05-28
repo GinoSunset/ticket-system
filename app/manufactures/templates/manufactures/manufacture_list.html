@@ -1,0 +1,68 @@
+{% extends 'ticsys/index.html' %}
+{% load static %}
+{% block header_style %}
+<link rel="stylesheet" type="text/css" href="{% static 'DataTables/DataTables-1.13.1/css/dataTables.semanticui.min.css' %}"/> 
+<script type="text/javascript" src="{% static 'DataTables/DataTables-1.13.1/js/jquery.dataTables.min.js' %}"></script>
+<script type="text/javascript" src="{% static 'DataTables/DataTables-1.13.1/js/dataTables.semanticui.min.js' %}"></script>
+{% endblock %}
+{% block content %}
+<h1>Производство</h1>
+<a class="ui button disable" style="margin-bottom: 10px;">Добавить задачу на производство (Не готово)</a> 
+<table id="tableManufactures" class="ui table">
+    <thead>
+        <tr>
+            <th>Номер</th>
+            <th>Дата создания</th>
+            <th>Клиент</th>
+            <th>Количество общее</th>
+            <th>Планируемая дата отгрузки</th>
+            <th>Брендирование</th>
+            <th>Статус</th>
+            <th>Подробнее</th>
+        </tr>
+    </thead>
+    <tbody>
+    {% for manufacture in manufactures  %}
+    <tr>
+        <td>{{ manufacture.pk }}</td>
+        <td>{{ manufacture.date_create }}</td>
+        <td>{{ manufacture.client }}</td>
+        <td>{{ manufacture.count}}</td>
+        <td>{{ manufacture.date_shipment}}</td>
+        <td class={{ ticket.get_colored_status_if_dup_shop }}>{% if ticket.status %} <div class="ui {{ticket.get_color_status}} label">{{ticket.status}}</div>{% endif %}</td>
+
+        <td>{{ manufacture.branding}}</td>
+        <td>
+            <a target="_blank" class="ui button info"  href="{% url 'manufacture_edit' manufacture.id %}">Подробнее</a>
+            {% if manufacture.comment %}
+            <i class="info icon link" data-content="{{ manufacture.comment }}"></i>
+            {% endif %}
+        </td>
+    </tr>
+    {% empty %}
+        <tr>
+          <td>Нет задач</td>
+        <tr>
+    {% endfor %}
+
+    </tbody>
+</table>
+{% endblock content %}
+
+{% block script %}
+<script>
+
+{% if  object_list%}
+var table = $('#tableManufactures').DataTable({
+    stateSave: true,
+    
+    language: {
+        url: "{% static 'DataTables/ru.json'%}"
+    } 
+  });
+table.on('draw.dt', function () {
+    $('.info.icon.link').popup();    
+});
+{%endif%}
+</script>
+{% endblock script %}

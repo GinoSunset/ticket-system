@@ -17,6 +17,10 @@
     <a class="item {% if url_name == 'report-list' %}active{% endif %}" href="{% url 'report-list' %}">
       Отчеты
     </a>
+    </a>
+    <a class="item {% if url_name == 'manufactures-list' %}active{% endif %}" href="{% url 'manufactures-list' %}">
+      Производство
+    </a>
     {% endif%}
     <div class="right menu">
       <img class="ui avatar image" id="headerAvatar" src="{{user.get_avatar}}">
