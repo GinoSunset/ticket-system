@@ -221,9 +221,11 @@
     </form>
   </div>
 </div>
+{% if not ticket.contractor %}
+{% include "ticket/contractor_modal.html" %}
+{% endif %}
 {% endif %}
 {% include "ticket/ticket_to_quick_status.html" %}
-{% include "ticket/contractor_modal.html" %}
 {% endblock content %}
 {% block script %}
 <script>
