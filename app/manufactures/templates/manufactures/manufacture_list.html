@@ -7,7 +7,7 @@
 {% endblock %}
 {% block content %}
 <h1>Производство</h1>
-<a class="ui button disable" style="margin-bottom: 10px;">Добавить задачу на производство (Не готово)</a> 
+<a class="ui button" style="margin-bottom: 10px;" href={% url "manufactures-create" %}>Добавить задачу на производство</a> 
 <table id="tableManufactures" class="ui table">
     <thead>
         <tr>
@@ -33,7 +33,7 @@
 
         <td>{{ manufacture.branding}}</td>
         <td>
-            <a target="_blank" class="ui button info"  href="{% url 'manufacture_edit' manufacture.id %}">Подробнее</a>
+            <a target="_blank" class="ui button info"  href="{% url 'manufacture-update' manufacture.id %}">Подробнее</a>
             {% if manufacture.comment %}
             <i class="info icon link" data-content="{{ manufacture.comment }}"></i>
             {% endif %}
