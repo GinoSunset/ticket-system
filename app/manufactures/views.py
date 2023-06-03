@@ -1,6 +1,7 @@
 from django.views.generic import ListView, CreateView, UpdateView
 from django.urls import reverse_lazy
 from .models import Manufacture, Client
+from .forms import ManufactureForm
 
 
 class ManufacturesListView(ListView):
@@ -10,7 +11,7 @@ class ManufacturesListView(ListView):
 
 class ManufactureCreateView(CreateView):
     model = Manufacture
-    fields = ["status", "client", "date_shipment", "branding", "comment"]
+    form_class = ManufactureForm
     success_url = reverse_lazy("manufactures-list")
 
     def form_valid(self, form):
@@ -20,7 +21,7 @@ class ManufactureCreateView(CreateView):
 
 class ManufactureUpdateView(UpdateView):
     model = Manufacture
-    fields = ["status", "client", "date_shipment", "branding", "comment"]
+    form_class = ManufactureForm
     success_url = reverse_lazy("manufactures-list")
 
 
