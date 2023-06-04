@@ -44,6 +44,7 @@ class Manufacture(models.Model):
         verbose_name="Номенклатуры",
         related_name="manufactures",
         blank=True,
+        through="ManufactureNomenclature",
     )
 
 
@@ -58,6 +59,9 @@ class Client(models.Model):
     date_create = models.DateTimeField(auto_now_add=True)
     date_update = models.DateTimeField(auto_now=True)
 
+    def __str__(self):
+        return f"{self.name}"
+
 
 class Nomenclature(models.Model):
     class Meta:
@@ -65,7 +69,27 @@ class Nomenclature(models.Model):
         verbose_name_plural = "Номенклатуры"
         ordering = ["-name"]
 
-    name = models.CharField(verbose_name="Имя", max_length=100)
-    comment = models.TextField(verbose_name="Комментарий", blank=True, null=True)
+    name = models.CharField(verbose_name="Наименование", max_length=100)
+    description = models.TextField(verbose_name="Описание", blank=True, null=True)
     date_create = models.DateTimeField(auto_now_add=True)
     date_update = models.DateTimeField(auto_now=True)
+
+    def __str__(self):
+        return f"{self.name}"
+
+
+class ManufactureNomenclature(models.Model):
+    manufacture = models.ForeignKey(
+        Manufacture,
+        verbose_name="Заявка на производство",
+        on_delete=models.PROTECT,
+        related_name="manufacture_nomenclatures",
+    )
+    nomenclature = models.ForeignKey(
+        Nomenclature,
+        verbose_name="Номенклатура",
+        on_delete=models.PROTECT,
+        related_name="manufacture_nomenclatures",
+    )
+    quantity = models.IntegerField(verbose_name="Количество", default=1)
+    comment = models.TextField(verbose_name="Комментарий", blank=True, null=True)

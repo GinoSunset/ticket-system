@@ -1,23 +1,48 @@
 {% extends 'ticsys/index.html' %}
 {% block content %}
 <h1>{% firstof name_page 'Создание задачи на производство' %}</h1>
-<a class="ui button basic" href="{% url 'client-create' %}">Создать клиента</a>
+<a class="ui button info basic" href="{% url 'client-create' %}">Создать клиента</a>
+<a class="ui button info basic" href="{% url 'nomenclature-create' %}">Создать номенклатуру</a>
 <div class="ui container">
     <form class="ui form" method="post">
         {{ form.non_field_errors }}
         {% csrf_token %}
         {% for field in form %}
-        <div class="field">
+        <div class="ui field {% if field.widget_type == 'checkbox' %}right aligned toggle checkbox{% endif %} " >
             {{ field.errors }}
             {{ field.label_tag }} 
             {{ field }}
+            {% if field.help_text %}
+              <span class="ui small grey text">
+                {{field.help_text}}
+              </span>
+              {% endif %}
         </div>
         {% endfor %}
+            {% comment %} Form nomeclature {% endcomment %}
+        <h4 class="ui dividing header">Номенклатуры в заявке</h4>
+        <input type="hidden" name="nomenclature-TOTAL_FORMS" value="1" id="id_nomenclature-TOTAL_FORMS">
+        <div class="two fields">
+          <div class="field">
+            {{form_nomenclature.nomenclature.errors}}
+            {{form_nomenclature.nomenclature.label_tag}}
+            {{form_nomenclature.nomenclature}}
+          </div>
+          <div class="field">
+            {{form_nomenclature.quantity.errors}}
+            {{form_nomenclature.quantity.label_tag}}
+            {{form_nomenclature.quantity}}
+          </div>
+        </div>
+        {% comment %} end from nomeclature {% endcomment %}
+      <button class="ui button" >Добавить номенклатуру</button>
       <button class="ui button" type="submit">{% firstof name_btn 'Создать' %}</button>
     </form>
   </div>
 
   <script>
+    $('.ui.checkbox').checkbox();
+    $('.selection.dropdown').dropdown();
     $('#date_calendar_date_shipment').calendar({
         type: "date", 
         firstDayOfWeek: 1,
@@ -32,4 +57,5 @@
         }
       });
   </script>
+  
 {% endblock content %}

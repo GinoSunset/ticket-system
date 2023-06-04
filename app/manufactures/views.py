@@ -1,7 +1,7 @@
 from django.views.generic import ListView, CreateView, UpdateView
 from django.urls import reverse_lazy
-from .models import Manufacture, Client
-from .forms import ManufactureForm
+from .models import Manufacture, Client, Nomenclature
+from .forms import ManufactureForm, ManufactureNomenclatureForm
 
 
 class ManufacturesListView(ListView):
@@ -13,6 +13,11 @@ class ManufactureCreateView(CreateView):
     model = Manufacture
     form_class = ManufactureForm
     success_url = reverse_lazy("manufactures-list")
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context["form_nomenclature"] = ManufactureNomenclatureForm()
+        return context
 
     def form_valid(self, form):
         form.instance.operator = self.request.user
@@ -28,4 +33,10 @@ class ManufactureUpdateView(UpdateView):
 class ClientCreateView(CreateView):
     model = Client
     fields = ["name", "comment"]
+    success_url = reverse_lazy("manufactures-create")
+
+
+class NomenclatureCreateView(CreateView):
+    model = Nomenclature
+    fields = ["name", "description"]
     success_url = reverse_lazy("manufactures-create")
