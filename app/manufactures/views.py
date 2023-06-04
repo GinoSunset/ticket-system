@@ -16,11 +16,23 @@ class ManufactureCreateView(CreateView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context["form_nomenclature"] = ManufactureNomenclatureForm()
+        context["form_nomenclature"] = ManufactureNomenclatureForm(prefix="0")
         return context
 
     def form_valid(self, form):
         form.instance.operator = self.request.user
+        count_forms = int(self.request.POST["nomenclature-TOTAL_FORMS"])
+        self.object = form.save()
+        for i in range(count_forms + 1):
+            form_nomenclature = ManufactureNomenclatureForm(
+                self.request.POST, prefix=str(i)
+            )
+            if form_nomenclature.is_valid():
+                manufacture_nomenclature = form_nomenclature.save(commit=False)
+                manufacture_nomenclature.manufacture = self.object
+                manufacture_nomenclature.save()
+            else:
+                return super().form_invalid(form)
         return super().form_valid(form)
 
 
