@@ -9,9 +9,9 @@
         {% csrf_token %}
         {% for field in form %}
         <div class="ui field {% if field.widget_type == 'checkbox' %}right aligned toggle checkbox{% endif %} " >
-            {{ field.errors }}
-            {{ field.label_tag }} 
-            {{ field }}
+          {{ field.label_tag }} 
+          {{ field }}
+          {{ field.errors }}
             {% if field.help_text %}
               <span class="ui small grey text">
                 {{field.help_text}}
@@ -21,12 +21,13 @@
         {% endfor %}
             {% comment %} Form nomeclature {% endcomment %}
         <h4 class="ui dividing header">Номенклатуры в заявке</h4>
-        <input type="hidden" name="nomenclature-TOTAL_FORMS" value="0" id="id_nomenclature-TOTAL_FORMS">
-        <div class="two fields form-nomenclature" id="form_nomenclature_0" >
+        <input type="hidden" name="nomenclature-TOTAL_FORMS" value={{count_form|default_if_none:'0'}} id="id_nomenclature-TOTAL_FORMS">
+        {% for form_nomenclature in forms_nomenclature %}
+        <div class="two fields form-nomenclature" id="form_nomenclature_{{forloop.counter0}}" >
           <div class="field">
-            {{form_nomenclature.nomenclature.errors}}
             {{form_nomenclature.nomenclature.label_tag}}
             {{form_nomenclature.nomenclature}}
+            {{form_nomenclature.nomenclature.errors}}
           </div>
           <div class="field">
             {{form_nomenclature.quantity.errors}}
@@ -34,9 +35,10 @@
             {{form_nomenclature.quantity}}
           </div>
         </div>
+        {% endfor %}
         {% comment %} end from nomeclature {% endcomment %}
       <button class="ui button" id="add_nomenclature">Добавить номенклатуру</button>
-      <button class="ui button" type="submit">{% firstof name_btn 'Создать' %}</button>
+      <button class="ui button positive" type="submit">{% firstof name_btn 'Создать' %}</button>
     </form>
   </div>
 
@@ -59,24 +61,25 @@
       const form = $("#form_nomenclature_0").clone()
 
       function add_nomenclature(){
+        const new_form = form.clone();
         const input_count = $("#id_nomenclature-TOTAL_FORMS")
         const index = input_count.val()
         const new_index = parseInt(index) + 1
         input_count.val(new_index)
-        form.attr("id", `id_nomenclature-${new_index}`)
-        form.find("input").each(function(){
+        new_form.attr("id", `id_nomenclature-${new_index}`)
+        new_form.find("input").each(function(){
           const input = $(this)
           const name = input.attr("name")
           input.attr("name",  name.replace("0", new_index))
           const id = input.attr("id")
           input.attr("id", id.replace("0", new_index))
         })
-        form.find("label").each(function(){
+        new_form.find("label").each(function(){
           const label = $(this)
           const for_label = label.attr("for")
           label.attr("for", for_label.replace("0", new_index))
         })   
-        form.find("select").each(function(){
+        new_form.find("select").each(function(){
           const select = $(this)
           const id_select = select.attr("id")
           select.attr("id", id_select.replace("0", new_index))
@@ -86,7 +89,7 @@
         })
 
         last_form = $(".form-nomenclature").last()
-        last_form.after(form)
+        last_form.after(new_form)
         
       }
 

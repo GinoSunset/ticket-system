@@ -14,7 +14,6 @@
             <th>Номер</th>
             <th>Дата создания</th>
             <th>Клиент</th>
-            <th>Количество общее</th>
             <th>Планируемая дата отгрузки</th>
             <th>Брендирование</th>
             <th>Статус</th>
@@ -27,13 +26,12 @@
         <td>{{ manufacture.pk }}</td>
         <td>{{ manufacture.date_create }}</td>
         <td>{{ manufacture.client }}</td>
-        <td>{{ manufacture.count}}</td>
-        <td>{{ manufacture.date_shipment}}</td>
-        <td class={{ ticket.get_colored_status_if_dup_shop }}>{% if ticket.status %} <div class="ui {{ticket.get_color_status}} label">{{ticket.status}}</div>{% endif %}</td>
+        <td>{{ manufacture.date_shipment|default_if_none:""}}</td>
+        <td><i class={% if manufacture.branding%}"check circle outline green icon"{% else %}"times circle outline red icon"{% endif %}></i></td>
+        <td>{% if manufacture.status %} <div class="ui {{manufacture.get_color_status}} label">{{manufacture.status}}</div>{% endif %}</td>
 
-        <td>{{ manufacture.branding}}</td>
         <td>
-            <a target="_blank" class="ui button info"  href="{% url 'manufacture-update' manufacture.id %}">Подробнее</a>
+            <a target="_blank" class="ui button info basic"  href="{% url 'manufacture-update' manufacture.id %}">Подробнее</a>
             {% if manufacture.comment %}
             <i class="info icon link" data-content="{{ manufacture.comment }}"></i>
             {% endif %}

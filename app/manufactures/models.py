@@ -33,7 +33,6 @@ class Manufacture(models.Model):
         on_delete=models.PROTECT,
         related_name="manufactures",
     )
-    count = models.IntegerField(verbose_name="Количество", default=1)
     date_shipment = models.DateField(
         verbose_name="Дата отгрузки", blank=True, null=True
     )
@@ -46,6 +45,14 @@ class Manufacture(models.Model):
         blank=True,
         through="ManufactureNomenclature",
     )
+
+    def get_color_status(self):
+        color = {
+            "in_progress": "blue",
+            "ready": "green",
+            "new_manufacture_task": "violet",
+        }
+        return color.get(self.status.code, "detail")
 
 
 class Client(models.Model):

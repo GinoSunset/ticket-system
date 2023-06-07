@@ -33,19 +33,12 @@ class ManufactureForm(forms.ModelForm):
 
 
 class ManufactureNomenclatureForm(forms.ModelForm):
-    nomenclature = forms.ModelChoiceField(
-        queryset=Nomenclature.objects.all(),
-        label="Номенклатура",
-        widget=forms.Select(attrs={"class": "ui selection dropdown"}),
-    )
-    quantity = forms.IntegerField(min_value=1, label="Количество")
-
     class Meta:
         model = ManufactureNomenclature
-        fields = (
-            "nomenclature",
-            "quantity",
-        )
+        fields = ("nomenclature", "quantity")
+        widgets = {
+            "nomenclature": forms.Select(attrs={"class": "ui selection dropdown"}),
+        }
 
 
 class NomenclatureForm(forms.ModelForm):
