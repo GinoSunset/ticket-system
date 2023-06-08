@@ -76,7 +76,48 @@ class Nomenclature(models.Model):
         verbose_name_plural = "Номенклатуры"
         ordering = ["-name"]
 
+    class FrameType(models.TextChoices):
+        PRODUCT = "AM", "AM"
+        SERVICE = "RF", "РЧ"
+
+    class Body(models.TextChoices):
+        PLEX = "PL", "Плекс"
+        PROFILE = "PR", "Профиль"
+        S = "S", "S"
+
+    class BDType(models.TextChoices):
+        INNER = "IN", "Внутренний"
+        OUTER = "OU", "Внешний"
+
     name = models.CharField(verbose_name="Наименование", max_length=100)
+    frame_type = models.CharField(
+        verbose_name="Тип",
+        choices=FrameType.choices,
+        default=FrameType.PRODUCT,
+        max_length=2,
+    )
+    body = models.CharField(
+        verbose_name="Корпус",
+        choices=Body.choices,
+        default=Body.PLEX,
+        max_length=2,
+    )
+    tx_count = models.IntegerField(verbose_name="Количество TX", default=1)
+    rx_count = models.IntegerField(verbose_name="Количество RX", default=1)
+
+    mdg = models.BooleanField(verbose_name="MDG", default=False)
+    md = models.BooleanField(verbose_name="MD", default=False)
+    wifi = models.BooleanField(verbose_name="Wifi", default=False)
+
+    bd_type = models.CharField(
+        verbose_name="Тип БД",
+        choices=BDType.choices,
+        default=BDType.INNER,
+        max_length=2,
+    )
+    bd_count = models.IntegerField(verbose_name="Количество БД", default=1)
+    illumination = models.BooleanField(verbose_name="Подсветка", default=False)
+
     description = models.TextField(verbose_name="Описание", blank=True, null=True)
     date_create = models.DateTimeField(auto_now_add=True)
     date_update = models.DateTimeField(auto_now=True)

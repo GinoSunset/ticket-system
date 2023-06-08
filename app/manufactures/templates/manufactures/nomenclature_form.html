@@ -6,13 +6,18 @@
         {{ form.non_field_errors }}
         {% csrf_token %}
         {% for field in form %}
-        <div class="field">
+        <div class="ui field {% if field.widget_type == 'checkbox' %}right aligned toggle checkbox{% endif %}  " >
             {{ field.errors }}
             {{ field.label_tag }} 
             {{ field }}
         </div>
         {% endfor %}
+        <br>
       <button class="ui button" type="submit">{% firstof name_btn 'Создать' %}</button>
     </form>
   </div>
+
+<script>
+    $('.ui.checkbox').checkbox();
+</script>
 {% endblock content %}

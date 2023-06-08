@@ -3,7 +3,7 @@ from django.http import HttpResponse
 from django.views.generic import ListView, CreateView, UpdateView
 from django.urls import reverse_lazy
 from .models import Manufacture, Client, Nomenclature
-from .forms import ManufactureForm, ManufactureNomenclatureForm
+from .forms import ManufactureForm, ManufactureNomenclatureForm, NomenclatureForm
 import logging
 
 
@@ -110,5 +110,5 @@ class ClientCreateView(CreateView):
 
 class NomenclatureCreateView(CreateView):
     model = Nomenclature
-    fields = ["name", "description"]
+    form_class = NomenclatureForm
     success_url = reverse_lazy("manufactures-create")

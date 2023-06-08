@@ -47,4 +47,18 @@ class NomenclatureForm(forms.ModelForm):
         fields = (
             "name",
             "description",
+            "frame_type",
+            "body",
+            "tx_count",
+            "rx_count",
+            "mdg",
+            "md",
+            "wifi",
+            "bd_count",
+            "illumination",
         )
+        widgets = {
+            "description": forms.Textarea(attrs={"rows": 2}),
+            "frame_type": forms.RadioSelect(),
+            "body": forms.RadioSelect(),
+        }
