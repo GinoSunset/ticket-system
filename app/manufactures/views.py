@@ -4,6 +4,7 @@ from django.views.generic import ListView, CreateView, UpdateView
 from django.urls import reverse_lazy
 from .models import Manufacture, Client, Nomenclature
 from .forms import ManufactureForm, ManufactureNomenclatureForm
+import logging
 
 
 class ManufacturesListView(ListView):
@@ -28,6 +29,7 @@ class ManufactureCreateView(CreateView):
         return context
 
     def form_valid(self, form):
+        logging.info(f"form_valid. POST: {self.request.POST}")
         form.instance.operator = self.request.user
         count_forms = int(self.request.POST["nomenclature-TOTAL_FORMS"])
         forms_nomenclature = []
@@ -49,6 +51,7 @@ class ManufactureCreateView(CreateView):
         return super().form_valid(form)
 
     def form_invalid(self, form):
+        logging.info(f"form_invalid. POST: {self.request.POST}, form: {form}, ")
         return self.render_to_response(self.get_context_data(form=form))
 
 
