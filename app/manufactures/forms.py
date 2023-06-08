@@ -45,8 +45,6 @@ class NomenclatureForm(forms.ModelForm):
     class Meta:
         model = Nomenclature
         fields = (
-            "name",
-            "description",
             "frame_type",
             "body",
             "tx_count",
@@ -54,11 +52,14 @@ class NomenclatureForm(forms.ModelForm):
             "mdg",
             "md",
             "wifi",
+            "bd_type",
             "bd_count",
             "illumination",
+            "comment",
         )
         widgets = {
-            "description": forms.Textarea(attrs={"rows": 2}),
+            "comment": forms.Textarea(attrs={"rows": 2}),
             "frame_type": forms.RadioSelect(),
             "body": forms.RadioSelect(),
+            "bd_type": forms.RadioSelect(),
         }

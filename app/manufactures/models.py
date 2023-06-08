@@ -74,7 +74,7 @@ class Nomenclature(models.Model):
     class Meta:
         verbose_name = "Номенклатура"
         verbose_name_plural = "Номенклатуры"
-        ordering = ["-name"]
+        ordering = ["-date_create"]
 
     class FrameType(models.TextChoices):
         PRODUCT = "AM", "AM"
@@ -89,7 +89,6 @@ class Nomenclature(models.Model):
         INNER = "IN", "Внутренний"
         OUTER = "OU", "Внешний"
 
-    name = models.CharField(verbose_name="Наименование", max_length=100)
     frame_type = models.CharField(
         verbose_name="Тип",
         choices=FrameType.choices,
@@ -118,12 +117,21 @@ class Nomenclature(models.Model):
     bd_count = models.IntegerField(verbose_name="Количество БД", default=1)
     illumination = models.BooleanField(verbose_name="Подсветка", default=False)
 
-    description = models.TextField(verbose_name="Описание", blank=True, null=True)
+    comment = models.TextField(verbose_name="Комментарий", blank=True, null=True)
     date_create = models.DateTimeField(auto_now_add=True)
     date_update = models.DateTimeField(auto_now=True)
 
     def __str__(self):
-        return f"{self.name}"
+        options = []
+        if self.mdg:
+            options.append("MGD")
+        if self.md:
+            options.append("MD")
+        if self.wifi:
+            options.append("WIFI")
+        options = "/".join(options)
+        illumination = "💡" if self.illumination else ""
+        return f"[{self.pk}]{self.frame_type} {self.body} RX:{self.tx_count} TX:{self.rx_count} {options} {self.bd_type} {self.bd_count} {illumination}"
 
 
 class ManufactureNomenclature(models.Model):
