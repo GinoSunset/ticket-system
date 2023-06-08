@@ -1,12 +1,14 @@
 {% load static %}
 {% with url_name=request.resolver_match.url_name %}
 <div class="ui secondary pointing menu">
+  {% if not user.is_manufacturer %}
     <a class="item {% if url_name == 'tickets-list' %}active{% endif %}" href="{% url 'tickets-list' %}">
       Заявки
     </a>
     <a class="item {% if url_name == 'tickets-new' %}active{% endif %}" href="{% url 'tickets-new' %}">
       Новая заявка
     </a>
+    {% endif %}
     {% if user.is_operator  or user.is_staff %}
     <a class="item {% if url_name == 'list-customers' %}active{% endif %}" href="{% url 'list-customers' %}">
       Заказчики
@@ -17,7 +19,13 @@
     <a class="item {% if url_name == 'report-list' %}active{% endif %}" href="{% url 'report-list' %}">
       Отчеты
     </a>
+    </a>
     {% endif%}
+    {% if user.is_operator  or user.is_staff or user.is_manufacturer %}
+    <a class="item {% if url_name == 'manufactures-list' %}active{% endif %}" href="{% url 'manufactures-list' %}">
+      Производство
+    </a>
+    {% endif %}
     <div class="right menu">
       <img class="ui avatar image" id="headerAvatar" src="{{user.get_avatar}}">
       <a class="item" href={{user.get_absolute_url}} >

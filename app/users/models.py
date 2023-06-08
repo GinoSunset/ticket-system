@@ -32,12 +32,19 @@ class ContractorManager(UserManager):
         return result.filter(role=User.Role.CONTRACTOR)
 
 
+class ManufacturerManager(UserManager):
+    def get_queryset(self, *args, **kwargs):
+        result = super().get_queryset(*args, **kwargs)
+        return result.filter(role=User.Role.MANUFACTURER)
+
+
 class User(AbstractUser):
     class Role(models.TextChoices):
         ADMIN = "ADMIN", "Администратор"
         OPERATOR = "OPERATOR", "Оператор"
         CUSTOMER = "CUSTOMER", "Заказчик"
         CONTRACTOR = "CONTRACTOR", "Исполнитель"
+        MANUFACTURER = "MANUFACTURER", "Производство"
         OTHER = "OTHER", "Не назначен"
 
     avatar = models.FileField(
@@ -78,6 +85,10 @@ class User(AbstractUser):
     @property
     def is_contractor(self):
         return self.role == self.Role.CONTRACTOR
+
+    @property
+    def is_manufacturer(self):
+        return self.role == self.Role.MANUFACTURER
 
     def get_role_user(self) -> "Operator | Customer | Contractor":
         type_user = {
@@ -237,3 +248,13 @@ class ContractorProfile(models.Model):
 
     def __str__(self) -> str:
         return str(self.user)
+
+
+class Manufacturer(User):
+    class Meta:
+        proxy = True
+        verbose_name = "Производство"
+        verbose_name_plural = "Производства"
+
+    base_role = User.Role.MANUFACTURER
+    objects = ManufacturerManager()

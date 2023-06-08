@@ -50,6 +50,7 @@ INSTALLED_APPS = [
     "reports",
     "channels",
     "share",
+    "manufactures",
 ]
 
 SITE_ID = 1

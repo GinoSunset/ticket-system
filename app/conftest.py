@@ -16,6 +16,12 @@ from users.factory import (
 from reports.factories import ReportFactory, ActFactory
 from share.factories import ShareFactory
 
+from manufactures.factories import (
+    ManufactureFactory,
+    NomenclatureFactory,
+    ClientFactory,
+)
+
 register(TicketFactory)
 register(UserFactory)
 register(CustomerFactory)
@@ -26,6 +32,9 @@ register(ReportFactory)
 register(ActFactory)
 register(CommentFactory)
 register(ShareFactory)
+register(ManufactureFactory)
+register(NomenclatureFactory)
+register(ClientFactory)
 
 
 @pytest.fixture
