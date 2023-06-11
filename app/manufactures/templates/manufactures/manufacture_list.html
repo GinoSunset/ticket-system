@@ -15,6 +15,7 @@
             <th>Дата создания</th>
             <th>Клиент</th>
             <th>Планируемая дата отгрузки</th>
+            <th>Количество</th>
             <th>Брендирование</th>
             <th>Статус</th>
             <th>Подробнее</th>
@@ -27,6 +28,7 @@
         <td>{{ manufacture.date_create }}</td>
         <td>{{ manufacture.client }}</td>
         <td>{{ manufacture.date_shipment|default_if_none:""}}</td>
+        <td>{{ manufacture.count}}
         <td><i class={% if manufacture.branding%}"check circle outline green icon"{% else %}"times circle outline red icon"{% endif %}></i></td>
         <td>{% if manufacture.status %} <div class="ui {{manufacture.get_color_status}} label">{{manufacture.status}}</div>{% endif %}</td>
 

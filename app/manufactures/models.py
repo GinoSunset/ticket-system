@@ -26,7 +26,7 @@ class Manufacture(models.Model):
         verbose_name="Оператор",
         on_delete=models.PROTECT,
     )
-
+    count = models.IntegerField(verbose_name="Количество", default=0)
     client = models.ForeignKey(
         "Client",
         verbose_name="Клиент",
@@ -43,7 +43,6 @@ class Manufacture(models.Model):
         verbose_name="Номенклатуры",
         related_name="manufactures",
         blank=True,
-        through="ManufactureNomenclature",
     )
 
     def get_color_status(self):
@@ -132,20 +131,3 @@ class Nomenclature(models.Model):
         options = "/".join(options)
         illumination = "💡" if self.illumination else ""
         return f"[{self.pk}]{self.frame_type} {self.body} RX:{self.tx_count} TX:{self.rx_count} {options} {self.bd_type} {self.bd_count} {illumination}"
-
-
-class ManufactureNomenclature(models.Model):
-    manufacture = models.ForeignKey(
-        Manufacture,
-        verbose_name="Заявка на производство",
-        on_delete=models.PROTECT,
-        related_name="manufacture_nomenclatures",
-    )
-    nomenclature = models.ForeignKey(
-        Nomenclature,
-        verbose_name="Номенклатура",
-        on_delete=models.PROTECT,
-        related_name="manufacture_nomenclatures",
-    )
-    quantity = models.IntegerField(verbose_name="Количество", default=1)
-    comment = models.TextField(verbose_name="Комментарий", blank=True, null=True)
