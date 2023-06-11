@@ -7,7 +7,9 @@
 {% endblock %}
 {% block content %}
 <h1>Производство</h1>
+{% if  user.is_operator  or user.is_staff %}
 <a class="ui button" style="margin-bottom: 10px;" href={% url "manufactures-create" %}>Добавить задачу на производство</a> 
+{% endif %}
 <table id="tableManufactures" class="ui table">
     <thead>
         <tr>

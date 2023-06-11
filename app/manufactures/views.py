@@ -1,18 +1,20 @@
+from django.contrib.auth.mixins import LoginRequiredMixin
 from django.forms.models import BaseModelForm
 from django.http import HttpResponse
 from django.views.generic import ListView, CreateView, UpdateView
 from django.urls import reverse_lazy
 from .models import Manufacture, Client, Nomenclature
 from .forms import ManufactureForm, NomenclatureForm
+from ticket.mixin import AccessOperatorMixin
 import logging
 
 
-class ManufacturesListView(ListView):
+class ManufacturesListView(LoginRequiredMixin, ListView):
     model = Manufacture
     context_object_name = "manufactures"
 
 
-class ManufactureCreateView(CreateView):
+class ManufactureCreateView(AccessOperatorMixin, LoginRequiredMixin, CreateView):
     model = Manufacture
     form_class = ManufactureForm
     success_url = reverse_lazy("manufactures-list")
@@ -26,7 +28,7 @@ class ManufactureCreateView(CreateView):
         return self.render_to_response(self.get_context_data(form=form))
 
 
-class ManufactureUpdateView(UpdateView):
+class ManufactureUpdateView(LoginRequiredMixin, UpdateView):
     model = Manufacture
     form_class = ManufactureForm
     success_url = reverse_lazy("manufactures-list")
@@ -38,13 +40,13 @@ class ManufactureUpdateView(UpdateView):
         return context
 
 
-class ClientCreateView(CreateView):
+class ClientCreateView(LoginRequiredMixin, CreateView):
     model = Client
     fields = ["name", "comment"]
     success_url = reverse_lazy("manufactures-create")
 
 
-class NomenclatureCreateView(CreateView):
+class NomenclatureCreateView(LoginRequiredMixin, CreateView):
     model = Nomenclature
     form_class = NomenclatureForm
     success_url = reverse_lazy("manufactures-create")

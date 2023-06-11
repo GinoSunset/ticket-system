@@ -1,8 +1,8 @@
-from typing import Union
+from typing import Any, Union
 
 from django.db.models import QuerySet
 from django.forms.models import BaseModelForm
-from django.http import HttpResponse
+from django.http import HttpRequest, HttpResponse
 from django.views.generic import ListView, UpdateView, DeleteView, View
 from django.views.generic.edit import CreateView
 from django.urls import reverse
@@ -37,6 +37,11 @@ class TicketsListView(LoginRequiredMixin, ListView):
         context = super().get_context_data(**kwargs)
         context["statuses"] = Dictionary.status_tickets()
         return context
+
+    def get(self, request: HttpRequest, *args: Any, **kwargs: Any) -> HttpResponse:
+        if request.user.is_manufacturer:
+            return redirect("manufactures-list")
+        return super().get(request, *args, **kwargs)
 
 
 class TicketFormView(LoginRequiredMixin, CreateView):
