@@ -17,7 +17,7 @@ class ManufactureForm(forms.ModelForm):
         ]
         widgets = {
             "date_shipment": CalendarInput(),
-            "comment": forms.Textarea(attrs={"rows": 1}),
+            "comment": forms.Textarea(attrs={"rows": 1, "placeholder": "Комментарий"}),
             "client": forms.Select(attrs={"class": "ui selection dropdown"}),
         }
 
@@ -49,7 +49,7 @@ class NomenclatureForm(forms.ModelForm):
             "comment",
         )
         widgets = {
-            "comment": forms.Textarea(attrs={"rows": 2}),
+            "comment": forms.Textarea(attrs={"rows": 2, "placeholder": "Комментарий"}),
             "frame_type": forms.Select(attrs={"class": "ui selection dropdown"}),
             "body": forms.Select(attrs={"class": "ui selection dropdown"}),
             "bp_type": forms.Select(attrs={"class": "ui selection dropdown"}),

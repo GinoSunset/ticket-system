@@ -7,7 +7,7 @@
         {{ form.non_field_errors }}
         {% csrf_token %}
         <h4 class="ui dividing header">Общая информация</h4>
-        <div class="three fields">
+        <div class="equal width fields">
           <div class="field">
               <label>{{form.status.label}}</label>
               {{form.status}}
@@ -23,16 +23,15 @@
               {{form.date_shipment}}
               {{form.date_shipment.errors}}
           </div>
-        </div>
-        <div class="ui segment">
-          <div class="ui field toggle checkbox">
-            {{form.branding}}
-            {{form.branding.errors}}
-            <label>Использовать брендирование</label>
-          </div>
+          <div class="ui field">
+            <div class="ui ui right aligned toggle checkbox">
+              {{form.branding}}
+              <label>{{form.branding.label}}</label>
+              {{form.branding.errors}}
+            </div>
+            </div>
         </div>
         <div class="field">
-          <label>{{form.comment.label}}</label>
           {{form.comment}}
           {{form.comment.errors}}
        </div>

@@ -1,6 +1,6 @@
-<div id="form_nomenclature_0" class="ui segment form-nomenclature">
+<div id="form_nomenclature_0" class="ui raised red segment form-nomenclature">
     {{ form.non_field_errors }}
-    <div class="equal width fields">
+    <div class="seven fields">
         <div class="field">
             <label>{{form.frame_type.label}}</label>
             {{form.frame_type}}
@@ -39,7 +39,7 @@
         {{form.illumination.error}}
         </div>
     </div>
-    <div class="fields">
+    <div class="two fields">
         <div class="ui segment">
             <div class="field ui right aligned toggle checkbox">
                 <label>{{form.mdg.label}}</label>
@@ -57,11 +57,11 @@
                 {{form.wifi.error}}
             </div>
         </div>
+        <div class="field">
+            {{form.comment}}
+            {{form.comment.error}}
+        </div>
     </div>    
-    <div class="field">
-        <label>{{form.comment.label}}</label>
-        {{form.comment}}
-        {{form.comment.error}}
-    </div>
+
 
 </div>
