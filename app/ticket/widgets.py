@@ -1,4 +1,4 @@
-from django.forms.widgets import Input, Select
+from django.forms.widgets import Input, Select, RadioSelect
 
 
 class CalendarInput(Input):
@@ -8,3 +8,7 @@ class CalendarInput(Input):
 
 class ContractorSelect(Select):
     template_name = "ticket/widgets/contractor_input.html"
+
+
+class FomanticRadioSelect(RadioSelect):
+    template_name = "ticket/widgets/fomantic_radio.html"

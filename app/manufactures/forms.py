@@ -1,6 +1,6 @@
 from django import forms
 
-from ticket.widgets import CalendarInput
+from ticket.widgets import CalendarInput, FomanticRadioSelect
 from additionally.models import DictionaryType, Dictionary
 from .models import Manufacture, Nomenclature
 
@@ -14,15 +14,11 @@ class ManufactureForm(forms.ModelForm):
             "date_shipment",
             "branding",
             "comment",
-            "nomenclatures",
         ]
         widgets = {
             "date_shipment": CalendarInput(),
-            "comment": forms.Textarea(attrs={"rows": 2}),
+            "comment": forms.Textarea(attrs={"rows": 1}),
             "client": forms.Select(attrs={"class": "ui selection dropdown"}),
-            "nomenclatures": forms.SelectMultiple(
-                attrs={"class": "ui fluid search dropdown"}
-            ),
         }
 
     def __init__(self, *args, **kwargs):
@@ -70,7 +66,7 @@ class NomenclatureForm(forms.ModelForm):
         )
         widgets = {
             "comment": forms.Textarea(attrs={"rows": 2}),
-            "frame_type": forms.RadioSelect(),
+            "frame_type": FomanticRadioSelect(),
             "body": forms.RadioSelect(),
             "bd_type": forms.RadioSelect(),
         }

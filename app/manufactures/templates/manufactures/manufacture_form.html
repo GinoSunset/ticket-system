@@ -1,24 +1,38 @@
 {% extends 'ticsys/index.html' %}
 {% block content %}
 <h1>{% firstof name_page 'Создание задачи на производство' %}</h1>
-<a class="ui button info basic" href="{% url 'client-create' %}">Создать клиента</a>
-<a class="ui button info basic" href="{% url 'nomenclature-create' %}">Создать номенклатуру</a>
+<a class="ui button blue basic" href="{% url 'client-create' %}">Создать клиента</a>
 <div class="ui container">
     <form class="ui form" method="post">
         {{ form.non_field_errors }}
         {% csrf_token %}
-        {% for field in form %}
-        <div class="ui field {% if field.widget_type == 'checkbox' %}right aligned toggle checkbox{% endif %} " >
-          {{ field.label_tag }} 
-          {{ field }}
-          {{ field.errors }}
-            {% if field.help_text %}
-              <span class="ui small grey text">
-                {{field.help_text}}
-              </span>
-              {% endif %}
+        <h4 class="ui dividing header">Общая информация</h4>
+        <div class="three fields">
+          <div class="field">
+              <label>{{form.status.label}}</label>
+              {{form.status}}
+          </div>
+          <div class="field">
+              <label>{{form.client.label}}</label>
+              {{form.client}}
+          </div>
+          <div class="field">
+              <label>{{form.date_shipment.label}}</label>
+              {{form.date_shipment}}
+          </div>
         </div>
-        {% endfor %}
+        <div class="ui segment">
+          <div class="ui field toggle checkbox">
+            {{form.branding}}
+            <label>Использовать брендирование</label>
+          </div>
+        </div>
+        <div class="field">
+          <label>{{form.comment.label}}</label>
+          {{form.comment}}
+       </div>
+
+
   
       <button class="ui button positive" type="submit">{% firstof name_btn 'Создать' %}</button>
     </form>
