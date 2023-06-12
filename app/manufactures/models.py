@@ -105,15 +105,15 @@ class Nomenclature(models.Model):
 
     mdg = models.BooleanField(verbose_name="MDG", default=False)
     md = models.BooleanField(verbose_name="MD", default=False)
-    wifi = models.BooleanField(verbose_name="Wifi", default=False)
+    wifi = models.BooleanField(verbose_name="Wi-Fi", default=False)
 
-    bd_type = models.CharField(
-        verbose_name="Тип БД",
+    bp_type = models.CharField(
+        verbose_name="Тип БП",
         choices=BDType.choices,
         default=BDType.INNER,
         max_length=2,
     )
-    bd_count = models.IntegerField(verbose_name="Количество БД", default=1)
+    bp_count = models.IntegerField(verbose_name="Количество БП", default=1)
     illumination = models.BooleanField(verbose_name="Подсветка", default=False)
 
     comment = models.TextField(verbose_name="Комментарий", blank=True, null=True)
@@ -130,4 +130,4 @@ class Nomenclature(models.Model):
             options.append("WIFI")
         options = "/".join(options)
         illumination = "💡" if self.illumination else ""
-        return f"[{self.pk}]{self.frame_type} {self.body} RX:{self.tx_count} TX:{self.rx_count} {options} {self.bd_type} {self.bd_count} {illumination}"
+        return f"[{self.pk}]{self.frame_type} {self.body} RX:{self.tx_count} TX:{self.rx_count} {options} {self.bp_type} {self.bp_count} {illumination}"

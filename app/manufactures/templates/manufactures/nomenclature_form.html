@@ -1,23 +1,67 @@
-{% extends 'ticsys/index.html' %}
-{% block content %}
-<h1>{% firstof name_page 'Создание номенклатуры' %}</h1>
-<div class="ui container">
-    <form class="ui form" method="post">
-        {{ form.non_field_errors }}
-        {% csrf_token %}
-        {% for field in form %}
-        <div class="ui field {% if field.widget_type == 'checkbox' %}right aligned toggle checkbox {% elif  field.widget_type == 'radioselect'%}1{% endif %}  " >
-            {{ field.errors }}
-            {{ field.label_tag }} 
-            {{ field }}
+<div id="form_nomenclature_0" class="ui segment form-nomenclature">
+    {{ form.non_field_errors }}
+    <div class="equal width fields">
+        <div class="field">
+            <label>{{form.frame_type.label}}</label>
+            {{form.frame_type}}
+            {{form.frame_type.error}}
         </div>
-        
-        {% endfor %}
-        <br>
-      <button class="ui button" type="submit">{% firstof name_btn 'Создать' %}</button>
-    </form>
-  </div>
-<script>
-    $('.ui.checkbox.toggle').checkbox();
-</script>
-{% endblock content %}
+        <div class="field">
+            <label>{{form.body.label}}</label>
+            {{form.body}}
+        {{form.body.error}}
+        </div>    
+        <div class="field">
+            <label>{{form.tx_count.label}}</label>
+            {{form.tx_count}}
+            {{form.tx_count.error}}
+        </div>    
+        <div class="field">
+            <label>{{form.rx_count.label}}</label>
+            {{form.rx_count}}
+            {{form.rx_count.error}}
+        </div>
+        <div class="field">
+            <label>{{form.bp_type.label}}</label>
+            {{form.bp_type}}
+            {{form.bp_type.error}}
+        </div>
+        <div class="field">
+            <label>{{form.bp_count.label}}</label>
+            {{form.bp_count}}
+            {{form.bp_count.error}}
+        </div>
+        <div class="field">
+            <div class="ui right aligned toggle checkbox">
+            <label>{{form.illumination.label}}</label>
+            {{form.illumination}}
+            </div>
+        {{form.illumination.error}}
+        </div>
+    </div>
+    <div class="fields">
+        <div class="ui segment">
+            <div class="field ui right aligned toggle checkbox">
+                <label>{{form.mdg.label}}</label>
+                {{form.mdg}}
+                {{form.mdg.error}}
+            </div>
+            <div class="field ui right aligned toggle checkbox">
+                <label>{{form.md.label}}</label>
+                {{form.md}}
+                {{form.md.error}}
+            </div>
+            <div class="field ui right aligned toggle checkbox">
+                <label>{{form.wifi.label}}</label>
+                {{form.wifi}}
+                {{form.wifi.error}}
+            </div>
+        </div>
+    </div>    
+    <div class="field">
+        <label>{{form.comment.label}}</label>
+        {{form.comment}}
+        {{form.comment.error}}
+    </div>
+
+</div>

@@ -1,6 +1,16 @@
 {% with id=widget.attrs.id %}
-<div{% if id %} id="{{ id }}"{% endif %}{% if widget.attrs.class %} class="{{ widget.attrs.class }}"{% endif %}>{% for group, options, index in widget.optgroups %}{% if group %}
-  <div class="ui radio checkbox"><label>{{ group }}</label>{% endif %}{% for option in options %}<div>
-    {% include option.template_name with widget=option %}</div>{% endfor %}{% if group %}
-  </div>{% endif %}{% endfor %}
-</div>{% endwith %}
+
+{% for group, options, index in widget.optgroups %}
+{% if group %}
+  <div><label>{{ group }}</label>
+{% endif %}
+{% for option in options %}
+  <div class="field">
+    <div class="ui radio checkbox">
+      {% include option.template_name with widget=option %}
+    </div>
+  </div>
+{% endfor %}{% if group %}
+</div>
+{% endif %}{% endfor %}
+{% endwith %}

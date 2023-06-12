@@ -12,3 +12,4 @@ class ContractorSelect(Select):
 
 class FomanticRadioSelect(RadioSelect):
     template_name = "ticket/widgets/fomantic_radio.html"
+    option_template_name = "ticket/widgets/fomantic_radio_option.html"

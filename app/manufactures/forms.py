@@ -31,22 +31,6 @@ class ManufactureForm(forms.ModelForm):
             type_dict=type_status, code="new_manufacture_task"
         )
 
-    # when save form add count as sum nomenclatures tx_count and rx_count
-    def save(self, commit=True):
-        instance = super().save(commit=False)
-
-        if commit:
-            instance.save()
-            self.save_m2m()
-            instance.count = sum(
-                [
-                    nomenclature.tx_count + nomenclature.rx_count
-                    for nomenclature in instance.nomenclatures.all()
-                ]
-            )
-            instance.save()
-        return instance
-
 
 class NomenclatureForm(forms.ModelForm):
     class Meta:
@@ -59,14 +43,14 @@ class NomenclatureForm(forms.ModelForm):
             "mdg",
             "md",
             "wifi",
-            "bd_type",
-            "bd_count",
+            "bp_type",
+            "bp_count",
             "illumination",
             "comment",
         )
         widgets = {
             "comment": forms.Textarea(attrs={"rows": 2}),
-            "frame_type": FomanticRadioSelect(),
-            "body": forms.RadioSelect(),
-            "bd_type": forms.RadioSelect(),
+            "frame_type": forms.Select(attrs={"class": "ui selection dropdown"}),
+            "body": forms.Select(attrs={"class": "ui selection dropdown"}),
+            "bp_type": forms.Select(attrs={"class": "ui selection dropdown"}),
         }
