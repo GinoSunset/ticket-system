@@ -21,6 +21,7 @@
             <th>Брендирование</th>
             <th>Статус</th>
             <th>Подробнее</th>
+            <th>Комментарий</th>
         </tr>
     </thead>
     <tbody>
@@ -33,13 +34,10 @@
         <td>{{ manufacture.count}}
         <td><i class={% if manufacture.branding%}"check circle outline green icon"{% else %}"times circle outline red icon"{% endif %}></i></td>
         <td>{% if manufacture.status %} <div class="ui {{manufacture.get_color_status}} label">{{manufacture.status}}</div>{% endif %}</td>
-
         <td>
             <a target="_blank" class="ui button info basic"  href="{% url 'manufacture-update' manufacture.id %}">Подробнее</a>
-            {% if manufacture.comment %}
-            <i class="info icon link" data-content="{{ manufacture.comment }}"></i>
-            {% endif %}
         </td>
+        <td>{{ manufacture.comment }}</td>
     </tr>
     {% empty %}
         <tr>
