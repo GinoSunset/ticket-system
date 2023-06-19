@@ -1,0 +1,91 @@
+{% for nomenclature in manufacture.nomenclatures.all %}
+<div class="ui mini statistic">
+    <div class="value">
+        {{ nomenclature.frame_type}}
+    </div>
+    <div class="label">
+        Тип
+    </div>
+</div>
+<div class="ui mini statistic">
+    <div class="value">
+        {{ nomenclature.body}}
+    </div>
+    <div class="label">
+        Корпус
+    </div>
+</div>
+<div class="ui mini green statistic">
+    <div class="value">
+        {{ nomenclature.tx_count}}
+    </div>
+    <div class="label">
+        Количество TX
+    </div>
+</div>
+<div class="ui mini yellow statistic">
+    <div class="value">
+        {{ nomenclature.rx_count}}
+    </div>
+    <div class="label">
+        Количество RX
+    </div>
+</div>
+{% if nomenclature.mgd %}
+<div class="ui mini statistic">
+    <div class="value">
+        MDG
+    </div>
+</div>
+{% endif %}
+{% if nomenclature.md %}
+<div class="ui mini statistic">
+    <div class="value">
+        MD
+    </div>
+</div>
+{% endif %}
+{% if nomenclature.wifi %}
+<div class="ui mini statistic">
+    <div class="value">
+        Wi-Fi
+    </div>
+</div>
+{% endif %}
+
+<div class="ui mini statistic">
+    <div class="value">
+        {{ nomenclature.bp_type}}
+    </div>
+    <div class="label">
+        Тип БП
+    </div>
+</div>
+<div class="ui mini statistic">
+    <div class="value">
+        {{ nomenclature.bp_count}}
+    </div>
+    <div class="label">
+        Количество БП
+    </div>
+</div>
+{% if nomenclature.illumination %}
+<div class="ui mini yellow statistic">
+    <div class="value">
+        Подсветка
+    </div>
+
+</div>
+{% endif %}
+<div class="ui mini statistic">
+    <div class="value">
+        {{ nomenclature.comment}}
+    </div>
+    <div class="label">
+        Комментарий
+    </div>
+</div>
+
+<div>
+    <div class="ui divider"></div>
+{% endfor %}

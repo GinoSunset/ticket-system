@@ -1,7 +1,7 @@
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.forms.models import BaseModelForm
 from django.http import HttpResponse
-from django.views.generic import ListView, CreateView, UpdateView
+from django.views.generic import ListView, CreateView, UpdateView, DetailView
 from django.urls import reverse_lazy
 from .models import Manufacture, Client, Nomenclature
 from .forms import ManufactureForm, NomenclatureForm
@@ -123,3 +123,10 @@ class NomenclatureCreateView(LoginRequiredMixin, CreateView):
     model = Nomenclature
     form_class = NomenclatureForm
     success_url = reverse_lazy("manufactures-create")
+
+
+class ManufactureNomenclaturesView(LoginRequiredMixin, DetailView):
+    model = Manufacture
+    template_name = "manufactures/manufacture_nomenclatures.html"
+    context_object_name = "manufacture"
+    queryset = Manufacture.objects.prefetch_related("nomenclatures")

@@ -12,4 +12,9 @@ urlpatterns = [
         views.NomenclatureCreateView.as_view(),
         name="nomenclature-create",
     ),
+    path(
+        "<int:pk>/nomenclatures/",
+        views.ManufactureNomenclaturesView.as_view(),
+        name="manufacture-detail-nomenclatures",
+    ),
 ]
