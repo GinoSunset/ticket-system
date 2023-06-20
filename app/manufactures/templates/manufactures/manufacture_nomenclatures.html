@@ -1,91 +1,32 @@
+<div class="ui divided items">
 {% for nomenclature in manufacture.nomenclatures.all %}
-<div class="ui mini statistic">
-    <div class="value">
-        {{ nomenclature.frame_type}}
-    </div>
-    <div class="label">
-        Тип
-    </div>
-</div>
-<div class="ui mini statistic">
-    <div class="value">
-        {{ nomenclature.body}}
-    </div>
-    <div class="label">
-        Корпус
-    </div>
-</div>
-<div class="ui mini green statistic">
-    <div class="value">
-        {{ nomenclature.tx_count}}
-    </div>
-    <div class="label">
-        Количество TX
-    </div>
-</div>
-<div class="ui mini yellow statistic">
-    <div class="value">
-        {{ nomenclature.rx_count}}
-    </div>
-    <div class="label">
-        Количество RX
-    </div>
-</div>
-{% if nomenclature.mgd %}
-<div class="ui mini statistic">
-    <div class="value">
-        MDG
-    </div>
-</div>
-{% endif %}
-{% if nomenclature.md %}
-<div class="ui mini statistic">
-    <div class="value">
-        MD
-    </div>
-</div>
-{% endif %}
-{% if nomenclature.wifi %}
-<div class="ui mini statistic">
-    <div class="value">
-        Wi-Fi
-    </div>
-</div>
-{% endif %}
 
-<div class="ui mini statistic">
-    <div class="value">
-        {{ nomenclature.bp_type}}
+<div class="item">
+    <div class="ui tiny image">
+        {% if nomenclature.illumination %}
+        <i class="lightbulb yellow icon big"></i>
+        {% else %}
+        <i class="lightbulb outline icon big"></i>
+        {% endif %}
     </div>
-    <div class="label">
-        Тип БП
-    </div>
-</div>
-<div class="ui mini statistic">
-    <div class="value">
-        {{ nomenclature.bp_count}}
-    </div>
-    <div class="label">
-        Количество БП
-    </div>
-</div>
-{% if nomenclature.illumination %}
-<div class="ui mini yellow statistic">
-    <div class="value">
-        Подсветка
-    </div>
-
-</div>
-{% endif %}
-<div class="ui mini statistic">
-    <div class="value">
-        {{ nomenclature.comment}}
-    </div>
-    <div class="label">
-        Комментарий
+    <div class="content">
+        <div class="header">Тип: {{ nomenclature.get_frame_type_display}}. Корпус: {{ nomenclature.get_body_display}}</p></div>
+        <div class="meta">
+            <span class="">RX: {{nomenclature.rx_count}}</span>
+            <span class="">TX: {{nomenclature.tx_count}}</span>
+        </div>
+        <div class="description">
+            <p>Тип БП: <b>{{ nomenclature.get_bp_type_display}}</b> ({{ nomenclature.bp_count}} шт.)</p>
+            {% if nomenclature.comment  %}
+            <p>Комментарий: {{ nomenclature.comment}}</p>
+            {% endif %}
+        </div>
+        <div class="extra">
+            <div class="ui label {% if nomenclature.mgd %} green{% else %}basic{% endif %}">MDG</div>
+            <div class="ui label {% if nomenclature.md %} green{% else %}basic{% endif %}">MD</div>
+            <div class="ui label {% if nomenclature.wifi %} green{% else %}basic{% endif %}">Wi-Fi</div>
+        </div>
     </div>
 </div>
-
-<div>
-    <div class="ui divider"></div>
 {% endfor %}
+</div>
