@@ -12,8 +12,8 @@
     <div class="content">
         <div class="header">Тип: {{ nomenclature.get_frame_type_display}}. Корпус: {{ nomenclature.get_body_display}}</p></div>
         <div class="meta">
-            <span class="">RX: {{nomenclature.rx_count}}</span>
             <span class="">TX: {{nomenclature.tx_count}}</span>
+            <span class="">RX: {{nomenclature.rx_count}}</span>
         </div>
         <div class="description">
             <p>Тип БП: <b>{{ nomenclature.get_bp_type_display}}</b> ({{ nomenclature.bp_count}} шт.)</p>
@@ -22,9 +22,9 @@
             {% endif %}
         </div>
         <div class="extra">
-            <div class="ui label {% if nomenclature.mgd %} green{% else %}basic{% endif %}">MDG</div>
-            <div class="ui label {% if nomenclature.md %} green{% else %}basic{% endif %}">MD</div>
-            <div class="ui label {% if nomenclature.wifi %} green{% else %}basic{% endif %}">Wi-Fi</div>
+            {% if nomenclature.mdg %} <div class="ui label  green">MDG</div>{% endif %}
+            {% if nomenclature.md %} <div class="ui label  green">MD</div>{% endif %}
+            {% if nomenclature.wifi %} <div class="ui label  green">Wi-Fi</div>{% endif %}
         </div>
     </div>
 </div>

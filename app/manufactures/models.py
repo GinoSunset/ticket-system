@@ -73,7 +73,7 @@ class Nomenclature(models.Model):
     class Meta:
         verbose_name = "Номенклатура"
         verbose_name_plural = "Номенклатуры"
-        ordering = ["-date_create"]
+        ordering = ["date_create"]
 
     class FrameType(models.TextChoices):
         PRODUCT = "AM", "AM"
@@ -88,6 +88,11 @@ class Nomenclature(models.Model):
         INNER = "IN", "Внутренний"
         OUTER = "OU", "Внешний"
 
+    class Color(models.TextChoices):
+        WHITE = "WH", "Белый"
+        GREY = "GR", "Серый"
+        BLACK = "BL", "Черный"
+
     frame_type = models.CharField(
         verbose_name="Тип",
         choices=FrameType.choices,
@@ -100,6 +105,16 @@ class Nomenclature(models.Model):
         default=Body.PLEX,
         max_length=2,
     )
+
+    # color = models.CharField(
+    #     verbose_name="Цвет",
+    #     choices=Color.choices,
+    #     default=None,
+    #     null=True,
+    #     blank=True,
+    #     max_length=2,
+    # )
+
     tx_count = models.IntegerField(verbose_name="Количество TX", default=1)
     rx_count = models.IntegerField(verbose_name="Количество RX", default=1)
 
@@ -131,3 +146,8 @@ class Nomenclature(models.Model):
         options = "/".join(options)
         illumination = "💡" if self.illumination else ""
         return f"[{self.pk}]{self.frame_type} {self.body} RX:{self.tx_count} TX:{self.rx_count} {options} {self.bp_type} {self.bp_count} {illumination}"
+
+    # def save(self, *args, **kwargs):
+    #     if self.body != self.Body.S:
+    #         self.color = None
+    #     return super().save(*args, **kwargs)
