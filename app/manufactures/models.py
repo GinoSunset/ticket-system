@@ -82,7 +82,9 @@ class Nomenclature(models.Model):
     class Body(models.TextChoices):
         PLEX = "PL", "Плекс"
         PROFILE = "PR", "Профиль"
-        S = "S", "S"
+        S_WHITE = "SW", "S Белый"
+        S_GREY = "SG", "S Серый"
+        S_BLACK = "SB", "S Черный"
 
     class BDType(models.TextChoices):
         INNER = "IN", "Внутренний"
@@ -105,15 +107,6 @@ class Nomenclature(models.Model):
         default=Body.PLEX,
         max_length=2,
     )
-
-    # color = models.CharField(
-    #     verbose_name="Цвет",
-    #     choices=Color.choices,
-    #     default=None,
-    #     null=True,
-    #     blank=True,
-    #     max_length=2,
-    # )
 
     tx_count = models.IntegerField(verbose_name="Количество TX", default=1)
     rx_count = models.IntegerField(verbose_name="Количество RX", default=1)
@@ -146,8 +139,3 @@ class Nomenclature(models.Model):
         options = "/".join(options)
         illumination = "💡" if self.illumination else ""
         return f"[{self.pk}]{self.frame_type} {self.body} RX:{self.tx_count} TX:{self.rx_count} {options} {self.bp_type} {self.bp_count} {illumination}"
-
-    # def save(self, *args, **kwargs):
-    #     if self.body != self.Body.S:
-    #         self.color = None
-    #     return super().save(*args, **kwargs)
