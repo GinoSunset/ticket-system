@@ -1,6 +1,6 @@
 <div id="form_nomenclature_0" class="ui raised red segment form-nomenclature">
     {{ form.non_field_errors }}
-    <div class="seven fields">
+    <div class="eight fields">
         <div class="field">
             <label>{{form.frame_type.label}}</label>
             {{form.frame_type}}
@@ -30,6 +30,11 @@
             <label>{{form.bp_count.label}}</label>
             {{form.bp_count}}
             {{form.bp_count.error}}
+        </div>
+        <div class="field">
+            <label>{{form.status.label}}</label>
+            {{form.status}}
+            {{form.status.error}}
         </div>
         <div class="field">
             <div class="ui right aligned toggle checkbox">

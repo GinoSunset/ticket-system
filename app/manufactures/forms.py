@@ -47,10 +47,12 @@ class NomenclatureForm(forms.ModelForm):
             "bp_count",
             "illumination",
             "comment",
+            "status",
         )
         widgets = {
             "comment": forms.Textarea(attrs={"rows": 2, "placeholder": "Комментарий"}),
             "frame_type": forms.Select(attrs={"class": "ui selection dropdown"}),
             "body": forms.Select(attrs={"class": "ui selection dropdown"}),
             "bp_type": forms.Select(attrs={"class": "ui selection dropdown"}),
+            "status": forms.Select(attrs={"class": "ui selection dropdown"}),
         }

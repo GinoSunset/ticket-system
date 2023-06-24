@@ -95,6 +95,18 @@ class Nomenclature(models.Model):
         GREY = "GR", "Серый"
         BLACK = "BL", "Черный"
 
+    class Status(models.TextChoices):
+        NEW = "NW", "Новый"
+        IN_PROGRESS = "IP", "В работе"
+        READY = "RD", "Готово"
+
+    status = models.CharField(
+        verbose_name="Статус",
+        choices=Status.choices,
+        default=Status.NEW,
+        max_length=2,
+    )
+
     frame_type = models.CharField(
         verbose_name="Тип",
         choices=FrameType.choices,

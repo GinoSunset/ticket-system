@@ -2,15 +2,20 @@
 {% for nomenclature in manufacture.nomenclatures.all %}
 
 <div class="item">
-    <div class="ui tiny image">
+    <div class="ui  image">
+
         {% if nomenclature.illumination %}
         <i class="lightbulb yellow icon big"></i>
         {% else %}
         <i class="lightbulb outline icon big"></i>
         {% endif %}
+
+        
     </div>
     <div class="content">
-        <div class="header">Тип: {{ nomenclature.get_frame_type_display}}. Корпус: {{ nomenclature.get_body_display}}</p></div>
+       
+        <div class="header">Тип: {{ nomenclature.get_frame_type_display}}. Корпус: {{ nomenclature.get_body_display}}  <div class="ui {% if nomenclature.status ==  %} horizontal label">{{ nomenclature.get_status_display}}</div></div>
+
         <div class="meta">
             <span class="">TX: {{nomenclature.tx_count}}</span>
             <span class="">RX: {{nomenclature.rx_count}}</span>
