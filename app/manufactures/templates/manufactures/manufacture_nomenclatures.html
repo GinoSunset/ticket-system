@@ -14,7 +14,7 @@
     </div>
     <div class="content">
        
-        <div class="header">Тип: {{ nomenclature.get_frame_type_display}}. Корпус: {{ nomenclature.get_body_display}}  <div class="ui {% if nomenclature.status ==  %} horizontal label">{{ nomenclature.get_status_display}}</div></div>
+        <div class="header"> <span class="ui {% if nomenclature.status == "RD"  %}green  {% elif  nomenclature.status == "IP"  %} yellow {% endif %} text">Тип: {{ nomenclature.get_frame_type_display}}. Корпус: {{ nomenclature.get_body_display}}</span>  <div class="ui {% if nomenclature.status == "RD"  %}green  {% elif  nomenclature.status == "IP"  %} yellow {% endif %}  horizontal label">{{ nomenclature.get_status_display}}</div></div>
 
         <div class="meta">
             <span class="">TX: {{nomenclature.tx_count}}</span>
