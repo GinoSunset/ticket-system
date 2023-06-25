@@ -11,7 +11,7 @@
 <a class="ui button" style="margin-bottom: 10px;" href={% url "manufactures-create" %}>Добавить задачу на производство</a> 
 {% endif %}
 <a class="ui button" style="margin-bottom: 10px;" id="onFull">На весь экран</a> 
-<table id="tableManufactures" class="ui table">
+<table id="tableManufactures" class="ui compact table">
     <thead>
         <tr>
             <th>Номер</th>
@@ -21,8 +21,8 @@
             <th>Количество</th>
             <th>Брендирование</th>
             <th>Статус</th>
-            <th>Подробнее</th>
-            <th>Комментарий</th>
+            <th>Комментарий/Готовность</th>
+            <th>Изменить</th>
         </tr>
     </thead>
     <tbody>
@@ -35,11 +35,27 @@
         <td>{{ manufacture.date_shipment| date:"Y-m-d"}}</td>            
         <td>{{ manufacture.count}}
         <td><i class={% if manufacture.branding%}"check circle outline green icon"{% else %}"times circle outline red icon"{% endif %}></i></td>
-        <td>{% if manufacture.status %} <div class="ui {{manufacture.get_color_status}} label">{{manufacture.status}}</div>{% endif %}</td>
         <td>
-            <a target="_blank" class="ui button info basic"  href="{% url 'manufacture-update' manufacture.id %}">Подробнее</a>
+            <span class="ui {{manufacture.get_color_status}} text">{{manufacture.status}}</span>
         </td>
-        <td>{{ manufacture.comment }}</td>
+        <td>
+            {{ manufacture.comment }}
+            
+            <div class="ui multiple progress" style="margin-bottom:0px;" data-total="{{manufacture.nomenclatures.count}}" data-value="{{manufacture.progress_str_as_list_nomenclatures}}">
+                <div class="yellow bar">
+                  <div class="progress"></div>
+                </div>
+                <div class="green bar">
+                  <div class="progress"></div>
+                </div>
+              </div>
+        </td>
+        <td>
+            <a target="_blank" class="ui button info basic"  href="{% url 'manufacture-update' manufacture.id %}"><i class="ui icon pen"></i> </a>
+        </td>
+
+
+
     </tr>
 
     {% empty %}
@@ -58,6 +74,7 @@
 {% if  object_list%}
 var table = $('#tableManufactures').DataTable({
     stateSave: true,
+    
     columnDefs: [
         { "orderable": false, "targets": [4,5,6,7,8] },
         {
@@ -112,6 +129,11 @@ function getDetails(id){
 $("#onFull").click(function(){
     $('.ui.container').toggleClass('fluid');
 });
+$('.ui.multiple.progress').progress({
+    text: {
+      percent : '{bar} {percent}%',
+    }
+  });
 
 </script>
 {% endblock script %}

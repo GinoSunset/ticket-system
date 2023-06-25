@@ -45,6 +45,15 @@ class Manufacture(models.Model):
         blank=True,
     )
 
+    @property
+    def progress_str_as_list_nomenclatures(self) -> str:
+        """return list with count nomenclatures in work and in status ready"""
+        list_progress = [
+            self.nomenclatures.filter(status=Nomenclature.Status.IN_PROGRESS).count(),
+            self.nomenclatures.filter(status=Nomenclature.Status.READY).count(),
+        ]
+        return ",".join([str(i) for i in list_progress])
+
     def get_color_status(self):
         color = {
             "in_progress": "blue",
