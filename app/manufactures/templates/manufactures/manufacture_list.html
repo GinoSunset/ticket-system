@@ -36,7 +36,9 @@
         <td>{{ manufacture.count}}
         <td><i class={% if manufacture.branding%}"check circle outline green icon"{% else %}"times circle outline red icon"{% endif %}></i></td>
         <td>
+            {% if manufacture.status %}
             <span class="ui {{manufacture.get_color_status}} text">{{manufacture.status}}</span>
+            {% endif %}
         </td>
         <td>
             {{ manufacture.comment }}
