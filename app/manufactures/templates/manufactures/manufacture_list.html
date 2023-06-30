@@ -91,7 +91,7 @@
 <script>
 
 {% if  object_list%}
-var hidden_values = JSON.parse(localStorage.hidden_value || null) || false;
+var hidden_values = JSON.parse(localStorage.hidden_value_manuf || null) || false;
     if (hidden_values){
       let hidden_value_list = hidden_values.split(",");
       for (var i = 0; i < hidden_value_list.length; i++) {
@@ -150,7 +150,7 @@ var table = $('#tableManufactures').DataTable({
 
     $("#filterBtn").dropdown({
         onChange: function (value, text, $selectedItem) {
-          localStorage.setItem('hidden_value', JSON.stringify(value));
+          localStorage.setItem('hidden_value_manuf', JSON.stringify(value));
           
           table.draw();
   
