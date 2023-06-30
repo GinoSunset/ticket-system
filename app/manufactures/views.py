@@ -1,3 +1,4 @@
+from typing import Any, Dict
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.forms.models import BaseModelForm
 from django.http import HttpResponse
@@ -6,11 +7,18 @@ from django.urls import reverse_lazy
 from .models import Manufacture, Client, Nomenclature
 from .forms import ManufactureForm, NomenclatureForm
 from ticket.mixin import AccessOperatorMixin
+from additionally.models import Dictionary
 
 
 class ManufacturesListView(LoginRequiredMixin, ListView):
     model = Manufacture
     context_object_name = "manufactures"
+
+    def get_context_data(self, **kwargs: Any) -> Dict[str, Any]:
+        context = super().get_context_data(**kwargs)
+
+        context["statuses"] = Dictionary.statuses_manufacture()
+        return context
 
 
 class ManufactureCreateView(AccessOperatorMixin, LoginRequiredMixin, CreateView):

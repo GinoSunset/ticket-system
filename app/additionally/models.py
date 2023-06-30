@@ -37,6 +37,11 @@ class Dictionary(models.Model):
         return cls.objects.filter(type_dict=dt)
 
     @classmethod
+    def statuses_manufacture(cls):
+        dt = DictionaryType.objects.get(code="status_manufactory")
+        return cls.objects.filter(type_dict=dt)
+
+    @classmethod
     def get_status_ticket(cls, code):
         dt = DictionaryType.objects.get(code="status_ticket")
         return cls.objects.get(type_dict=dt, code=code)
@@ -47,7 +52,9 @@ class Dictionary(models.Model):
         return cls.objects.get(type_dict=dt, code=code)
 
     def get_status_color(self):
-        if self.type_dict != DictionaryType.objects.get(code="status_ticket"):
+        if self.type_dict != DictionaryType.objects.get(
+            code="status_ticket"
+        ) and self.type_dict != DictionaryType.objects.get(code="status_manufactory"):
             return
         color = {
             "work": "blue",
@@ -57,5 +64,8 @@ class Dictionary(models.Model):
             "done": "green",
             "new": "violet",
             "testing": "pink",
+            "in_progress": "blue",
+            "ready": "green",
+            "new_manufacture_task": "violet",
         }
         return color.get(self.code, "detail")

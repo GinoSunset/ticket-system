@@ -11,6 +11,23 @@
 <a class="ui button" style="margin-bottom: 10px;" href={% url "manufactures-create" %}>Добавить задачу на производство</a> 
 {% endif %}
 <a class="ui button" style="margin-bottom: 10px;" id="onFull">На весь экран</a> 
+<br>
+<div class="ui multiple floated dropdown labeled icon button " style="margin-bottom:10px;" id="filterBtn">
+    <input type="hidden" name="filters">
+    <i class="filter icon"></i>
+    <span class="text">Скрыть статусы</span>
+    <div class="menu">
+  
+      <div class="scrolling menu">
+        {% for status in statuses %}
+        <div class="item" data-value="{{status.description}}">
+          <div class="ui {{status.get_status_color}} empty circular label"></div>
+          {{status.description}}
+        </div>
+        {% endfor %}
+      </div>
+    </div>
+  </div>
 <table id="tableManufactures" class="ui compact table">
     <thead>
         <tr>
@@ -74,6 +91,30 @@
 <script>
 
 {% if  object_list%}
+var hidden_values = JSON.parse(localStorage.hidden_value || null) || false;
+    if (hidden_values){
+      let hidden_value_list = hidden_values.split(",");
+      for (var i = 0; i < hidden_value_list.length; i++) {
+        $("#filterBtn").dropdown('set selected', hidden_value_list[i]);
+      }
+      
+    }
+
+    $.fn.dataTable.ext.search.push(function (settings, data, dataIndex) {
+      var status = data
+      to_hide = $("#filterBtn").dropdown('get value');
+      if (!to_hide){
+        return true;
+      }
+      to_hide = to_hide.split(",");
+      for (var i = 0; i < to_hide.length; i++) {
+        to_hide[i] = to_hide[i].trim();
+        if (status.indexOf(to_hide[i]) >= 0) {
+          return false;
+        }
+      }
+      return true;
+    });
 var table = $('#tableManufactures').DataTable({
     stateSave: true,
     
@@ -107,6 +148,14 @@ var table = $('#tableManufactures').DataTable({
         }
     } );
 
+    $("#filterBtn").dropdown({
+        onChange: function (value, text, $selectedItem) {
+          localStorage.setItem('hidden_value', JSON.stringify(value));
+          
+          table.draw();
+  
+        }
+      })
 {%endif%}
 {% if  user.is_operator  or user.is_staff %}
 {%endif%}
