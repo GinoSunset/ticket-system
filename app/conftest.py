@@ -34,7 +34,7 @@ register(CommentFactory)
 register(ShareFactory)
 register(ManufactureFactory)
 register(NomenclatureFactory)
-register(ClientFactory)
+register(ClientFactory, _name="manufacture_client")
 
 
 @pytest.fixture

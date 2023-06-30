@@ -15,9 +15,6 @@ class NomenclatureFactory(factory.django.DjangoModelFactory):
     class Meta:
         model = Nomenclature
 
-    name = factory.Faker("name")
-    comment = factory.Faker("text")
-
 
 class ManufactureFactory(factory.django.DjangoModelFactory):
     class Meta:
