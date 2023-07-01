@@ -4,6 +4,26 @@
 <link rel="stylesheet" type="text/css" href="{% static 'DataTables/DataTables-1.13.1/css/dataTables.semanticui.min.css' %}"/> 
 <script type="text/javascript" src="{% static 'DataTables/DataTables-1.13.1/js/jquery.dataTables.min.js' %}"></script>
 <script type="text/javascript" src="{% static 'DataTables/DataTables-1.13.1/js/dataTables.semanticui.min.js' %}"></script>
+<style>
+  .reloadbtn{
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+  }
+  .rotate{
+    animation: rotate 2s linear infinite;
+  }
+  
+  @keyframes rotate {
+    0% {
+      transform:  rotate(0deg);
+    }
+    100% {
+      transform:  rotate(360deg);
+    }
+  }
+  
+</style>
 {% endblock %}
 {% block content %}
 <h1>Производство</h1>
@@ -85,10 +105,49 @@
 
     </tbody>
 </table>
+
+<button class="circular ui icon button basic reloadbtn">
+  <i class="sync alternate icon"></i>
+</button>
+
 {% endblock content %}
 
 {% block script %}
 <script>
+const reloadbtn = $('.reloadbtn');
+let timer = JSON.parse(localStorage.timer || null) || false;
+if (timer){
+  reloadbtn.toggleClass('rotate')
+  reloadbtn.toggleClass('basic')
+  reloadbtn.toggleClass('green')
+  startLoopReload();
+}
+
+reloadbtn.click(function(){
+  rotate_btn()
+});
+
+function rotate_btn(){
+  reloadbtn.toggleClass('rotate')
+  reloadbtn.toggleClass('basic')
+  reloadbtn.toggleClass('green')
+
+  if (timer){
+    console.log('stop');
+    clearTimeout(timer);
+    timer = false;
+  }else{
+    console.log('start');
+    startLoopReload();
+  }
+}
+
+function startLoopReload(){
+  timer = setTimeout(function(){
+    location.reload();
+  }, 2*60*1000);
+  localStorage.setItem('timer', JSON.stringify(true));
+}
 
 {% if  object_list%}
 var hidden_values = JSON.parse(localStorage.hidden_value_manuf || null) || false;
