@@ -104,25 +104,15 @@ class Nomenclature(models.Model):
         GREY = "GR", "Серый"
         BLACK = "BL", "Черный"
 
-    class Status(models.TextChoices):
-        NEW = "NW", "Новый"
-        IN_PROGRESS = "IP", "В работе"
-        READY = "RD", "Готово"
-
-    class StatusInt(models.IntegerChoices):
+    class Status(models.IntegerChoices):
         NEW = 1, "Новый"
         IN_PROGRESS = 2, "В работе"
         READY = 3, "Готово"
 
-    status = models.TextField(
+    status = models.IntegerField(
         verbose_name="Статус",
         choices=Status.choices,
         default=Status.NEW,
-    )
-    status_int = models.IntegerField(
-        verbose_name="Статус",
-        choices=StatusInt.choices,
-        default=StatusInt.NEW,
     )
 
     frame_type = models.CharField(
