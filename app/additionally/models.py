@@ -67,5 +67,6 @@ class Dictionary(models.Model):
             "in_progress": "blue",
             "ready": "green",
             "new_manufacture_task": "violet",
+            "shipped": "green",
         }
         return color.get(self.code, "detail")
