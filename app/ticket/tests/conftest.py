@@ -224,6 +224,12 @@ def email_with_img():
     mail = MailMessage.from_bytes(data)
     return mail
 
+@pytest.fixture
+def email_dmv2_serv():
+    with open(settings.BASE_DIR / "ticket/tests/dmv2_serv.eml", "rb") as f:
+        data = f.read()
+    mail = MailMessage.from_bytes(data)
+    return mail
 
 @pytest.fixture
 def text_dm_with_dup_new_line():

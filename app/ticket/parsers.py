@@ -175,6 +175,7 @@ class DMParser(BaseParser):
 class DMV2Parser(DMParser):
     def __init__(self):
         self.sap_str = "сервисный запрос"
+        self.sap_str_incident = "назначен инцидент"
         self.sap_delimiter = "под номером "
         self.meta_data_map = {
             "Магазин/Департамент": "shop_id",
@@ -230,6 +231,13 @@ class DMV2Parser(DMParser):
         description_lines = text[index_start:end_index]
         return description_lines[len("Описание:") :].strip()
 
+    def get_sap_id_from_text(self, text):
+        if self.sap_str not in text:
+            if not self.sap_str_incident in text:
+                raise ValueError("Not found SAP in text")
+            self.sap_str = self.sap_str_incident
+        return super().get_sap_id_from_text(text)
+    
     def get_end_index(self, text, index_start):
         index_start += len("Описание:")
 

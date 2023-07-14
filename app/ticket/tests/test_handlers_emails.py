@@ -177,3 +177,19 @@ def test_create_email_as_comment_if_sap_exists(
 
     notify = Notification.objects.first()
     assert notify.message
+
+
+@pytest.mark.django_db
+@factory.django.mute_signals(signals.post_save)
+def test_create_ticket_from_email_dmv2_serv(email_dmv2_serv, customer_factory):
+    customer = customer_factory(email=email_dmv2_serv.from_)
+    CustomerProfile.objects.create(user=customer)   
+
+    customer.profile.parser = "DMV2"
+    customer.profile.save()
+    status = create_ticket_from_email(email=email_dmv2_serv)
+    assert status
+    ticket = Ticket.objects.all().get()
+    assert ticket.sap_id
+    assert ticket.address
+    assert ticket.status.code == "new"
