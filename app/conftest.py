@@ -19,7 +19,7 @@ from share.factories import ShareFactory
 from manufactures.factories import (
     ManufactureFactory,
     NomenclatureFactory,
-    ClientFactory,
+    ClientManufFactory,
 )
 
 register(TicketFactory)
@@ -34,7 +34,7 @@ register(CommentFactory)
 register(ShareFactory)
 register(ManufactureFactory)
 register(NomenclatureFactory)
-register(ClientFactory, _name="manufacture_client")
+register(ClientManufFactory, _name="manufacture_client")
 
 
 @pytest.fixture

@@ -117,8 +117,26 @@ class ManufactureUpdateView(UpdateView):
                 for nomenclature in self.object.nomenclatures.all()
             ]
         )
+        if "status" not in form.changed_data:
+            self.object.status =  self.get_status_from_nomenclatures()
+
         self.object.save()
         return super().form_valid(form)
+
+    def get_status_from_nomenclatures(self):
+        status_map = {
+                1: Dictionary.objects.get(code="new_manufacture_task"),
+                2: Dictionary.objects.get(code="in_progress"),
+                3: Dictionary.objects.get(code="ready"),
+            }
+        min_status_nomenclature = min(
+                [
+                    nomenclature.status
+                    for nomenclature in self.object.nomenclatures.all()
+                ]
+            , default=-1)
+        return status_map.get(min_status_nomenclature, self.object.status)
+        
 
 
 class ClientCreateView(LoginRequiredMixin, CreateView):

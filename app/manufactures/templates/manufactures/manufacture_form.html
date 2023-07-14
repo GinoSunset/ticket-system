@@ -3,10 +3,19 @@
 <h1>{% firstof name_page 'Создание задачи на производство' %}</h1>
 <a class="ui button blue basic" href="{% url 'client-create' %}">Создать клиента</a>
 <div class="ui container">
+  
     <form class="ui form" method="post">
-        {{ form.non_field_errors }}
-        {% csrf_token %}
-        <h4 class="ui dividing header">Общая информация</h4>
+      {{ form.non_field_errors }}
+      {% csrf_token %}
+      <h4 class="ui dividing header">Общая информация</h4>
+      <div class="ui message">
+        <div class="header">
+          Автоматическое изменение статуса
+        </div>
+        <p>Статус задачи меняться автоматически на минимальный статус номенклатуры. Можно самому изменить статус, без автоматизации. </p>
+      </div>
+       
+
         <div class="equal width fields">
           <div class="field">
               <label>{{form.status.label}}</label>
