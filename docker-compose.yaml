@@ -3,7 +3,7 @@ version: '3.8'
 services:
   web:
     user: "1000:1000"
-    build: ./app
+    image: helpdesk:latest
     restart: always
     command: daphne -b 0.0.0.0 -p 8000 ticsys.asgi:application --access-log=logs/daphne.access.log
     volumes:
@@ -14,7 +14,7 @@ services:
       - ./.env
 
   beat:
-    build: ./app
+    image: helpdesk:latest
     restart: always
     user: "1000:1000"
     command: celery -A ticsys beat -l info
@@ -28,7 +28,7 @@ services:
       - rabbitmq
 
   worker:
-    build: ./app
+    image: helpdesk:latest
     restart: always
     user: "1000:1000"
     command: celery -A ticsys worker -l info
