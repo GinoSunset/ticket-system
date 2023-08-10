@@ -142,6 +142,10 @@ class Nomenclature(models.Model):
         max_length=2,
     )
     bp_count = models.IntegerField(verbose_name="Количество БП", default=1)
+    
+    amperage_6 = models.BooleanField(verbose_name="6 А", default=False)
+    amperage_3_2 = models.BooleanField(verbose_name="3.2 А", default=False)
+
     illumination = models.BooleanField(verbose_name="Подсветка", default=False)
 
     comment = models.TextField(verbose_name="Комментарий", blank=True, null=True)

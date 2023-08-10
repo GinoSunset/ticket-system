@@ -48,11 +48,16 @@ class NomenclatureForm(forms.ModelForm):
             "illumination",
             "comment",
             "status",
+            "amperage_6",
+            "amperage_3_2",
         )
         widgets = {
             "comment": forms.Textarea(attrs={"rows": 2, "placeholder": "Комментарий"}),
-            "frame_type": forms.Select(attrs={"class": "ui selection dropdown"}),
+            "frame_type": forms.Select(attrs={"class": "ui selection dropdown frame_type"}),
             "body": forms.Select(attrs={"class": "ui selection dropdown"}),
             "bp_type": forms.Select(attrs={"class": "ui selection dropdown"}),
             "status": forms.Select(attrs={"class": "ui selection dropdown"}),
+            "amperage_6": forms.CheckboxInput(attrs={"class": "ui checkbox"}),
+            "amperage_3_2": forms.CheckboxInput(attrs={"class": "ui checkbox"}),
+            
         }

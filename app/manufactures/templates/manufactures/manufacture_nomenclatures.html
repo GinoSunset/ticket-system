@@ -21,7 +21,13 @@
             <span class="">RX: {{nomenclature.rx_count}}</span>
         </div>
         <div class="description">
-            <p>Тип БП: <b>{{ nomenclature.get_bp_type_display}}</b> ({{ nomenclature.bp_count}} шт.)</p>
+            <p>Тип БП: <b>{{ nomenclature.get_bp_type_display}}</b> ({{ nomenclature.bp_count}} шт.) 
+                {% if nomenclature.amperage_3_2%}
+                <i class="bolt yellow icon"></i>3.2В
+                {% endif %}
+                {% if nomenclature.amperage_6 %}
+                <i class="bolt yellow icon"></i>6В
+                {% endif %}
             {% if nomenclature.comment  %}
             <p>Комментарий: {{ nomenclature.comment}}</p>
             {% endif %}

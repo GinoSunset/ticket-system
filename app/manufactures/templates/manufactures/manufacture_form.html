@@ -61,6 +61,7 @@
   <script>
     $('.ui.checkbox').checkbox();
     $('.selection.dropdown').dropdown();
+    init_dropdown_frame_type();
     $('.ui.fluid.search.dropdown').dropdown();
     $('#date_calendar_date_shipment').calendar({
         type: "date", 
@@ -77,7 +78,22 @@
       });
 
     const form = $("#form_nomenclature_0").clone()
-    $("#form_nomenclature_0")
+    
+
+    function init_dropdown_frame_type(){
+      $(".frame_type").each(function(){
+        let dr = $(this).dropdown()
+        let value = dr.dropdown("get value")
+
+        change_frame_type(value, dr)
+      })
+      $(".frame_type").dropdown({
+
+        onChange: function(value, text, $selectedItem) {
+          change_frame_type(value, $(this))
+        }
+      })
+    }
     function add_nomenclature(){
       console.log("add nomenclature")
       const new_form = form.clone();
@@ -106,6 +122,7 @@
         let id = input.attr("id")
         input.attr("id", id.replace(start_index, new_index))
       })
+      
       new_form.find("label").each(function(){
         let label = $(this)
         let for_label = label.attr("for")
@@ -128,6 +145,14 @@
         textarea.attr("id", id_textarea.replace(start_index, new_index))
         let name = textarea.attr("name")
         textarea.attr("name", name.replace(start_index, new_index))
+      })
+
+      new_form.find("div").each(function(){
+        let div = $(this)
+        let id_div = div.attr("id")
+        if (id_div){
+          div.attr("id", id_div.replace(start_index, new_index))
+        }
       })
 
       let btn_remove = new_form.find(`#btn_remove_nom_${start_index}`)
@@ -174,7 +199,21 @@
       e.preventDefault()
       add_nomenclature()
       activate_toggle()
+      init_dropdown_frame_type()
     })
+
+    // if select frame_type 2 then remove display amperag-field-1 if select frame_type 1 then hide amperag-field-1
+    function change_frame_type(value, self){
+      let id = self.children("select").attr("id").match(/\d+/g)[0]
+      if (value == "AM"){
+        $(`#amperag-field-${id}`).hide()
+        $(`#id_${id}-amperage_3_2`).prop("checked", false)
+        $(`#id_${id}-amperage_6`).prop("checked", false)
+      }
+      else{
+        $(`#amperag-field-${id}`).show()
+      }
+    }
 
   </script>
   
