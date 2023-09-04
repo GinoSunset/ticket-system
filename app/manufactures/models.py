@@ -138,7 +138,7 @@ class Nomenclature(models.Model):
     bp_type = models.CharField(
         verbose_name="Тип БП",
         choices=BDType.choices,
-        default=BDType.INNER,
+        default=BDType.OUTER,
         max_length=2,
     )
     bp_count = models.IntegerField(verbose_name="Количество БП", default=1)
