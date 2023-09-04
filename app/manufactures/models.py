@@ -96,8 +96,8 @@ class Nomenclature(models.Model):
         S_BLACK = "SB", "S Черный"
 
     class BDType(models.TextChoices):
-        INNER = "IN", "Внутренний"
         OUTER = "OU", "Внешний"
+        INNER = "IN", "Внутренний"
 
     class Color(models.TextChoices):
         WHITE = "WH", "Белый"
@@ -146,7 +146,7 @@ class Nomenclature(models.Model):
     amperage_6 = models.BooleanField(verbose_name="6 А", default=False)
     amperage_3_2 = models.BooleanField(verbose_name="3.2 А", default=False)
 
-    illumination = models.BooleanField(verbose_name="Подсветка", default=False)
+    illumination = models.BooleanField(verbose_name="Подсветка", default=True)
 
     comment = models.TextField(verbose_name="Комментарий", blank=True, null=True)
     date_create = models.DateTimeField(auto_now_add=True)
