@@ -23,10 +23,10 @@
         <div class="description">
             <p>Тип БП: <b>{{ nomenclature.get_bp_type_display}}</b> ({{ nomenclature.bp_count}} шт.) 
                 {% if nomenclature.amperage_3_2%}
-                <i class="bolt yellow icon"></i>3.2В
+                <i class="bolt yellow icon"></i>3.2А
                 {% endif %}
                 {% if nomenclature.amperage_6 %}
-                <i class="bolt yellow icon"></i>6В
+                <i class="bolt yellow icon"></i>6А
                 {% endif %}
             {% if nomenclature.comment  %}
             <p>Комментарий: {{ nomenclature.comment}}</p>
