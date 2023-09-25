@@ -174,6 +174,8 @@ class DMParser(BaseParser):
 
 class DMV2Parser(DMParser):
     def __init__(self):
+        self.email_regexp = r"(?:mailto:)([\w'._+-]+@[\w'._+-]+)"
+        self.start_email_text = "Вы можете связаться с заказчиком"
         self.sap_str = "сервисный запрос"
         self.sap_str_incident = "назначен инцидент"
         self.sap_delimiter = "под номером "
@@ -195,7 +197,7 @@ class DMV2Parser(DMParser):
         descriptor, info, additional_text = self.split_text_to_parts(text)
 
         meta_data = self.get_metadata(info)
-
+        email_current_customer_email = self.get_email_from_text_ticket_for_reply(additional_text)
         if not "sap_id" in meta_data:
             meta_data["sap_id"] = self.get_sap_id_from_text(text)
 
@@ -204,6 +206,8 @@ class DMV2Parser(DMParser):
             "sap_id": meta_data["sap_id"],
         }
         result.update(meta_data)
+        if email_current_customer_email:
+            result["email_current_customer_email"] = email_current_customer_email
         return result
 
     def split_text_to_parts(self, text):
@@ -256,6 +260,16 @@ class DMV2Parser(DMParser):
             end_index = text[index_start:].index("\n")
         return end_index + index_start
 
+    def get_email_from_text_ticket_for_reply(self, text):
+        "Получить email из текста тикета для ответа на него"
+        for i in text.splitlines():
+            if self.start_email_text in i:
+                match = re.search(self.email_regexp, i)
+                if match:
+                    logging.info(f"Found current email for reply into text ticket: {match.group(1)}")
+                    return match.group(1)
+                logging.info(f"Not found current email for reply into text ticket")
+        
 
 class DMV2ParseHTML(DMV2Parser):
     def __init__(self):

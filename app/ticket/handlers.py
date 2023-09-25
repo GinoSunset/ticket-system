@@ -174,14 +174,17 @@ def create_ticket_from_email(email: MailMessage) -> bool:
     creator = User.objects.get(username=settings.TICKET_CREATOR_USERNAME)
     status = Dictionary.get_status_ticket("new")
     type_ticket = Dictionary.get_type_ticket(Ticket.default_type_code)
-
+    if ticket_info.get("email_current_customer_email"):
+        added_email = ticket_info.pop("email_current_customer_email")
+        logging.info(f"Add {added_email} to reply_to")
+        reply_to = list(reply_to or ()) + [added_email]
     ticket = Ticket.objects.create(
         customer=customer,
         creator=creator,
         status=status,
         type_ticket=type_ticket,
         id_email_message=id_email_message,
-        _reply_to_emails=",".join(reply_to),
+        _reply_to_emails=",".join(reply_to or ()),
         **ticket_info,
     )
     save_attachment(email, ticket, customer)

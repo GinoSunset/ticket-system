@@ -105,3 +105,8 @@ class TestDMV2Parser:
             description
             == "ОА ТРИКОТАЖ 2-й этаж.\r\nДоброе утро.\r\n\r\nКассы работают частично.\r\n\r\nНе все реагируют на защиту"
         )
+
+
+    def test_get_email_to_reply_from_text(self, text_dm_ver_2):
+        email = DMV2Parser().get_email_from_text_ticket_for_reply(text_dm_ver_2)
+        assert email == "favicon@email.com"

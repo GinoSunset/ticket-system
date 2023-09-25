@@ -10,7 +10,7 @@ services:
     ports:
       - 127.0.0.1:8001:8000
     env_file:
-      - ./.env
+      - ./.dev.env
     environment:
       - RABBIT_HOST=rabbitmq
       - EMAIL_PORT=1025
@@ -20,12 +20,11 @@ services:
 
   beat:
     build: ./app
-    restart: always
     command: celery -A ticsys beat -l info
     volumes:
       - ./app/:/usr/src/app/
     env_file:
-      - ./.env
+      - ./.dev.env
     environment:
       - RABBIT_HOST=rabbitmq
       - EMAIL_PORT=1025
@@ -37,12 +36,11 @@ services:
 
   worker:
     build: ./app
-    restart: always
     command: celery -A ticsys worker -l info
     volumes:
       - ./app/:/usr/src/app/
     env_file:
-      - ./.env
+      - ./.dev.env
     environment:
       - RABBIT_HOST=rabbitmq
       - EMAIL_PORT=1025
@@ -55,7 +53,6 @@ services:
 
   rabbitmq:
     image: rabbitmq:3-management
-    restart: always
     environment:
       - RABBITMQ_DEFAULT_USER=${RABBIT_LOGIN}
       - RABBITMQ_DEFAULT_PASS=${RABBIT_PASSWORD}
@@ -63,11 +60,19 @@ services:
 
   redis:
     image: redis:latest
-    restart: always
+
+  flower:
+    image: mher/flower
+    command: ["celery", "--broker=amqp://$RABBIT_LOGIN:$RABBIT_PASSWORD@rabbitmq:5672/$RABBIT_VHOST", "flower"]
+    ports:
+       - 5552:5555
+    env_file:
+      - .dev.env
+    depends_on:
+      - rabbitmq
 
   mailhog:
     image: mailhog/mailhog
-    restart: always
     ports:
       - 8025:8025
       - 1025:1025
