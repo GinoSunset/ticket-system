@@ -88,6 +88,25 @@
                     </div>
                 </div>
             </div>
+            <div class="field" id="amperag-AM-field-{{form.prefix}}" style="display:none">
+                <label>Ампераж БП</label>
+                <div class="tree fields">
+                    <div class="field">
+                        <div class="ui checkbox">
+                            {{form.amperage_1}}
+                            <label>{{form.amperage_1.label}}</label>
+                            {{form.amperage_1.error}}
+                        </div>
+                    </div>
+                    <div class="field">
+                        <div class="ui checkbox">
+                            {{form.amperage_2}}
+                            <label>{{form.amperage_2.label}}</label>
+                            {{form.amperage_2.error}}
+                        </div>
+                    </div>
+                </div>
+            </div>
             <div class=" eight wide field">
                 {{form.comment}}
                 {{form.comment.error}}

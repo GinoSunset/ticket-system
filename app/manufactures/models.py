@@ -142,9 +142,19 @@ class Nomenclature(models.Model):
         max_length=2,
     )
     bp_count = models.IntegerField(verbose_name="Количество БП", default=1)
-    
-    amperage_6 = models.BooleanField(verbose_name="6 А", default=False)
-    amperage_3_2 = models.BooleanField(verbose_name="3.2 А", default=False)
+
+    amperage_6 = models.BooleanField(
+        verbose_name="6 А", default=False, help_text="Amperage for RF"
+    )
+    amperage_3_2 = models.BooleanField(
+        verbose_name="3.2 А", default=False, help_text="Amperage for RF"
+    )
+    amperage_1 = models.BooleanField(
+        verbose_name="1 А", default=False, help_text="Amperage for AM"
+    )
+    amperage_2 = models.BooleanField(
+        verbose_name="2 А", default=False, help_text="Amperage for AM"
+    )
 
     illumination = models.BooleanField(verbose_name="Подсветка", default=True)
 

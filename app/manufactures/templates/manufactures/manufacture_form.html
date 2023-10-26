@@ -202,16 +202,19 @@
       init_dropdown_frame_type()
     })
 
-    // if select frame_type 2 then remove display amperag-field-1 if select frame_type 1 then hide amperag-field-1
     function change_frame_type(value, self){
       let id = self.children("select").attr("id").match(/\d+/g)[0]
       if (value == "AM"){
         $(`#amperag-field-${id}`).hide()
+        $(`#amperag-AM-field-${id}`).show()
         $(`#id_${id}-amperage_3_2`).prop("checked", false)
         $(`#id_${id}-amperage_6`).prop("checked", false)
       }
       else{
+        $(`#amperag-AM-field-${id}`).hide()
         $(`#amperag-field-${id}`).show()
+        $(`#id_${id}-amperage_1`).prop("checked", false)
+        $(`#id_${id}-amperage_2`).prop("checked", false)
       }
     }
 
