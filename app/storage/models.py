@@ -1,24 +1,58 @@
 from django.db import models
 
-class Category(models.Model):
-    name = models.CharField(max_length=100)
-    description = models.CharField(max_length=1000)
-
-    def __str__(self):
-        return self.name
 
 class Component(models.Model):
-    name = models.CharField(max_length=100)
-    description = models.CharField(max_length=1000, blank=True, null=True)
-    price = models.DecimalField(max_digits=10, decimal_places=2, blank=True, null=True)
-    category = models.ForeignKey(Category, on_delete=models.CASCADE)
+    name = models.CharField(max_length=255)
+    component_type = models.ForeignKey(
+        "ComponentType", verbose_name="Тип компонента", on_delete=models.CASCADE
+    )
+    serial_number = models.CharField(max_length=255)
+    is_stock = models.BooleanField(default=False, verbose_name="В наличии")
+    date_delivery = models.DateField(
+        verbose_name="Дата получения", blank=True, null=True
+    )
+    is_reserve = models.BooleanField(default=False, verbose_name="Резерв")
+    nomenclature = models.ForeignKey(
+        "manufactures.Nomenclature",
+        verbose_name="Номенклатура",
+        on_delete=models.SET_NULL,
+        blank=True,
+        null=True,
+    )
 
-    def __str__(self):
-        return self.name
-    
 
-class Order(models.Model):
-    components = models.ManyToManyField(Component, through='OrderComponent')
-    date_shipment = models.DateField(
-        verbose_name="Дата отгрузки", blank=True, null=True
+class Alias(models.Model):
+    name = models.CharField(max_length=255)
+    component_type = models.ForeignKey(
+        "ComponentType", verbose_name="Тип компонента", on_delete=models.CASCADE
+    )
+
+
+class ComponentType(models.Model):
+    name = models.CharField(max_length=255)
+    sub_component_type = models.ForeignKey(
+        "ComponentType",
+        verbose_name="Тип подкомпонента",
+        on_delete=models.SET_NULL,
+        blank=True,
+        null=True,
+        help_text="Выберите тип компонента, в состав которого входит данный компонент",
+    )
+    is_internal = models.BooleanField(
+        default=False,
+        verbose_name="Для внутреннего использования",
+        help_text="Если отмечено, то компонент  будет отображаться в списке компонентов только для инженеров",
+    )
+
+
+class Delivery(models.Model):
+    date_create = models.DateTimeField(auto_now_add=True)
+    date_update = models.DateTimeField(auto_now=True)
+    date_delivery = models.DateField(verbose_name="Дата получения")
+    comment = models.TextField(verbose_name="Комментарий", blank=True, null=True)
+    components = models.ManyToManyField(
+        "Component",
+        verbose_name="Компоненты",
+        related_name="deliveries",
+        blank=True,
     )
