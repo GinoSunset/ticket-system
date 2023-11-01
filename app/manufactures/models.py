@@ -92,8 +92,8 @@ class Nomenclature(models.Model):
         ordering = ["date_create"]
 
     class FrameType(models.TextChoices):
-        PRODUCT = "AM", "AM"
-        SERVICE = "RF", "РЧ"
+        FRAME_AM = "AM", "AM"
+        FRAME_RF = "RF", "РЧ"  # Radio Frequency
 
     class Body(models.TextChoices):
         PLEX = "PL", "Плекс"
@@ -125,7 +125,7 @@ class Nomenclature(models.Model):
     frame_type = models.CharField(
         verbose_name="Тип",
         choices=FrameType.choices,
-        default=FrameType.PRODUCT,
+        default=FrameType.FRAME_AM,
         max_length=2,
     )
     body = models.CharField(
