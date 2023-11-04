@@ -4,6 +4,13 @@ from additionally.models import Dictionary
 from users.models import Operator
 
 
+def get_default_new_manufacture_status():
+    status, _ = Dictionary.objects.get_or_create(
+        code="new_manufacture_task", type_dict__code="status_manufactory"
+    )
+    return status
+
+
 class Manufacture(models.Model):
     class Meta:
         verbose_name = "Заявка на производство"
@@ -17,7 +24,7 @@ class Manufacture(models.Model):
         related_name="manufactures_status",
         on_delete=models.SET_NULL,
         null=True,
-        blank=True,
+        default=get_default_new_manufacture_status,
     )
     date_create = models.DateTimeField(auto_now_add=True)
     date_update = models.DateTimeField(auto_now=True)
