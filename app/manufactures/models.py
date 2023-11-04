@@ -11,6 +11,19 @@ def get_default_new_manufacture_status():
     return status
 
 
+#  Option
+class Option(models.Model):
+    class Meta:
+        abstract = True
+
+    name = models.CharField(max_length=100, unique=True)
+    description = models.CharField(max_length=200, null=True, blank=True)
+
+
+class FrameTypeOption(Option):
+    pass
+
+
 class Manufacture(models.Model):
     class Meta:
         verbose_name = "Заявка на производство"
@@ -122,11 +135,12 @@ class Nomenclature(models.Model):
         default=Status.NEW,
     )
 
-    frame_type = models.CharField(
+    frame_type = models.ForeignKey(
+        FrameTypeOption,
         verbose_name="Тип",
-        choices=FrameType.choices,
-        default=FrameType.FRAME_AM,
-        max_length=2,
+        on_delete=models.PROTECT,
+        null=True,
+        blank=True,
     )
     body = models.CharField(
         verbose_name="Корпус",
