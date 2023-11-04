@@ -5,7 +5,7 @@ from django.http import HttpResponse
 from django.views.generic import ListView, CreateView, UpdateView, DetailView
 from django.urls import reverse_lazy
 from .models import Manufacture, Client, Nomenclature
-from .forms import ManufactureForm, NomenclatureForm
+from .forms import ManufactureForm, NomenclatureForm, ManufactureChangeStatusForm
 from ticket.mixin import AccessOperatorMixin
 from additionally.models import Dictionary
 
@@ -118,25 +118,22 @@ class ManufactureUpdateView(UpdateView):
             ]
         )
         if "status" not in form.changed_data:
-            self.object.status =  self.get_status_from_nomenclatures()
+            self.object.status = self.get_status_from_nomenclatures()
 
         self.object.save()
         return super().form_valid(form)
 
     def get_status_from_nomenclatures(self):
         status_map = {
-                1: Dictionary.objects.get(code="new_manufacture_task"),
-                2: Dictionary.objects.get(code="in_progress"),
-                3: Dictionary.objects.get(code="ready"),
-            }
+            1: Dictionary.objects.get(code="new_manufacture_task"),
+            2: Dictionary.objects.get(code="in_progress"),
+            3: Dictionary.objects.get(code="ready"),
+        }
         min_status_nomenclature = min(
-                [
-                    nomenclature.status
-                    for nomenclature in self.object.nomenclatures.all()
-                ]
-            , default=-1)
+            [nomenclature.status for nomenclature in self.object.nomenclatures.all()],
+            default=-1,
+        )
         return status_map.get(min_status_nomenclature, self.object.status)
-        
 
 
 class ClientCreateView(LoginRequiredMixin, CreateView):
@@ -156,3 +153,9 @@ class ManufactureNomenclaturesView(LoginRequiredMixin, DetailView):
     template_name = "manufactures/manufacture_nomenclatures.html"
     context_object_name = "manufacture"
     queryset = Manufacture.objects.prefetch_related("nomenclatures")
+
+
+class ManufactureStatusUpdateView(LoginRequiredMixin, UpdateView):
+    model = Manufacture
+    form_class = ManufactureChangeStatusForm
+    success_url = reverse_lazy("manufactures-list")

@@ -74,7 +74,7 @@
         <td><i class={% if manufacture.branding%}"check circle outline green icon"{% else %}"times circle outline red icon"{% endif %}></i></td>
         <td>
             {% if manufacture.status %}
-            <span class="ui {{manufacture.get_color_status}} text">{{manufacture.status}}</span>
+            <button class="ui button mini {{manufacture.get_color_status}} showModal">{{manufacture.status}}</button>
             {% endif %}
         </td>
         <td>
@@ -110,11 +110,36 @@
   <i class="sync alternate icon"></i>
 </button>
 
+<div class="ui modal" id="ChangeStatusModal">
+  <i class="close icon"></i>
+  <div class="header">Изменить статус</div>
+  <div class="content">
+    bla
+  </div>
+
+</div>
+
 {% endblock content %}
 
 {% block script %}
 <script>
 const reloadbtn = $('.reloadbtn');
+
+$(".showModal").on("click", function(e){
+  e.preventDefault();
+
+  let id = $(this).closest('tr').find('td:first').text();
+  url = "index"
+  {% comment %} //let url = "{% url 'manufacture-detail' 0 %}".replace('0', id); {% endcomment %}
+  $.ajax({
+    url: url,
+    success: function ( res ) {
+      $('#ChangeStatusModal .content').html(res);
+      $('#ChangeStatusModal').modal('show');
+    }
+  });
+});
+
 let timer = JSON.parse(localStorage.timer || null) || false;
 if (timer){
   reloadbtn.toggleClass('rotate')

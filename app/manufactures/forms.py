@@ -66,3 +66,12 @@ class NomenclatureForm(forms.ModelForm):
             "amperage_1": forms.CheckboxInput(attrs={"class": "ui checkbox"}),
             "amperage_2": forms.CheckboxInput(attrs={"class": "ui checkbox"}),
         }
+
+
+class ManufactureChangeStatusForm(forms.ModelForm):
+    class Meta:
+        model = Manufacture
+        fields = ("status",)
+        widgets = {
+            "status": forms.Select(attrs={"class": "ui selection dropdown"}),
+        }

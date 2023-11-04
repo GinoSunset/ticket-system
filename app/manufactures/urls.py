@@ -17,4 +17,9 @@ urlpatterns = [
         views.ManufactureNomenclaturesView.as_view(),
         name="manufacture-detail-nomenclatures",
     ),
+    path(
+        "status/<int:pk>/",
+        views.ManufactureStatusUpdateView.as_view(),
+        name="manufacture-update-status",
+    ),
 ]
