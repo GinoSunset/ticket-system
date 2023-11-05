@@ -129,13 +129,13 @@ $(".showModal").on("click", function(e){
   e.preventDefault();
 
   let id = $(this).closest('tr').find('td:first').text();
-  url = "index"
-  {% comment %} //let url = "{% url 'manufacture-detail' 0 %}".replace('0', id); {% endcomment %}
+  let url = "{% url 'manufacture-update-status' 0 %}".replace('0', id);
   $.ajax({
     url: url,
     success: function ( res ) {
       $('#ChangeStatusModal .content').html(res);
       $('#ChangeStatusModal').modal('show');
+      $("#id_status").checkbox();
     }
   });
 });

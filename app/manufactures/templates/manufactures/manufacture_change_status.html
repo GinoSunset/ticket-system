@@ -1,0 +1,11 @@
+
+<form class="ui form" method="post" action="{% url 'manufacture-update-status' object.pk %}">
+    {{ form.non_field_errors }}
+  {% csrf_token %}
+  <div class="field">
+    <label>{{form.status.label}}</label>
+    {{form.status}}
+    {{form.status.errors}}
+</div>
+  <button class="ui button" type="submit">Изменить статус</button>
+</form>

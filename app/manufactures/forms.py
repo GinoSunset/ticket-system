@@ -69,6 +69,10 @@ class NomenclatureForm(forms.ModelForm):
 
 
 class ManufactureChangeStatusForm(forms.ModelForm):
+    status = forms.ModelChoiceField(
+        queryset=Dictionary.objects.filter(type_dict__code="status_manufactory"),
+    )
+
     class Meta:
         model = Manufacture
         fields = ("status",)

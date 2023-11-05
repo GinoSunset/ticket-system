@@ -159,3 +159,4 @@ class ManufactureStatusUpdateView(LoginRequiredMixin, UpdateView):
     model = Manufacture
     form_class = ManufactureChangeStatusForm
     success_url = reverse_lazy("manufactures-list")
+    template_name = "manufactures/manufacture_change_status.html"
