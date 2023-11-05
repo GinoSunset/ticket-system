@@ -135,7 +135,7 @@ $(".showModal").on("click", function(e){
     success: function ( res ) {
       $('#ChangeStatusModal .content').html(res);
       $('#ChangeStatusModal').modal('show');
-      $("#id_status").checkbox();
+      $("#id_status").dropdown();
     }
   });
 });
