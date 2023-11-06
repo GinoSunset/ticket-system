@@ -19,6 +19,9 @@ class Option(models.Model):
     name = models.CharField(max_length=100, unique=True)
     description = models.CharField(max_length=200, null=True, blank=True)
 
+    def __str__(self) -> str:
+        return self.name
+
 
 class FrameTypeOption(Option):
     pass

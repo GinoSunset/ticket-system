@@ -83,14 +83,14 @@
     function init_dropdown_frame_type(){
       $(".frame_type").each(function(){
         let dr = $(this).dropdown()
-        let value = dr.dropdown("get value")
+        let text = dr.dropdown("get text")
 
-        change_frame_type(value, dr)
+        change_frame_type(text, dr)
       })
       $(".frame_type").dropdown({
 
         onChange: function(value, text, $selectedItem) {
-          change_frame_type(value, $(this))
+          change_frame_type(text, $(this))
         }
       })
     }
@@ -203,8 +203,9 @@
     })
 
     function change_frame_type(value, self){
+      value = value.replace(/\s+/g, '')
       let id = self.children("select").attr("id").match(/\d+/g)[0]
-      if (value == "AM"){
+      if (value == "АМ"){
         $(`#amperag-field-${id}`).hide()
         $(`#amperag-AM-field-${id}`).show()
         $(`#id_${id}-amperage_3_2`).prop("checked", false)
