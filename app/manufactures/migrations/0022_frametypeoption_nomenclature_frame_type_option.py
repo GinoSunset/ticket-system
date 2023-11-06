@@ -5,9 +5,8 @@ import django.db.models.deletion
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
-        ("manufactures", "0020_alter_nomenclature_amperage_1_and_more"),
+        ("manufactures", "0021_alter_manufacture_status"),
     ]
 
     operations = [

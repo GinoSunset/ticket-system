@@ -6,7 +6,7 @@ import django.db.models.deletion
 
 class Migration(migrations.Migration):
     dependencies = [
-        ("manufactures", "0022_save_all_frame_to_table"),
+        ("manufactures", "0023_save_all_frame_to_table"),
     ]
 
     operations = [

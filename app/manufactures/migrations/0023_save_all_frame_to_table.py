@@ -23,7 +23,7 @@ def save_frame_type(apps, schema_editor):
 
 class Migration(migrations.Migration):
     dependencies = [
-        ("manufactures", "0021_frametypeoption_nomenclature_frame_type_option"),
+        ("manufactures", "0022_frametypeoption_nomenclature_frame_type_option"),
     ]
 
     operations = [
