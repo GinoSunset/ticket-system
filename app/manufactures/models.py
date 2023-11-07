@@ -61,12 +61,6 @@ class Manufacture(models.Model):
     )
     branding = models.BooleanField(verbose_name="Брендирование", default=False)
     comment = models.TextField(verbose_name="Комментарий", blank=True, null=True)
-    nomenclatures = models.ManyToManyField(
-        "Nomenclature",
-        verbose_name="Номенклатуры",
-        related_name="manufactures",
-        blank=True,
-    )
 
     @property
     def progress_str_as_list_nomenclatures(self) -> str:
@@ -181,6 +175,15 @@ class Nomenclature(models.Model):
     comment = models.TextField(verbose_name="Комментарий", blank=True, null=True)
     date_create = models.DateTimeField(auto_now_add=True)
     date_update = models.DateTimeField(auto_now=True)
+
+    manufacture = models.ForeignKey(
+        Manufacture,
+        verbose_name="Заявка на производство",
+        on_delete=models.CASCADE,
+        related_name="nomenclatures",
+        null=True,
+        blank=True,
+    )
 
     def __str__(self):
         options = []
