@@ -107,10 +107,6 @@ class Nomenclature(models.Model):
         verbose_name_plural = "Номенклатуры"
         ordering = ["date_create"]
 
-    class FrameType(models.TextChoices):
-        FRAME_AM = "AM", "AM"
-        FRAME_RF = "RF", "РЧ"  # Radio Frequency
-
     class Body(models.TextChoices):
         PLEX = "PL", "Плекс"
         PROFILE = "PR", "Профиль"

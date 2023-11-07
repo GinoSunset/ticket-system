@@ -7,7 +7,7 @@ import logging
 def save_frame_type(apps, schema_editor):
     FrameType = apps.get_model("manufactures", "FrameTypeOption")
     AM = FrameType.objects.create(name="АМ")
-    RF = FrameType.objects.create(name=" РЧ")
+    RF = FrameType.objects.create(name="РЧ")
     logging.info(f"FrameTypeOption: AM, RF created")
     Nomenclature = apps.get_model("manufactures", "Nomenclature")
     for nomenclature in Nomenclature.objects.all():
