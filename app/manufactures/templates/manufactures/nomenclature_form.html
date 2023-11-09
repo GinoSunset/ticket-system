@@ -110,6 +110,12 @@
             <div class=" eight wide field">
                 {{form.comment}}
                 {{form.comment.error}}
+                
+            </div>
+            <div class="field">
+                <a class="ui icon basic button mini" id="btn_add_comment_{{form.prefix}}" style="display:none" onclick="append_commment('{{form.prefix}}')">
+                    <i class="magic icon"></i>
+                </a>
             </div>
         </div>    
     </div>    
