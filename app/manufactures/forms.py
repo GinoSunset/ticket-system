@@ -27,9 +27,6 @@ class ManufactureForm(forms.ModelForm):
         self.fields["status"].queryset = Dictionary.objects.filter(
             type_dict=type_status
         )
-        self.fields["status"].initial = Dictionary.objects.get(
-            type_dict=type_status, code="new_manufacture_task"
-        )
 
 
 class NomenclatureForm(forms.ModelForm):

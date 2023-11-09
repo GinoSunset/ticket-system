@@ -26,6 +26,11 @@ class Option(models.Model):
 class FrameTypeOption(Option):
     pass
 
+    @classmethod
+    def get_default(cls):
+        frame_type, _ = cls.objects.get_or_create(name="АМ")
+        return frame_type.pk
+
 
 class Manufacture(models.Model):
     class Meta:
@@ -132,9 +137,9 @@ class Nomenclature(models.Model):
         FrameTypeOption,
         verbose_name="Тип",
         on_delete=models.PROTECT,
-        null=True,
-        blank=True,
+        default=FrameTypeOption.get_default,
     )
+
     body = models.CharField(
         verbose_name="Корпус",
         choices=Body.choices,

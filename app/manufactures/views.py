@@ -109,7 +109,6 @@ class ManufactureUpdateView(UpdateView):
             manufacture_nomenclature = form_nomenclature.save(commit=False)
             manufacture_nomenclature.manufacture = self.object
             manufacture_nomenclature.save()
-            self.object.nomenclatures.add(manufacture_nomenclature)
 
         self.object.count = sum(
             [
