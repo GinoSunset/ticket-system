@@ -43,13 +43,16 @@ def test_save_status_if_change_nomenclature(
         manufacture=manufacture,
     )
 
-    nomenc_form = NomenclatureForm(instance=nomenclature, prefix="0")
-    nomenc_form.fields["status"].initial = Nomenclature.Status.READY
+    nomenc_form = NomenclatureForm(
+        instance=nomenclature, prefix="0", initial={"status": Nomenclature.Status.READY}
+    )
 
     client.force_login(operator)
     res = client.post(
         reverse("manufacture-update", kwargs={"pk": manufacture.pk}),
         data={
+            "status": manufacture.status.pk,
+            "initial-status": manufacture.status.pk,
             "client": manufacture.client.pk,
             "nomenclature-TOTAL_FORMS": 0,
             **{i.html_name: i.value() for i in nomenc_form},
