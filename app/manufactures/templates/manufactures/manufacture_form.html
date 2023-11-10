@@ -236,7 +236,8 @@
     function append_commment(id){
       message = get_comment(id);
       if ($(`#id_${id}-comment`).val() != ""){
-        message = `\n${message}`
+        comment = $(`#id_${id}-comment`).val()
+        message = `${comment}\n${message}`
       } 
       $(`#id_${id}-comment`).val(message)
 
