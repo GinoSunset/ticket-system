@@ -217,13 +217,27 @@
         $(`#id_${id}-amperage_1`).prop("checked", false)
         $(`#id_${id}-amperage_2`).prop("checked", false)
         $(`#btn_add_comment_${id}`).hide()
-        //clean_comment
-        $(`#id_${id}-comment`).val("")
+        remove_comment_am(id);
       }
+    }
+    function remove_comment_am(id){
+      let comment = $(`#id_${id}-comment`).val()
+      let lines = comment.split("\n")
+      let new_lines = []
+      for (let line of lines){
+        if (!line.startsWith("10 жил - ")){
+          new_lines.push(line)
+        }
+      }
+      $(`#id_${id}-comment`).val(new_lines.join("\n"))
+
     }
 
     function append_commment(id){
       message = get_comment(id);
+      if ($(`#id_${id}-comment`).val() != ""){
+        message = `\n${message}`
+      } 
       $(`#id_${id}-comment`).val(message)
 
     }
