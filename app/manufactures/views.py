@@ -2,7 +2,13 @@ from typing import Any, Dict
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.forms.models import BaseModelForm
 from django.http import HttpResponse
-from django.views.generic import ListView, CreateView, UpdateView, DetailView
+from django.views.generic import (
+    ListView,
+    CreateView,
+    UpdateView,
+    DetailView,
+    DeleteView,
+)
 from django.urls import reverse_lazy
 from .models import Manufacture, Client, Nomenclature
 from .forms import ManufactureForm, NomenclatureForm, ManufactureChangeStatusForm
@@ -104,7 +110,6 @@ class ManufactureUpdateView(UpdateView):
                 self.get_context_data(form, forms_nomenclature=forms_nomenclature)
             )
         self.object = form.save()
-        self.object.nomenclatures.clear()
         for form_nomenclature in forms_nomenclature:
             manufacture_nomenclature = form_nomenclature.save(commit=False)
             manufacture_nomenclature.manufacture = self.object
@@ -159,3 +164,11 @@ class ManufactureStatusUpdateView(LoginRequiredMixin, UpdateView):
     form_class = ManufactureChangeStatusForm
     success_url = reverse_lazy("manufactures-list")
     template_name = "manufactures/manufacture_change_status.html"
+
+
+class DeleteNomenclature(LoginRequiredMixin, DeleteView):
+    model = Nomenclature
+    success_url = reverse_lazy("manufactures-list")
+
+    def get_success_url(self):
+        return self.request.META.get("HTTP_REFERER", "/")

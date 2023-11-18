@@ -112,12 +112,16 @@
       
     }
     function change_form_id(new_form, new_index, start_index=0){
-      console.log("change form id")
+      console.log("change form id ")
       new_form.attr("id", `form_nomenclature_${new_index}`)
 
       new_form.find("input").each(function(){
         let input = $(this)
         let name = input.attr("name")
+        if (name === `${start_index}-id`){
+          $(this).remove();
+          return
+        }
         input.attr("name",  name.replace(start_index, new_index))
         let id = input.attr("id")
         input.attr("id", id.replace(start_index, new_index))
@@ -157,10 +161,10 @@
 
       let btn_remove = new_form.find(`#btn_remove_nom_${start_index}`)
       btn_remove.attr("id", `btn_remove_nom_${new_index}`)
-      btn_remove.attr("onclick", `remove_nomenclature('form_nomenclature_${new_index}')`)
+      btn_remove.attr("onclick", `remove_nomenclature('${new_index}')`)
 
     }
-    function remove_nomenclature(id){
+    function remove_nomenclature(field_id){
       if ($(".form-nomenclature").length == 1)
       {
         $.toast({
@@ -171,24 +175,54 @@
         }
         
       console.log("remove")
-      let nomeclature = $(`#${id}`)
-      const input_count = $("#id_nomenclature-TOTAL_FORMS")
-      const index = input_count.val()
-      const new_index = parseInt(index) - 1
-      input_count.val(new_index)
-      next_nomenclatures = nomeclature.nextAll(".form-nomenclature")
-      next_nomenclatures.each(function(){
-        let next_nomenclature = $(this)
-        let id_next = next_nomenclature.attr("id")
-        let new_id = id_next.replace(/\d+/g, function(match){
-          return parseInt(match) - 1
-        })
-        change_form_id(next_nomenclature, new_id.match(/\d+/g)[0], id_next.match(/\d+/g)[0])
-      })
-      
-      nomeclature.remove()
+      let nomeclature_id = $(`#id_${field_id}-id`)
+      if (nomeclature_id.val()){
+        send_request_remove_nomenclature(field_id, nomeclature_id.val())
+      }
+      else{
+        remove_nomenclature_from_form(field_id)
+      }
+
     }
 
+    function send_request_remove_nomenclature(field_id, nomeclature_id){
+      let url = "{% url 'nomenclature-delete' 0 %}".replace("0", nomeclature_id)
+        $.ajax({
+          url: url,
+          type: "POST",
+          data: {
+            csrfmiddlewaretoken: "{{ csrf_token }}"
+          },
+          success: function(response){
+            remove_nomenclature_from_form(field_id)
+          },
+          error: function(response){
+            $.toast({
+              class: 'error',
+              message: `Ошибка удаления номенклатуры ${nomeclature_id} -  ${response.responseText}`
+            })
+          }
+        })
+    }
+
+    function remove_nomenclature_from_form(id) {
+        let nomeclature = $(`#form_nomenclature_${id}`)
+        const input_count = $("#id_nomenclature-TOTAL_FORMS")
+        const index = input_count.val()
+        const new_index = parseInt(index) - 1
+        input_count.val(new_index)
+        next_nomenclatures = nomeclature.nextAll(".form-nomenclature")
+        next_nomenclatures.each(function () {
+          let next_nomenclature = $(this)
+          let id_next = next_nomenclature.attr("id")
+          let new_id = id_next.replace(/\d+/g, function (match) {
+            return parseInt(match) - 1
+          })
+          change_form_id(next_nomenclature, new_id.match(/\d+/g)[0], id_next.match(/\d+/g)[0])
+        })
+
+        nomeclature.remove()
+      }
 
     function activate_toggle(){
       $('.ui.checkbox').checkbox();

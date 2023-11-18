@@ -30,9 +30,14 @@ class ManufactureForm(forms.ModelForm):
 
 
 class NomenclatureForm(forms.ModelForm):
+    id = forms.IntegerField(
+        widget=forms.HiddenInput(), required=False, label="id_nomenclature"
+    )
+
     class Meta:
         model = Nomenclature
         fields = (
+            "id",
             "frame_type",
             "body",
             "tx_count",
