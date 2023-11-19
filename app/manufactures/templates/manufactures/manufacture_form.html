@@ -159,6 +159,18 @@
         }
       })
 
+      new_form.find("a").each(function(){
+        let a = $(this)
+        let id_a = a.attr("id")
+        if (id_a){
+          a.attr("id", id_a.replace(start_index, new_index))
+        }
+        let onclick = a.attr("onclick")
+        if (onclick){
+          a.attr("onclick", onclick.replace(start_index, new_index))
+        }
+      })
+
       let btn_remove = new_form.find(`#btn_remove_nom_${start_index}`)
       btn_remove.attr("id", `btn_remove_nom_${new_index}`)
       btn_remove.attr("onclick", `remove_nomenclature('${new_index}')`)
