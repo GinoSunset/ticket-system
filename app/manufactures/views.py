@@ -103,7 +103,13 @@ class ManufactureUpdateView(UpdateView):
 
         forms_nomenclature = []
         for i in range(count_forms + 1):
-            form_nomenclature = NomenclatureForm(self.request.POST, prefix=str(i))
+            id_nomenclature = self.request.POST.get(f"{i}-id")
+            instance_nomenclature = None
+            if Nomenclature.objects.filter(id=id_nomenclature).exists():
+                instance_nomenclature = Nomenclature.objects.get(id=id_nomenclature)
+            form_nomenclature = NomenclatureForm(
+                self.request.POST, prefix=str(i), instance=instance_nomenclature
+            )
             forms_nomenclature.append(form_nomenclature)
         if not all([form_n.is_valid() for form_n in forms_nomenclature]):
             return self.render_to_response(
