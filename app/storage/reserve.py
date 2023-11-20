@@ -2,13 +2,12 @@ from manufactures.models import Manufacture, Nomenclature
 from .models import Component, ComponentType
 
 
-def processing_reserved_component(manufacture: Manufacture):
-    for nomenclature in manufacture.nomenclatures.all():
-        components_type = get_components_type_from_nomenclature(nomenclature)
-        if not components_type:
-            continue
-        for component_type in components_type:
-            reserve_component(component_type, manufacture)
+def processing_reserved_component(nomenclature: Nomenclature):
+    components_type = get_components_type_from_nomenclature(nomenclature)
+    if not components_type:
+        return
+    for component_type in components_type:
+        reserve_component(component_type, nomenclature)
 
 
 def get_components_type_from_nomenclature(
@@ -33,7 +32,7 @@ def get_sub_component_from_component(
     return components_type
 
 
-def reserve_component(component_type: ComponentType, manufacture):
+def reserve_component(component_type: ComponentType, nomenclature: Nomenclature):
     Component.objects.create(
-        component_type=component_type, is_reserve=True, manufacture=manufacture
+        component_type=component_type, is_reserve=True, nomenclature=nomenclature
     )
