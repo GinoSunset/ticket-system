@@ -34,5 +34,8 @@ def get_sub_component_from_component(
 
 def reserve_component(component_type: ComponentType, nomenclature: Nomenclature):
     Component.objects.create(
-        component_type=component_type, is_reserve=True, nomenclature=nomenclature
+        component_type=component_type,
+        is_reserve=True,
+        nomenclature=nomenclature,
+        name=component_type.name,
     )
