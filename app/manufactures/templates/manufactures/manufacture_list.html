@@ -278,10 +278,14 @@ function printDetails(id){
   $.ajax({
     url: url,
     success: function ( res ) {
-      let win = window.open('', 'PrintWindow', 'height=400,width=600');
+      let win = window.open('', 'PrintWindow', 'height=700,width=800');
       win.document.write(res);
-      win.document.close();
-      win.print();
+      //slep 1 sec for load css
+      setTimeout(function(){
+        win.document.close();
+        win.print();
+      }, 1000);
+
     }
   });
 }
