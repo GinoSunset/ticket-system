@@ -30,12 +30,13 @@ class Alias(models.Model):
 
 class ComponentType(models.Model):
     name = models.CharField(max_length=255)
-    sub_component_type = models.ForeignKey(
+    parent_component_type = models.ForeignKey(
         "ComponentType",
         verbose_name="Тип подкомпонента",
         on_delete=models.SET_NULL,
         blank=True,
         null=True,
+        related_name="sub_components_type",
         help_text="Выберите тип компонента, в состав которого входит данный компонент",
     )
     is_internal = models.BooleanField(
@@ -43,6 +44,9 @@ class ComponentType(models.Model):
         verbose_name="Для внутреннего использования",
         help_text="Если отмечено, то компонент  будет отображаться в списке компонентов только для инженеров",
     )
+
+    def __str__(self) -> str:
+        return f"{self.name} {self.sub_component_type.count() if self.sub_component_type.all() else ''}"
 
 
 class Delivery(models.Model):

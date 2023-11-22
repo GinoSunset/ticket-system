@@ -16,3 +16,16 @@ class ComponentFactory(factory.django.DjangoModelFactory):
 
     name = factory.Faker("name")
     component_type = factory.SubFactory(ComponentTypeFactory)
+    is_reserve = factory.Faker("boolean")
+    is_stock = factory.Faker("boolean")
+    serial_number = factory.Faker("ean13")
+    nomenclature = factory.SubFactory("manufactures.factories.NomenclatureFactory")
+    date_delivery = factory.Faker("date")
+
+    @factory.post_generation
+    def component_type_name(self, create, extracted, **kwargs):
+        if not create:
+            return
+        if extracted:
+            self.component_type.name = extracted
+            self.component_type.save()
