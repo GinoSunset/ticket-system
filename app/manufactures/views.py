@@ -178,3 +178,10 @@ class DeleteNomenclature(LoginRequiredMixin, DeleteView):
 
     def get_success_url(self):
         return self.request.META.get("HTTP_REFERER", "/")
+
+
+class ManufactureNomenclaturesPrintView(LoginRequiredMixin, DetailView):
+    model = Manufacture
+    template_name = "manufactures/manufacture_nomenclatures_print.html"
+    context_object_name = "manufacture"
+    queryset = Manufacture.objects.prefetch_related("nomenclatures")
