@@ -1,0 +1,59 @@
+{% extends "ticsys/base.html" %}
+{% block common_content%}
+    <h1>Информация о заявке № {{manufacture.id}}</h1>
+    <div class="ui segment">
+        <p>Дата отгрузки: <b>{{manufacture.date_shipment}}</b></p>
+        <p>Клиент: <b>{{manufacture.client}}</b></p>
+        <p>Брендирование: {% if manufacture.branding%}<b>ДА</b>{% else %}<b>НЕТ</b>{% endif %}
+    </div>
+    <div class="ui divided items">
+        {% for nomenclature in manufacture.nomenclatures.all %}
+        <div class="item">
+            <div class="ui image">
+                {% if nomenclature.illumination %}
+                <i class="lightbulb yellow icon big">+</i>
+                
+                {% else %}
+                <i class="lightbulb outline icon big">-</i>
+                {% endif %}
+            </div>
+            <div class="content">
+               
+                <div class="header"> <span class="ui {% if nomenclature.status == "RD"  %}green  {% elif  nomenclature.status == "IP"  %} yellow {% endif %} text">Тип: {{ nomenclature.get_frame_type_display}}. Корпус: {{ nomenclature.get_body_display}}</span>  <div class="ui basic  horizontal label">{{ nomenclature.get_status_display}}</div></div>
+        
+                <div class="meta">
+                    <span class="">TX: {{nomenclature.tx_count}}</span>
+                    <span class="">RX: {{nomenclature.rx_count}}</span>
+                </div>
+                <div class="description">
+                    <p>Тип БП: <b>{{ nomenclature.get_bp_type_display}}</b> ({{ nomenclature.bp_count}} шт.) 
+                        {% if nomenclature.amperage_3_2%}
+                            <i class="bolt yellow icon"></i>3.2А
+                        {% endif %}
+                        {% if nomenclature.amperage_6 %}
+                            <i class="bolt yellow icon"></i>6А
+                        {% endif %}
+                        {% if nomenclature.amperage_1 %}
+                            <i class="bolt yellow icon"></i>1А
+                        {% endif %}
+                        {% if nomenclature.amperage_2 %}
+                            <i class="bolt yellow icon"></i>2А
+                        {% endif %}
+                    {% if nomenclature.comment %}
+                    <p>Комментарий: {{ nomenclature.comment}}</p>
+                    {% endif %}
+                </div>
+                <div class="extra">
+                    {% if nomenclature.mdg %} <div class="ui label basic">MDG</div>{% endif %}
+                    {% if nomenclature.md %} <div class="ui label basic">MD</div>{% endif %}
+                    {% if nomenclature.wifi %} <div class="ui label basic">Wi-Fi</div>{% endif %}
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+        </div>
+        <div class="ui segment">
+            <p>Комментарий: {{manufacture.comment}}</p>
+        </div>
+        
+{% endblock common_content%}

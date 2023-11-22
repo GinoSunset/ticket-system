@@ -160,3 +160,10 @@ class ManufactureStatusUpdateView(LoginRequiredMixin, UpdateView):
     form_class = ManufactureChangeStatusForm
     success_url = reverse_lazy("manufactures-list")
     template_name = "manufactures/manufacture_change_status.html"
+
+
+class ManufactureNomenclaturesPrintView(LoginRequiredMixin, DetailView):
+    model = Manufacture
+    template_name = "manufactures/manufacture_nomenclatures_print.html"
+    context_object_name = "manufacture"
+    queryset = Manufacture.objects.prefetch_related("nomenclatures")

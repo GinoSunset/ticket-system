@@ -90,7 +90,10 @@
               </div>
         </td>
         <td>
-            <a class="ui button info basic"  href="{% url 'manufacture-update' manufacture.id %}"><i class="ui icon pen"></i> </a>
+          <div class="ui buttons">
+            <a class="ui button info basic icon"  href="{% url 'manufacture-update' manufacture.id %}"><i class="ui icon pen"></i></a>
+            <button class ="ui button basic icon" onclick='printDetails({{manufacture.id}})'><i class="ui icon print"></i></button>
+          </div>
         </td>
 
 
@@ -269,6 +272,19 @@ $('.ui.multiple.progress').progress({
       percent : '{bar} {percent}%',
     }
   });
+
+function printDetails(id){
+  let url = "{% url 'manufacture-detail-nomenclatures-print' 0 %}".replace('0', id);
+  $.ajax({
+    url: url,
+    success: function ( res ) {
+      let win = window.open('', 'PrintWindow', 'height=400,width=600');
+      win.document.write(res);
+      win.document.close();
+      win.print();
+    }
+  });
+}
 
 </script>
 {% endblock script %}
