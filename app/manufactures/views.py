@@ -172,14 +172,6 @@ class ManufactureStatusUpdateView(LoginRequiredMixin, UpdateView):
     template_name = "manufactures/manufacture_change_status.html"
 
 
-class DeleteNomenclature(LoginRequiredMixin, DeleteView):
-    model = Nomenclature
-    success_url = reverse_lazy("manufactures-list")
-
-    def get_success_url(self):
-        return self.request.META.get("HTTP_REFERER", "/")
-
-
 class ManufactureNomenclaturesPrintView(LoginRequiredMixin, DetailView):
     model = Manufacture
     template_name = "manufactures/manufacture_nomenclatures_print.html"
