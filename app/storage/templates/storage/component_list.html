@@ -1,0 +1,40 @@
+{% extends 'ticsys/index.html' %}
+{% block header_style %}
+<script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
+{% endblock %}
+
+{% block content %}
+  <div id="app">
+    <h1>Компоненты</h1>
+    
+
+            <table>
+                <thead>
+                    <tr>
+                        <th>Name</th>
+                        <th>Description</th>
+                        <th>Price</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for component in components %}
+                        <tr>
+                            <td>{{ component.name }}</td>
+                            <td>{{ component.description }}</td>
+                            <td>{{ component.price }}</td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+
+        <script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
+        <script>
+            new Vue({
+                el: '#app',
+                data: {
+                    components: {{ components|safe }}
+                }
+            });
+        </script>
+    {% endblock %}

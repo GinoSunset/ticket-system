@@ -23,6 +23,11 @@ urlpatterns = [
         name="manufacture-update-status",
     ),
     path(
+        "nomenclature/<int:pk>/delete/",
+        views.DeleteNomenclature.as_view(),
+        name="nomenclature-delete",
+    ),
+    path(
         "<int:pk>/print/",
         views.ManufactureNomenclaturesPrintView.as_view(),
         name="manufacture-detail-nomenclatures-print",

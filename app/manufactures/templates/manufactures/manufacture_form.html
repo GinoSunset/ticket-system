@@ -55,7 +55,6 @@
     {% comment %} end from nomeclature {% endcomment %}
     <button class="ui button" id="add_nomenclature">Добавить номенклатуру</button>
 
-
     <button class="ui button positive" type="submit">{% firstof name_btn 'Создать' %}</button>
   </form>
 </div>
@@ -81,18 +80,17 @@
 
   const form = $("#form_nomenclature_0").clone()
 
-
   function init_dropdown_frame_type() {
     $(".frame_type").each(function () {
       let dr = $(this).dropdown()
-      let value = dr.dropdown("get value")
+      let text = dr.dropdown("get text")
 
-      change_frame_type(value, dr)
+      change_frame_type(text, dr)
     })
     $(".frame_type").dropdown({
 
       onChange: function (value, text, $selectedItem) {
-        change_frame_type(value, $(this))
+        change_frame_type(text, $(this))
       }
     })
   }
@@ -113,18 +111,22 @@
     last_form.after(new_form)
 
   }
+
   function change_form_id(new_form, new_index, start_index = 0) {
-    console.log("change form id")
+    console.log("change form id ")
     new_form.attr("id", `form_nomenclature_${new_index}`)
 
     new_form.find("input").each(function () {
       let input = $(this)
       let name = input.attr("name")
+      if (name === `${start_index}-id`) {
+        $(this).remove();
+        return
+      }
       input.attr("name", name.replace(start_index, new_index))
       let id = input.attr("id")
       input.attr("id", id.replace(start_index, new_index))
     })
-
     new_form.find("label").each(function () {
       let label = $(this)
       let for_label = label.attr("for")
@@ -132,6 +134,7 @@
         label.attr("for", for_label.replace(start_index, new_index))
       }
     })
+
     new_form.find("select").each(function () {
       let select = $(this)
       let id_select = select.attr("id")
@@ -148,7 +151,6 @@
       let name = textarea.attr("name")
       textarea.attr("name", name.replace(start_index, new_index))
     })
-
     new_form.find("div").each(function () {
       let div = $(this)
       let id_div = div.attr("id")
@@ -156,12 +158,24 @@
         div.attr("id", id_div.replace(start_index, new_index))
       }
     })
+    new_form.find("a").each(function () {
+      let a = $(this)
+      let id_a = a.attr("id")
+      if (id_a) {
+        a.attr("id", id_a.replace(start_index, new_index))
+      }
+      let onclick = a.attr("onclick")
+      if (onclick) {
+        a.attr("onclick", onclick.replace(start_index, new_index))
+      }
+    })
 
     let btn_remove = new_form.find(`#btn_remove_nom_${start_index}`)
     btn_remove.attr("id", `btn_remove_nom_${new_index}`)
-    btn_remove.attr("onclick", `remove_nomenclature('form_nomenclature_${new_index}')`)
+    btn_remove.attr("onclick", `remove_nomenclature('${new_index}')`)
 
   }
+
   function remove_nomenclature(id) {
     if ($(".form-nomenclature").length == 1) {
       $.toast({
@@ -172,7 +186,37 @@
     }
 
     console.log("remove")
-    let nomeclature = $(`#${id}`)
+    let nomeclature_id = $(`#id_${field_id}-id`)
+    if (nomeclature_id.val()) {
+      send_request_remove_nomenclature(field_id, nomeclature_id.val())
+    }
+    else {
+      remove_nomenclature_from_form(field_id)
+    }
+
+  }
+  function send_request_remove_nomenclature(field_id, nomeclature_id) {
+    let url = "{% url 'nomenclature-delete' 0 %}".replace("0", nomeclature_id)
+    $.ajax({
+      url: url,
+      type: "POST",
+      data: {
+        csrfmiddlewaretoken: "{{ csrf_token }}"
+      },
+      success: function (response) {
+        remove_nomenclature_from_form(field_id)
+      },
+      error: function (response) {
+        $.toast({
+          class: 'error',
+          message: `Ошибка удаления номенклатуры ${nomeclature_id} -  ${response.responseText}`
+        })
+      }
+    })
+  }
+
+  function remove_nomenclature_from_form(id) {
+    let nomeclature = $(`#form_nomenclature_${id}`)
     const input_count = $("#id_nomenclature-TOTAL_FORMS")
     const index = input_count.val()
     const new_index = parseInt(index) - 1
@@ -189,8 +233,6 @@
 
     nomeclature.remove()
   }
-
-
   function activate_toggle() {
     $('.ui.checkbox').checkbox();
     $('.selection.dropdown').dropdown();
@@ -202,6 +244,10 @@
     activate_toggle()
     init_dropdown_frame_type()
   })
+
+
+
+
 
   function change_frame_type(value, self) {
     let id = self.children("select").attr("id").match(/\d+/g)[0]

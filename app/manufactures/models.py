@@ -11,6 +11,27 @@ def get_default_new_manufacture_status():
     return status
 
 
+#  Option
+class Option(models.Model):
+    class Meta:
+        abstract = True
+
+    name = models.CharField(max_length=100, unique=True)
+    description = models.CharField(max_length=200, null=True, blank=True)
+
+    def __str__(self) -> str:
+        return self.name
+
+
+class FrameTypeOption(Option):
+    pass
+
+    @classmethod
+    def get_default(cls):
+        frame_type, _ = cls.objects.get_or_create(name="АМ")
+        return frame_type.pk
+
+
 class Manufacture(models.Model):
     class Meta:
         verbose_name = "Заявка на производство"
@@ -45,12 +66,6 @@ class Manufacture(models.Model):
     )
     branding = models.BooleanField(verbose_name="Брендирование", default=False)
     comment = models.TextField(verbose_name="Комментарий", blank=True, null=True)
-    nomenclatures = models.ManyToManyField(
-        "Nomenclature",
-        verbose_name="Номенклатуры",
-        related_name="manufactures",
-        blank=True,
-    )
 
     @property
     def progress_str_as_list_nomenclatures(self) -> str:
@@ -91,10 +106,6 @@ class Nomenclature(models.Model):
         verbose_name_plural = "Номенклатуры"
         ordering = ["date_create"]
 
-    class FrameType(models.TextChoices):
-        PRODUCT = "AM", "AM"
-        SERVICE = "RF", "РЧ"
-
     class Body(models.TextChoices):
         PLEX = "PL", "Плекс"
         PROFILE = "PR", "Профиль"
@@ -122,12 +133,13 @@ class Nomenclature(models.Model):
         default=Status.NEW,
     )
 
-    frame_type = models.CharField(
+    frame_type = models.ForeignKey(
+        FrameTypeOption,
         verbose_name="Тип",
-        choices=FrameType.choices,
-        default=FrameType.PRODUCT,
-        max_length=2,
+        on_delete=models.PROTECT,
+        default=FrameTypeOption.get_default,
     )
+
     body = models.CharField(
         verbose_name="Корпус",
         choices=Body.choices,
@@ -168,6 +180,15 @@ class Nomenclature(models.Model):
     comment = models.TextField(verbose_name="Комментарий", blank=True, null=True)
     date_create = models.DateTimeField(auto_now_add=True)
     date_update = models.DateTimeField(auto_now=True)
+
+    manufacture = models.ForeignKey(
+        Manufacture,
+        verbose_name="Заявка на производство",
+        on_delete=models.CASCADE,
+        related_name="nomenclatures",
+        null=True,
+        blank=True,
+    )
 
     def __str__(self):
         options = []

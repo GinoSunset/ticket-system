@@ -1,6 +1,7 @@
 <div id="form_nomenclature_{{form.prefix}}" class="ui raised red segment form-nomenclature">
     {{ form.non_field_errors }}
     <div class="field">
+        {{form.id}}
         <div class="eight fields">
             <div class="field">
                 <label>{{form.frame_type.label}}</label>
@@ -120,7 +121,7 @@
         </div>    
     </div>    
     <div class="ui bottom right attached label">
-        <a class="ui icon red label" id="btn_remove_nom_{{form.prefix}}" onclick="remove_nomenclature('form_nomenclature_{{form.prefix}}')">
+        <a class="ui icon red label" id="btn_remove_nom_{{form.prefix}}" onclick="remove_nomenclature('{{form.prefix}}')">
             <i class="trash icon"></i>
         </a>
     </div>

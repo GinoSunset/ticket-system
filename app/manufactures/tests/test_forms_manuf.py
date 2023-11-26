@@ -31,22 +31,28 @@ def test_save_auto_save(operator, client):
 
 
 @pytest.mark.django_db
-def test_save_status_if_change_manuf(operator, nomenclature_factory, client):
-    nomenclature = NomenclatureFactory(
-        comment="test comment", status=Nomenclature.Status.IN_PROGRESS
-    )
+def test_save_status_if_change_nomenclature(
+    operator, nomenclature_factory, manufacture_factory, client
+):
     status_new = Dictionary.objects.get(code="new_manufacture_task")
-    manufacture = ManufactureFactory.create(
-        status=status_new, nomenclatures=[nomenclature]
+
+    manufacture = manufacture_factory(status=status_new)
+    nomenclature = nomenclature_factory(
+        comment="test comment",
+        status=Nomenclature.Status.NEW,
+        manufacture=manufacture,
     )
 
-    nomenc_form = NomenclatureForm(instance=nomenclature, prefix="0")
+    nomenc_form = NomenclatureForm(
+        instance=nomenclature, prefix="0", initial={"status": Nomenclature.Status.READY}
+    )
 
     client.force_login(operator)
     res = client.post(
         reverse("manufacture-update", kwargs={"pk": manufacture.pk}),
         data={
-            "status": status_new.pk,
+            "status": manufacture.status.pk,
+            "initial-status": manufacture.status.pk,
             "client": manufacture.client.pk,
             "nomenclature-TOTAL_FORMS": 0,
             **{i.html_name: i.value() for i in nomenc_form},
@@ -63,10 +69,10 @@ def test_save_status_change_and_status_manuf_change(
     "Status set from form is more important than status from nomenclature"
     manuf = manufacture_factory()
     status_work = Dictionary.objects.get(code="in_progress")
-    nomenclature = nomenclature_factory(status=Nomenclature.Status.READY)
-    manuf.nomenclatures.add(nomenclature)
-    manuf.save()
-    nomenc_form = ManufactureChangeStatusForm(instance=nomenclature, prefix="0")
+    nomenclature = nomenclature_factory(
+        status=Nomenclature.Status.READY, manufacture=manuf
+    )
+    nomenc_form = NomenclatureForm(instance=nomenclature, prefix="0")
 
     client.force_login(operator)
     res = client.post(
