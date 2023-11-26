@@ -3,270 +3,289 @@
 <h1>{% firstof name_page 'Создание задачи на производство' %}</h1>
 <a class="ui button blue basic" href="{% url 'client-create' %}">Создать клиента</a>
 <div class="ui container">
-  
-    <form class="ui form" method="post">
-      {{ form.non_field_errors }}
-      {% csrf_token %}
-      <h4 class="ui dividing header">Общая информация</h4>
-      <div class="ui message">
-        <div class="header">
-          Автоматическое изменение статуса
-        </div>
-        <p>Статус задачи меняться автоматически на минимальный статус номенклатуры. Можно самому изменить статус, без автоматизации. </p>
+
+  <form class="ui form" method="post">
+    {{ form.non_field_errors }}
+    {% csrf_token %}
+    <h4 class="ui dividing header">Общая информация</h4>
+    <div class="ui message">
+      <div class="header">
+        Автоматическое изменение статуса
       </div>
-       
+      <p>Статус задачи меняться автоматически на минимальный статус номенклатуры. Можно самому изменить статус, без
+        автоматизации. </p>
+    </div>
 
-        <div class="equal width fields">
-          <div class="field">
-              <label>{{form.status.label}}</label>
-              {{form.status}}
-              {{form.status.errors}}
-          </div>
-          <div class="field">
-              <label>{{form.client.label}}</label>
-              {{form.client}}
-              {{form.client.errors}}
-          </div>
-          <div class="field">
-              <label>{{form.date_shipment.label}}</label>
-              {{form.date_shipment}}
-              {{form.date_shipment.errors}}
-          </div>
-          <div class="ui field">
-            <div class="ui ui right aligned toggle checkbox">
-              {{form.branding}}
-              <label>{{form.branding.label}}</label>
-              {{form.branding.errors}}
-            </div>
-            </div>
+
+    <div class="equal width fields">
+      <div class="field">
+        <label>{{form.status.label}}</label>
+        {{form.status}}
+        {{form.status.errors}}
+      </div>
+      <div class="field">
+        <label>{{form.client.label}}</label>
+        {{form.client}}
+        {{form.client.errors}}
+      </div>
+      <div class="field">
+        <label>{{form.date_shipment.label}}</label>
+        {{form.date_shipment}}
+        {{form.date_shipment.errors}}
+      </div>
+      <div class="ui field">
+        <div class="ui ui right aligned toggle checkbox">
+          {{form.branding}}
+          <label>{{form.branding.label}}</label>
+          {{form.branding.errors}}
         </div>
-        <div class="field">
-          {{form.comment}}
-          {{form.comment.errors}}
-       </div>
-           {% comment %} Form nomeclature {% endcomment %}
-           <h4 class="ui dividing header">Номенклатуры в заявке</h4>
-           <input type="hidden" name="nomenclature-TOTAL_FORMS" value={{count_form|default_if_none:'0'}} id="id_nomenclature-TOTAL_FORMS">
-           {% for form_nomenclature in forms_nomenclature %}
-           {% include "manufactures/nomenclature_form.html" with form=form_nomenclature %}
-           {% endfor %}
-           {% comment %} end from nomeclature {% endcomment %}
-         <button class="ui button" id="add_nomenclature">Добавить номенклатуру</button>
+      </div>
+    </div>
+    <div class="field">
+      {{form.comment}}
+      {{form.comment.errors}}
+    </div>
+    {% comment %} Form nomeclature {% endcomment %}
+    <h4 class="ui dividing header">Номенклатуры в заявке</h4>
+    <input type="hidden" name="nomenclature-TOTAL_FORMS" value={{count_form|default_if_none:'0'}}
+      id="id_nomenclature-TOTAL_FORMS">
+    {% for form_nomenclature in forms_nomenclature %}
+    {% include "manufactures/nomenclature_form.html" with form=form_nomenclature %}
+    {% endfor %}
+    {% comment %} end from nomeclature {% endcomment %}
+    <button class="ui button" id="add_nomenclature">Добавить номенклатуру</button>
 
-  
-      <button class="ui button positive" type="submit">{% firstof name_btn 'Создать' %}</button>
-    </form>
-  </div>
 
-  <script>
-    $('.ui.checkbox').checkbox();
-    $('.selection.dropdown').dropdown();
-    init_dropdown_frame_type();
-    $('.ui.fluid.search.dropdown').dropdown();
-    $('#date_calendar_date_shipment').calendar({
-        type: "date", 
-        firstDayOfWeek: 1,
-        text: {
-        days: ['В', 'П', 'В', 'С', 'Ч', 'П', 'С'],
-          today: 'Сегодня',
-          months: ["Январь", "Февраль", "Март", "Апрель", "Май", "Июнь", "Июль", "Август", "Сентябрь", "Октябрь", "Ноябрь", "Декабрь"],
-          monthsShort: ["Янв", "Фев", "Мар", "Апр", "Май", "Июн", "Июл", "Авг", "Сен", "Окт", "Ноя", "Дек"],
-        },
-        formatter: {
-          date: 'DD.MM.YYYY'
-        }
-      });
+    <button class="ui button positive" type="submit">{% firstof name_btn 'Создать' %}</button>
+  </form>
+</div>
 
-    const form = $("#form_nomenclature_0").clone()
-    
-
-    function init_dropdown_frame_type(){
-      $(".frame_type").each(function(){
-        let dr = $(this).dropdown()
-        let value = dr.dropdown("get value")
-
-        change_frame_type(value, dr)
-      })
-      $(".frame_type").dropdown({
-
-        onChange: function(value, text, $selectedItem) {
-          change_frame_type(value, $(this))
-        }
-      })
+<script>
+  $('.ui.checkbox').checkbox();
+  $('.selection.dropdown').dropdown();
+  init_dropdown_frame_type();
+  $('.ui.fluid.search.dropdown').dropdown();
+  $('#date_calendar_date_shipment').calendar({
+    type: "date",
+    firstDayOfWeek: 1,
+    text: {
+      days: ['В', 'П', 'В', 'С', 'Ч', 'П', 'С'],
+      today: 'Сегодня',
+      months: ["Январь", "Февраль", "Март", "Апрель", "Май", "Июнь", "Июль", "Август", "Сентябрь", "Октябрь", "Ноябрь", "Декабрь"],
+      monthsShort: ["Янв", "Фев", "Мар", "Апр", "Май", "Июн", "Июл", "Авг", "Сен", "Окт", "Ноя", "Дек"],
+    },
+    formatter: {
+      date: 'DD.MM.YYYY'
     }
-    function add_nomenclature(){
-      console.log("add nomenclature")
-      const new_form = form.clone();
-      let input_count = $("#id_nomenclature-TOTAL_FORMS")
-      let index = parseInt(input_count.val())
-      let new_index = index + 1
-      input_count.val(new_index)
-      change_form_id(new_form, new_index)
-      let last_form = $(".form-nomenclature").last()
-      if  (last_form.length == 0){
-        last_form = $("#add_nomenclature")
-        last_form.before(new_form)
-        return
+  });
+
+  const form = $("#form_nomenclature_0").clone()
+
+
+  function init_dropdown_frame_type() {
+    $(".frame_type").each(function () {
+      let dr = $(this).dropdown()
+      let value = dr.dropdown("get value")
+
+      change_frame_type(value, dr)
+    })
+    $(".frame_type").dropdown({
+
+      onChange: function (value, text, $selectedItem) {
+        change_frame_type(value, $(this))
       }
-      last_form.after(new_form)
-      
+    })
+  }
+  function add_nomenclature() {
+    console.log("add nomenclature")
+    const new_form = form.clone();
+    let input_count = $("#id_nomenclature-TOTAL_FORMS")
+    let index = parseInt(input_count.val())
+    let new_index = index + 1
+    input_count.val(new_index)
+    change_form_id(new_form, new_index)
+    let last_form = $(".form-nomenclature").last()
+    if (last_form.length == 0) {
+      last_form = $("#add_nomenclature")
+      last_form.before(new_form)
+      return
     }
-    function change_form_id(new_form, new_index, start_index=0){
-      console.log("change form id")
-      new_form.attr("id", `form_nomenclature_${new_index}`)
+    last_form.after(new_form)
 
-      new_form.find("input").each(function(){
-        let input = $(this)
-        let name = input.attr("name")
-        input.attr("name",  name.replace(start_index, new_index))
-        let id = input.attr("id")
-        input.attr("id", id.replace(start_index, new_index))
-      })
-      
-      new_form.find("label").each(function(){
-        let label = $(this)
-        let for_label = label.attr("for")
-        if (for_label) {
-          label.attr("for", for_label.replace(start_index, new_index))
-        }
-      })   
-      new_form.find("select").each(function(){
-        let select = $(this)
-        let id_select = select.attr("id")
-        select.attr("id", id_select.replace(start_index, new_index))
-        let name = select.attr("name")
-        select.attr("name", name.replace(start_index, new_index))
-        select.parent().dropdown();   
-      })
+  }
+  function change_form_id(new_form, new_index, start_index = 0) {
+    console.log("change form id")
+    new_form.attr("id", `form_nomenclature_${new_index}`)
 
-      new_form.find("textarea").each(function(){
-        let textarea = $(this)
-        let id_textarea = textarea.attr("id")
-        textarea.attr("id", id_textarea.replace(start_index, new_index))
-        let name = textarea.attr("name")
-        textarea.attr("name", name.replace(start_index, new_index))
-      })
-
-      new_form.find("div").each(function(){
-        let div = $(this)
-        let id_div = div.attr("id")
-        if (id_div){
-          div.attr("id", id_div.replace(start_index, new_index))
-        }
-      })
-
-      let btn_remove = new_form.find(`#btn_remove_nom_${start_index}`)
-      btn_remove.attr("id", `btn_remove_nom_${new_index}`)
-      btn_remove.attr("onclick", `remove_nomenclature('form_nomenclature_${new_index}')`)
-
-    }
-    function remove_nomenclature(id){
-      if ($(".form-nomenclature").length == 1)
-      {
-        $.toast({
-            class: 'error',
-            message: `Нельзя удалить последнюю номенклатуру`
-          })
-          return false;
-        }
-        
-      console.log("remove")
-      let nomeclature = $(`#${id}`)
-      const input_count = $("#id_nomenclature-TOTAL_FORMS")
-      const index = input_count.val()
-      const new_index = parseInt(index) - 1
-      input_count.val(new_index)
-      next_nomenclatures = nomeclature.nextAll(".form-nomenclature")
-      next_nomenclatures.each(function(){
-        let next_nomenclature = $(this)
-        let id_next = next_nomenclature.attr("id")
-        let new_id = id_next.replace(/\d+/g, function(match){
-          return parseInt(match) - 1
-        })
-        change_form_id(next_nomenclature, new_id.match(/\d+/g)[0], id_next.match(/\d+/g)[0])
-      })
-      
-      nomeclature.remove()
-    }
-
-
-    function activate_toggle(){
-      $('.ui.checkbox').checkbox();
-      $('.selection.dropdown').dropdown();
-      $('.ui.fluid.search.dropdown').dropdown();
-    }
-    $("#add_nomenclature").click(function(e){
-      e.preventDefault()
-      add_nomenclature()
-      activate_toggle()
-      init_dropdown_frame_type()
+    new_form.find("input").each(function () {
+      let input = $(this)
+      let name = input.attr("name")
+      input.attr("name", name.replace(start_index, new_index))
+      let id = input.attr("id")
+      input.attr("id", id.replace(start_index, new_index))
     })
 
-    function change_frame_type(value, self){
-      let id = self.children("select").attr("id").match(/\d+/g)[0]
-      if (value == "AM"){
-        $(`#amperag-field-${id}`).hide()
-        $(`#amperag-AM-field-${id}`).show()
-        $(`#id_${id}-amperage_3_2`).prop("checked", false)
-        $(`#id_${id}-amperage_6`).prop("checked", false)
-        $(`#btn_add_comment_${id}`).show()
+    new_form.find("label").each(function () {
+      let label = $(this)
+      let for_label = label.attr("for")
+      if (for_label) {
+        label.attr("for", for_label.replace(start_index, new_index))
       }
-      else{
-        $(`#amperag-AM-field-${id}`).hide()
-        $(`#amperag-field-${id}`).show()
-        $(`#id_${id}-amperage_1`).prop("checked", false)
-        $(`#id_${id}-amperage_2`).prop("checked", false)
-        $(`#btn_add_comment_${id}`).hide()
-        remove_comment_am(id);
+    })
+    new_form.find("select").each(function () {
+      let select = $(this)
+      let id_select = select.attr("id")
+      select.attr("id", id_select.replace(start_index, new_index))
+      let name = select.attr("name")
+      select.attr("name", name.replace(start_index, new_index))
+      select.parent().dropdown();
+    })
+
+    new_form.find("textarea").each(function () {
+      let textarea = $(this)
+      let id_textarea = textarea.attr("id")
+      textarea.attr("id", id_textarea.replace(start_index, new_index))
+      let name = textarea.attr("name")
+      textarea.attr("name", name.replace(start_index, new_index))
+    })
+
+    new_form.find("div").each(function () {
+      let div = $(this)
+      let id_div = div.attr("id")
+      if (id_div) {
+        div.attr("id", id_div.replace(start_index, new_index))
       }
-    }
-    function remove_comment_am(id){
-      let comment = $(`#id_${id}-comment`).val()
-      let lines = comment.split("\n")
-      let new_lines = []
-      for (let line of lines){
-        if (!line.startsWith("10 жил - ")){
-          new_lines.push(line)
-        }
-      }
-      $(`#id_${id}-comment`).val(new_lines.join("\n"))
+    })
 
-    }
+    let btn_remove = new_form.find(`#btn_remove_nom_${start_index}`)
+    btn_remove.attr("id", `btn_remove_nom_${new_index}`)
+    btn_remove.attr("onclick", `remove_nomenclature('form_nomenclature_${new_index}')`)
 
-    function append_commment(id){
-      message = get_comment(id);
-      if ($(`#id_${id}-comment`).val() != ""){
-        comment = $(`#id_${id}-comment`).val()
-        message = `${comment}\n${message}`
-      } 
-      $(`#id_${id}-comment`).val(message)
-
-    }
-
-    function get_comment(id){
-      count_tx = parseInt($(`#id_${id}-tx_count`).val())
-      count_rx = parseInt($(`#id_${id}-rx_count`).val())
-      is_amperage_2 = $(`#id_${id}-amperage_2`).prop("checked")
-
-      let amperage = 1
-      if (is_amperage_2){
-        amperage = 2
-      }
-
-      bp_type = $(`#id_${id}-bp_type`).val()
-      bp_count = $(`#id_${id}-bp_count`).val()
-      is_mdg = $(`#id_${id}-mdg`).prop("checked")
-
-      message = `10 жил - ${count_tx + count_rx - 1} шт.`
-      if (bp_type === "OU"){
-        message += ` | UTP 2m - ${bp_count*amperage} шт.`
-      }
-      if (is_mdg & (bp_type === "OU")){
-        message += ` | БП 3,2А - ${count_tx} шт.`
-      }
-      return message
+  }
+  function remove_nomenclature(id) {
+    if ($(".form-nomenclature").length == 1) {
+      $.toast({
+        class: 'error',
+        message: `Нельзя удалить последнюю номенклатуру`
+      })
+      return false;
     }
 
-  </script>
-  
+    console.log("remove")
+    let nomeclature = $(`#${id}`)
+    const input_count = $("#id_nomenclature-TOTAL_FORMS")
+    const index = input_count.val()
+    const new_index = parseInt(index) - 1
+    input_count.val(new_index)
+    next_nomenclatures = nomeclature.nextAll(".form-nomenclature")
+    next_nomenclatures.each(function () {
+      let next_nomenclature = $(this)
+      let id_next = next_nomenclature.attr("id")
+      let new_id = id_next.replace(/\d+/g, function (match) {
+        return parseInt(match) - 1
+      })
+      change_form_id(next_nomenclature, new_id.match(/\d+/g)[0], id_next.match(/\d+/g)[0])
+    })
+
+    nomeclature.remove()
+  }
+
+
+  function activate_toggle() {
+    $('.ui.checkbox').checkbox();
+    $('.selection.dropdown').dropdown();
+    $('.ui.fluid.search.dropdown').dropdown();
+  }
+  $("#add_nomenclature").click(function (e) {
+    e.preventDefault()
+    add_nomenclature()
+    activate_toggle()
+    init_dropdown_frame_type()
+  })
+
+  function change_frame_type(value, self) {
+    let id = self.children("select").attr("id").match(/\d+/g)[0]
+    if (value == "AM") {
+      $(`#amperag-field-${id}`).hide()
+      $(`#amperag-AM-field-${id}`).show()
+      $(`#id_${id}-amperage_3_2`).prop("checked", false)
+      $(`#id_${id}-amperage_6`).prop("checked", false)
+    }
+    else {
+      $(`#amperag-AM-field-${id}`).hide()
+      $(`#amperag-field-${id}`).show()
+      $(`#id_${id}-amperage_1`).prop("checked", false)
+      $(`#id_${id}-amperage_2`).prop("checked", false)
+      remove_comment_am(id);
+    }
+  }
+  function remove_comment_am(id) {
+    let comment = $(`#id_${id}-comment`).val()
+    let lines = comment.split("\n")
+    let new_lines = []
+    for (let line of lines) {
+      if (!line.startsWith("10 жил - ")) {
+        new_lines.push(line)
+      }
+    }
+    $(`#id_${id}-comment`).val(new_lines.join("\n"))
+
+  }
+
+  function append_commment(id) {
+    message = get_comment(id);
+    if ($(`#id_${id}-comment`).val() != "") {
+      comment = $(`#id_${id}-comment`).val()
+      message = `${comment}\n${message}`
+    }
+    $(`#id_${id}-comment`).val(message)
+
+  }
+
+  function get_comment(id) {
+    frame_type = $(`#id_${id}-frame_type`).val()
+    if (frame_type == "AM") {
+      return get_comment_am(id)
+    }
+    return get_comment_rf(id)
+  }
+
+  function get_comment_rf(id) {
+
+    let count_tx = parseInt($(`#id_${id}-tx_count`).val());
+    let multiply = 4;
+    let is_mdg = $(`#id_${id}-mdg`).prop("checked")
+    if (is_mdg) {
+      multiply = 6
+    }
+    var message = `Tx(${count_tx}) - Ферриты(${count_tx * multiply})`
+    return message
+  }
+
+  function get_comment_am(id) {
+    count_tx = parseInt($(`#id_${id}-tx_count`).val())
+    count_rx = parseInt($(`#id_${id}-rx_count`).val())
+    is_amperage_2 = $(`#id_${id}-amperage_2`).prop("checked")
+
+    let amperage = 1
+    if (is_amperage_2) {
+      amperage = 2
+    }
+
+    bp_type = $(`#id_${id}-bp_type`).val()
+    bp_count = $(`#id_${id}-bp_count`).val()
+    is_mdg = $(`#id_${id}-mdg`).prop("checked")
+
+    message = `10 жил - ${count_tx + count_rx - 1} шт.`
+    if (bp_type === "OU") {
+      message += ` | UTP 2m - ${bp_count * amperage} шт.`
+    }
+    if (is_mdg & (bp_type === "OU")) {
+      message += ` | БП 3,2А - ${count_tx} шт.`
+    }
+    return message
+  }
+
+</script>
+
 {% endblock content %}
