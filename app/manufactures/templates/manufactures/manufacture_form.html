@@ -112,16 +112,18 @@
 
   }
 
-  function change_form_id(new_form, new_index, start_index = 0) {
+  function change_form_id(new_form, new_index, start_index = 0, skip_id = true) {
     console.log("change form id ")
     new_form.attr("id", `form_nomenclature_${new_index}`)
 
     new_form.find("input").each(function () {
       let input = $(this)
       let name = input.attr("name")
-      if (name === `${start_index}-id`) {
-        $(this).remove();
-        return
+      if (skip_id) {
+        if (name === `${start_index}-id`) {
+          $(this).remove();
+          return
+        }
       }
       input.attr("name", name.replace(start_index, new_index))
       let id = input.attr("id")
@@ -176,7 +178,7 @@
 
   }
 
-  function remove_nomenclature(id) {
+  function remove_nomenclature(field_id) {
     if ($(".form-nomenclature").length == 1) {
       $.toast({
         class: 'error',
@@ -228,7 +230,7 @@
       let new_id = id_next.replace(/\d+/g, function (match) {
         return parseInt(match) - 1
       })
-      change_form_id(next_nomenclature, new_id.match(/\d+/g)[0], id_next.match(/\d+/g)[0])
+      change_form_id(next_nomenclature, new_id.match(/\d+/g)[0], id_next.match(/\d+/g)[0], skip_id = false)
     })
 
     nomeclature.remove()
