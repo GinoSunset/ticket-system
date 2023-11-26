@@ -27,6 +27,9 @@ class Alias(models.Model):
         "ComponentType", verbose_name="Тип компонента", on_delete=models.CASCADE
     )
 
+    def __str__(self) -> str:
+        return f"{self.name}->({self.component_type})"
+
 
 class ComponentType(models.Model):
     name = models.CharField(max_length=255)
@@ -46,7 +49,7 @@ class ComponentType(models.Model):
     )
 
     def __str__(self) -> str:
-        return f"{self.name} {self.sub_component_type.count() if self.sub_component_type.all() else ''}"
+        return f"{self.name} {f'[{self.sub_components_type.count()}]' if self.sub_components_type.all() else ''}"
 
 
 class Delivery(models.Model):
