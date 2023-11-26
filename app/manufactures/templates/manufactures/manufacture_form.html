@@ -251,7 +251,7 @@
 
   function change_frame_type(value, self) {
     let id = self.children("select").attr("id").match(/\d+/g)[0]
-    if (value == "AM") {
+    if (value == "АМ") {
       $(`#amperag-field-${id}`).hide()
       $(`#amperag-AM-field-${id}`).show()
       $(`#id_${id}-amperage_3_2`).prop("checked", false)
@@ -283,7 +283,7 @@
     let lines = comment.split("\n")
     let new_lines = []
     for (let line of lines) {
-      if (!line.startsWith("Tx(")) {
+      if (!line.startsWith("Ферриты(")) {
         new_lines.push(line);
       };
     }
@@ -301,8 +301,10 @@
   }
 
   function get_comment(id) {
-    frame_type = $(`#id_${id}-frame_type`).val();
-    if (frame_type == "AM") {
+    frame_type_el = $(`#id_${id}-frame_type`).dropdown();
+    let frame_type = frame_type_el.dropdown("get text")
+
+    if (frame_type == "АМ") {
       remove_comment_am(id);
       return get_comment_am(id)
     }
