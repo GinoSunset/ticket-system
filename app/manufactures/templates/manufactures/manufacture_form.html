@@ -210,6 +210,7 @@
       $(`#amperag-AM-field-${id}`).show()
       $(`#id_${id}-amperage_3_2`).prop("checked", false)
       $(`#id_${id}-amperage_6`).prop("checked", false)
+      remove_comment_rf(id);
     }
     else {
       $(`#amperag-AM-field-${id}`).hide()
@@ -231,8 +232,19 @@
     $(`#id_${id}-comment`).val(new_lines.join("\n"))
 
   }
+  function remove_comment_rf(id) {
+    let comment = $(`#id_${id}-comment`).val()
+    let lines = comment.split("\n")
+    let new_lines = []
+    for (let line of lines) {
+      if (!line.startsWith("Tx(")) {
+        new_lines.push(line);
+      };
+    }
+    $(`#id_${id}-comment`).val(new_lines.join("\n"));
+  }
 
-  function append_commment(id) {
+  function append_comment(id) {
     message = get_comment(id);
     if ($(`#id_${id}-comment`).val() != "") {
       comment = $(`#id_${id}-comment`).val()
@@ -243,10 +255,12 @@
   }
 
   function get_comment(id) {
-    frame_type = $(`#id_${id}-frame_type`).val()
+    frame_type = $(`#id_${id}-frame_type`).val();
     if (frame_type == "AM") {
+      remove_comment_am(id);
       return get_comment_am(id)
     }
+    remove_comment_rf(id);
     return get_comment_rf(id)
   }
 
@@ -263,25 +277,25 @@
   }
 
   function get_comment_am(id) {
-    count_tx = parseInt($(`#id_${id}-tx_count`).val())
-    count_rx = parseInt($(`#id_${id}-rx_count`).val())
-    is_amperage_2 = $(`#id_${id}-amperage_2`).prop("checked")
+    count_tx = parseInt($(`#id_${id}-tx_count`).val());
+    count_rx = parseInt($(`#id_${id}-rx_count`).val());
+    is_amperage_2 = $(`#id_${id}-amperage_2`).prop("checked");
 
-    let amperage = 1
+    let amperage = 1;
     if (is_amperage_2) {
       amperage = 2
     }
 
-    bp_type = $(`#id_${id}-bp_type`).val()
-    bp_count = $(`#id_${id}-bp_count`).val()
-    is_mdg = $(`#id_${id}-mdg`).prop("checked")
+    bp_type = $(`#id_${id}-bp_type`).val();
+    bp_count = $(`#id_${id}-bp_count`).val();
+    is_mdg = $(`#id_${id}-mdg`).prop("checked");
 
-    message = `10 жил - ${count_tx + count_rx - 1} шт.`
+    message = `10 жил - ${count_tx + count_rx - 1} шт.`;
     if (bp_type === "OU") {
-      message += ` | UTP 2m - ${bp_count * amperage} шт.`
+      message += ` | UTP 2m - ${bp_count * amperage} шт.`;
     }
     if (is_mdg & (bp_type === "OU")) {
-      message += ` | БП 3,2А - ${count_tx} шт.`
+      message += ` | БП 3,2А - ${count_tx} шт.`;
     }
     return message
   }
