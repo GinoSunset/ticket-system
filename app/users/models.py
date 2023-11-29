@@ -139,10 +139,16 @@ class Customer(User):
     def get_operators(self) -> models.QuerySet:
         return self.profile.linked_operators.all()
 
+    def short_str(self):
+        if self.profile and self.profile.company:
+            return self.profile.company
+        return super().__str__()
+
     def __str__(self) -> str:
-        if self.profile:
-            if self.profile.company:
-                return self.profile.company
+        if self.profile and self.profile.company:
+            if self.first_name and self.last_name:
+                return f"{self.profile.company} ({self.first_name} {self.last_name})"
+            return self.profile.company
         return super().__str__()
 
 
