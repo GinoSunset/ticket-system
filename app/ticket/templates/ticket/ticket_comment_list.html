@@ -5,7 +5,7 @@
     <div class="content">
       <span class="author">
         {% if comment.author == ticket.customer %}
-            {{ticket.customer.get_role_user}} ({{ticket.customer.first_name}} {{ticket.customer.last_name}})
+            {{ticket.customer.get_role_user}}
         {% else %}
             {{comment.author}}
         {% endif %}

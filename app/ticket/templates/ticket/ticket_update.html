@@ -88,7 +88,7 @@
       {% endif %}
       
       {% endif %}
-      {% if user.is_operator %}
+      {% if user.is_operator or user.is_staff %}
       <div class="ui dropdown button basic {% if ticket.share %} violet {% endif %} mini share" id="shareBtn">
         <div class="text">Поделиться</div>
         <i class="dropdown  icon"></i>
@@ -130,7 +130,7 @@
         </div>
         <div class="item"> 
           <div class="header"> Заказчик</div> 
-          {{ticket.customer.get_role_user}} ({{ticket.customer.first_name}} {{ticket.customer.last_name}})
+          {{ticket.customer.get_role_user}}
         </div>
         <div class="item"> 
           <div class="header"> Исполнитель</div> 
