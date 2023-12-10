@@ -1,7 +1,7 @@
 {% extends 'ticsys/index.html' %}
 
 {% block content %}
-  <h1>Создание базового компонента</h1>
+  <h1>Создание типов компонента</h1>
   <form class="ui form" method="post">
     {{ form.non_field_errors }}
     {% csrf_token %}
@@ -11,37 +11,24 @@
         {{ form.name }}
         {{ form.name.errors }}
       </div>
-      <div class="field">
-        <div class="ui checkbox">
-          {{ form.is_internal }}
-          <label>{{ form.is_internal.label }}</label>
-          {{ form.is_internal.errors }}
-        </div>
+    </div>
+    <div class="field">
+      <div class="ui checkbox">
+        {{ form.is_internal }}
+        <label>{{ form.is_internal.label }}</label>
+        {{ form.is_internal.errors }}
       </div>
+    </div>
+    <div>
+      <label>{{ form.parent_component_type.label }}</label>
+      {{ form.parent_component_type }}
+      {{ form.parent_component_type.errors }}
     </div>
 
-    <div class="field">
-      <div class="ui multiple search selection dropdown">
-        <input name="alias" type="hidden" />
-        <i class="dropdown icon"></i>
-        <div class="default text">Выберите или создайте Alias</div>
-        <div class="menu">
-          {% for alias in aliases %}
-            <div class="item" data-value="{{ alias.id }}">{{ alias.name }}</div>
-          {% endfor %}
-        </div>
-      </div>
-    </div>
     <button class="ui button basic green" type="submit">Создать</button>
   </form>
   <script>
     $('.ui.checkbox').checkbox()
-    $('.ui.dropdown').dropdown({
-      allowAdditions: true,
-      hideAdditions: false,
-      className: {
-        addition: 'stuck addition'
-      }
-    })
+    $('select').dropdown()
   </script>
 {% endblock %}

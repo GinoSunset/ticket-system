@@ -2,7 +2,7 @@ from django.db import models
 
 
 class Component(models.Model):
-    name = models.CharField(max_length=255)
+    name = models.CharField(max_length=255, verbose_name="Название компонента")
     component_type = models.ForeignKey(
         "ComponentType", verbose_name="Тип компонента", on_delete=models.CASCADE
     )
@@ -27,7 +27,7 @@ class Alias(models.Model):
         verbose_name_plural = "Алиасы"
         unique_together = ("name", "component_type")
 
-    name = models.CharField(max_length=255)
+    name = models.CharField(max_length=255, verbose_name="Алиас")
     component_type = models.ForeignKey(
         "ComponentType", verbose_name="Тип компонента", on_delete=models.CASCADE
     )
@@ -37,10 +37,10 @@ class Alias(models.Model):
 
 
 class ComponentType(models.Model):
-    name = models.CharField(max_length=255)
+    name = models.CharField(max_length=255, verbose_name="Название типа компонента")
     parent_component_type = models.ForeignKey(
         "ComponentType",
-        verbose_name="Тип подкомпонента",
+        verbose_name="Тип родительского подкомпонента",
         on_delete=models.SET_NULL,
         blank=True,
         null=True,

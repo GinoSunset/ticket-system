@@ -1,5 +1,5 @@
 from django import forms
-from django.forms import ModelForm, TextInput, inlineformset_factory
+from django.forms import ModelForm
 from .models import ComponentType, Alias
 
 
@@ -17,6 +17,3 @@ class ComponentTypeForm(ModelForm):
         widgets = {
             "is_internal": forms.CheckboxInput(attrs={"class": "ui checkbox"}),
         }
-
-
-AliasFormSet = inlineformset_factory(ComponentType, Alias, form=AliasForm, extra=1)
