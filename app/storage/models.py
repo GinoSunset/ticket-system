@@ -22,6 +22,11 @@ class Component(models.Model):
 
 
 class Alias(models.Model):
+    class Meta:
+        verbose_name = "Алиас"
+        verbose_name_plural = "Алиасы"
+        unique_together = ("name", "component_type")
+
     name = models.CharField(max_length=255)
     component_type = models.ForeignKey(
         "ComponentType", verbose_name="Тип компонента", on_delete=models.CASCADE

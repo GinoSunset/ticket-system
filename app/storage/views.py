@@ -2,7 +2,7 @@ from typing import Any
 from django.shortcuts import render
 from django.urls import reverse_lazy
 from django.views.generic import ListView, CreateView
-from .models import Component, ComponentType
+from .models import Component, ComponentType, Alias
 from .forms import AliasFormSet, ComponentTypeForm
 
 
@@ -12,7 +12,6 @@ class ComponentListView(ListView):
     context_object_name = "components"
 
 
-# TODO: create template and other for create component type
 class ComponentTypeCreateView(CreateView):
     model = ComponentType
     template_name = "storage/component_type_create.html"
@@ -30,14 +29,8 @@ class ComponentTypeCreateView(CreateView):
         return context
 
     def form_valid(self, form):
-        context = self.get_context_data()
-        formset = context["aliases_formset"]
-        if not formset.is_valid():
-            return self.form_invalid(form)
-
+        aliases = form.data["alias"].split(",")
         component_type = form.save()
-        for alias_form in formset:
-            alias = alias_form.save(commit=False)
-            alias.component_type = component_type
-            alias.save()
+        for alias_name in aliases:
+            Alias.objects.get_or_create(name=alias_name, component_type=component_type)
         return super().form_valid(form)
