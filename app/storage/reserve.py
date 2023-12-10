@@ -16,6 +16,7 @@ def get_components_type_from_nomenclature(
     nomenclature: Nomenclature,
 ) -> list[ComponentType] | None:
     try:
+        # TODO: get type components from all options nomenclature (body, frame, etc.)
         type_component = ComponentType.objects.get(name=nomenclature.frame_type.name)
     except ComponentType.DoesNotExist:
         return None

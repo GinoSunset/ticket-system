@@ -183,7 +183,7 @@ def test_create_email_as_comment_if_sap_exists(
 @factory.django.mute_signals(signals.post_save)
 def test_create_ticket_from_email_dmv2_serv(email_dmv2_serv, customer_factory):
     customer = customer_factory(email=email_dmv2_serv.from_)
-    CustomerProfile.objects.create(user=customer)   
+    CustomerProfile.objects.create(user=customer)
 
     customer.profile.parser = "DMV2"
     customer.profile.save()
@@ -195,7 +195,6 @@ def test_create_ticket_from_email_dmv2_serv(email_dmv2_serv, customer_factory):
     assert ticket.status.code == "new"
 
 
-
 @pytest.mark.django_db
 @factory.django.mute_signals(signals.post_save)
 def test_from_dmv2_get_emails_for_reply(email_dmv2_serv, customer_factory):
@@ -203,14 +202,14 @@ def test_from_dmv2_get_emails_for_reply(email_dmv2_serv, customer_factory):
     Взять почту из сообщения: "Вы можете связаться с заказчиком по адресу annfedorova@detmir.ru"
     """
     customer = customer_factory(email=email_dmv2_serv.from_)
-    CustomerProfile.objects.create(user=customer)   
+    CustomerProfile.objects.create(user=customer)
 
     customer.profile.parser = "DMV2"
     customer.profile.save()
     status = create_ticket_from_email(email=email_dmv2_serv)
     assert status
     ticket = Ticket.objects.all().get()
-    assert "1212@fl.com" in  ticket.reply_to_emails
+    assert "1212@fl.com" in ticket.reply_to_emails
 
 
 def get_email_from_html():
@@ -219,7 +218,7 @@ def get_email_from_html():
 
     text = 'Цветные рамки\r\nРамки сами по себе переодически начинают краснеть, иногда перестают работать\r\n\r\n<a href="http://sapepp.ЕК.ru:50000/irj/21212">Для выполнения инцидента перейдите по ссылке.</a>\r\n\r\nВы можете связаться с заказчиком по  адресу <a href="mailto:1212@fl.com">1212@fl.com</a>'
 
-    email_regex = r'\b[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Z|a-z]{2,}\b'
+    email_regex = r"\b[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Z|a-z]{2,}\b"
     # This regex pattern matches email addresses
 
     match = re.search(email_regex, text)
@@ -227,4 +226,4 @@ def get_email_from_html():
         email = match.group()
         print(email)
     else:
-        print('No email address found')
+        print("No email address found")

@@ -4,9 +4,12 @@
 {% endblock %}
 
 {% block content %}
-  <div id="app">
+<div id="app">
     <h1>Компоненты</h1>
-    
+    <div class="row">
+        <div class="col-md-6">
+            <a class="ui button basic blue" href="{% url 'component-type-create' %}">Создать тип компонент</a>
+
 
             <table>
                 <thead>
@@ -18,11 +21,11 @@
                 </thead>
                 <tbody>
                     {% for component in components %}
-                        <tr>
-                            <td>{{ component.name }}</td>
-                            <td>{{ component.description }}</td>
-                            <td>{{ component.price }}</td>
-                        </tr>
+                    <tr>
+                        <td>{{ component.name }}</td>
+                        <td>{{ component.description }}</td>
+                        <td>{{ component.price }}</td>
+                    </tr>
                     {% endfor %}
                 </tbody>
             </table>
@@ -33,8 +36,8 @@
             new Vue({
                 el: '#app',
                 data: {
-                    components: {{ components|safe }}
+                    components: {{ components| safe }}
                 }
             });
         </script>
-    {% endblock %}
+        {% endblock %}
