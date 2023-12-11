@@ -6,7 +6,9 @@ class Component(models.Model):
     component_type = models.ForeignKey(
         "ComponentType", verbose_name="Тип компонента", on_delete=models.CASCADE
     )
-    serial_number = models.CharField(max_length=255)
+    serial_number = models.CharField(
+        max_length=255, verbose_name="Серийный номер", null=True, blank=True
+    )
     is_stock = models.BooleanField(default=False, verbose_name="В наличии")
     date_delivery = models.DateField(
         verbose_name="Дата получения", blank=True, null=True
@@ -19,6 +21,16 @@ class Component(models.Model):
         blank=True,
         null=True,
     )
+
+    def get_status_color(self):
+        if not self.is_stock and self.is_reserve and not self.date_delivery:
+            return "red"
+        if not self.is_stock and self.is_reserve and self.date_delivery:
+            return "orange"
+        if self.date_delivery:
+            return "blue"
+        if self.is_reserve:
+            return "yellow"
 
 
 class Alias(models.Model):

@@ -8,4 +8,9 @@ urlpatterns = [
         views.ComponentTypeCreateView.as_view(),
         name="component-type-create",
     ),
+    path(
+        "create-component/",
+        views.ComponentCreateView.as_view(),
+        name="component-create",
+    ),
 ]

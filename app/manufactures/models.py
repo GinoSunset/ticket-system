@@ -1,4 +1,5 @@
 from django.db import models
+from django.urls import reverse
 
 from additionally.models import Dictionary
 from users.models import Operator
@@ -83,6 +84,9 @@ class Manufacture(models.Model):
             "new_manufacture_task": "violet",
         }
         return color.get(self.status.code, "detail")
+
+    def get_absolute_url(self):
+        return reverse("manufacture-update", kwargs={"pk": self.pk})
 
 
 class Client(models.Model):

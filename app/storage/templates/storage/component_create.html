@@ -1,0 +1,58 @@
+{% extends 'ticsys/index.html' %}
+
+{% block content %}
+  <h1>Добавить компонент на склад</h1>
+  <form class="ui form" method="post">
+    {% csrf_token %}
+    <div class="field">
+      <label>{{ form.component_type.label }}</label>
+      {{ form.component_type }}
+      {{ form.component_type.errors }}
+    </div>
+    <div class="three fields">
+      <div class="field">
+        <label>{{ form.serial_number.label }}</label>
+        {{ form.serial_number }}
+        {{ form.serial_number.errors }}
+      </div>
+      <div class="field">
+        <label>{{ form.nomenclature.label }}</label>
+
+        {{ form.nomenclature }}
+        {{ form.nomenclature.errors }}
+      </div>
+      <a id="clear" class="ui button basic" style="margin-top: 24px;">x</a>
+      <div class="field">
+        <label>{{ form.date_delivery.label }}</label>
+        {{ form.date_delivery }}
+        {{ form.date_delivery.errors }}
+      </div>
+    </div>
+    <div class="fields">
+      <div class="field">
+        <div class="ui checkbox">
+          {{ form.is_reserve }}
+          <label>{{ form.is_reserve.label }}</label>
+          {{ form.is_reserve.errors }}
+        </div>
+      </div>
+      <div class="field">
+        <div class="ui checkbox">
+          {{ form.is_stock }}
+          <label>{{ form.is_stock.label }}</label>
+          {{ form.is_stock.errors }}
+        </div>
+      </div>
+    </div>
+    <button class="ui button green basic" type="submit">Добавить</button>
+  </form>
+  <script>
+    $('.ui.dropdown.search').dropdown()
+    $('.ui.dropdown').dropdown()
+    $('.ui.checkbox').checkbox()
+    
+    $('#clear').on('click', function () {
+      $('.clearable').dropdown('clear')
+    })
+  </script>
+{% endblock %}

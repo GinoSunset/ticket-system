@@ -1,43 +1,49 @@
 {% extends 'ticsys/index.html' %}
 {% block header_style %}
-<script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
+  <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
 {% endblock %}
 
 {% block content %}
-<div id="app">
-    <h1>Компоненты</h1>
+    <h1>Склад</h1>
     <div class="row">
-        <div class="col-md-6">
-            <a class="ui button basic blue" href="{% url 'component-type-create' %}">Создать тип компонент</a>
+      <div class="col-md-6">
+        <a class="ui button basic blue" href="{% url 'component-type-create' %}">Создать тип компонент</a>
+        <a class="ui button basic green" href="{% url 'component-create' %}">Добавить компонент на склад</a>
+        <a class="ui button basic green" href="{% url 'component-type-create' %}">Добавить доставку</a>
+
+        <table class="ui celled table">
+          <thead>
+            <tr>
+              <th>Компонент</th>
+              <th>Резерв</th>
+              <th>Дата ближайшей доставки доставки</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for component in components %}
+              <tr class="{{ component.get_status_color }}">
+                <td>
+                  {{ component.component_type.name }} 
+                </td>
+                <td>
+                  {% if component.is_reserve %}
+                  <div class="content">
+                    <a href={{component.nomenclature.manufacture.get_absolute_url}}> {{component.nomenclature}}</a>
+                    </div>
+                    <div class="ui label">
+                      {{ component.nomenclature.manufacture.date_shipment|date:"d.m.Y" }}
+                    </div>
+                  {% comment %} Дата отгрузки: {{ component.nomenclature.manufacture.date_shipment|date:"d.m.Y" }} {% endcomment %}
+                  {% endif %}
+                </td>
+                <td>{% firstof component.date_delivery %}</td>
+              </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </div>
 
 
-            <table>
-                <thead>
-                    <tr>
-                        <th>Name</th>
-                        <th>Description</th>
-                        <th>Price</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {% for component in components %}
-                    <tr>
-                        <td>{{ component.name }}</td>
-                        <td>{{ component.description }}</td>
-                        <td>{{ component.price }}</td>
-                    </tr>
-                    {% endfor %}
-                </tbody>
-            </table>
-        </div>
 
-        <script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
-        <script>
-            new Vue({
-                el: '#app',
-                data: {
-                    components: {{ components| safe }}
-                }
-            });
-        </script>
-        {% endblock %}
+{% endblock %}
