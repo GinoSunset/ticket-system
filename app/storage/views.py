@@ -64,3 +64,29 @@ class ComponentCreateView(CreateView):
     template_name = "storage/component_create.html"
     form_class = ComponentForm
     success_url = reverse_lazy("component-list")
+
+
+class ComponentTypeReserveView(ListView):
+    model = ComponentType
+    template_name = "storage/component_type_modal.html"
+    context_object_name = "manufacturers"
+
+    def get_queryset(self):
+        componentType = ComponentType.objects.get(id=self.kwargs["pk"])
+        manufactures = (
+            Component.objects.filter(component_type=componentType, is_reserve=True)
+            .values(
+                "nomenclature__manufacture",
+                "nomenclature__manufacture__date_shipment",
+                "nomenclature__manufacture__client__name",
+            )
+            .distinct()
+            .annotate(
+                id=models.F("nomenclature__manufacture"),
+                date_shipment=models.F("nomenclature__manufacture__date_shipment"),
+                client=models.F("nomenclature__manufacture__client__name"),
+            )
+        )
+
+        # get all manufacture from nomenclatures with distinct
+        return manufactures

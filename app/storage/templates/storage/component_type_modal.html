@@ -1,0 +1,18 @@
+<div class="content">
+  <table class="ui table short">
+    <tr>
+      <th>Заявка на производство</th>
+      <th>Клиент</th>
+      <th>Дата отгрузки</th>
+    </tr>
+    {% for manufature in manufacturers %}
+      <tr>
+        <td>
+          <a href="{% url 'manufacture-update' manufature.id %}">{{ manufature.id }}</a>
+        </td>
+        <td>{{ manufature.client }}</td>
+        <td>{{ manufature.date_shipment|date:'d.m.Y' }}</td>
+      </tr>
+    {% endfor %}
+  </table>
+</div>

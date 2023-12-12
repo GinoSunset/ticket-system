@@ -1,7 +1,7 @@
 {% extends 'ticsys/index.html' %}
 {% load progress %}
 {% block header_style %}
-  <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
+
 {% endblock %}
 
 {% block content %}
@@ -13,23 +13,29 @@
         <a class="ui button basic green" href="{% url 'component-create' %}">Добавить компонент на склад</a>
         <a class="ui button basic disabled">Добавить доставку</a>
 
-        <table class="ui celled table">
+        <table class="ui compact table very padded">
           <thead>
             <tr>
               <th>Тип компонента</th>
               <th>На складе</th>
               <th>Необходимо</th>
               <th>На доставке</th>
-              <th>Диаграмма</th>
+              <th class="seven wide">Диаграмма</th>
             </tr>
           </thead>
           <tbody>
             {% for component in components %}
-              <tr class="{{ component.get_status_color }}">
-                <td>{{ component.component_type_name }}</td>
+              <tr>
+                <td class="selectable">
+                  <a>{{ component.component_type_name }}</a>
+                </td>
                 <td>{{ component.in_stock }}</td>
-                <td>{{ component.in_reserve }}</td>
-                <td>{{ component.in_delivery }}</td>
+                <td class="reserved_popup">
+                  {{ component.in_reserve }}<i class="attention grey icon" onclick="load_reserved({{ component.component_type }})"></i>
+                </td>
+                <td>
+                  {{ component.in_delivery }}<i class="attention grey icon"></i>
+                </td>
 
                 <td>
                   <div class="ui multiple progress" data-total="{{ component.count }}" data-value="{{ component|get_value_progress }}">
@@ -62,11 +68,21 @@
       </div>
     </div>
   </div>
+  <div class="ui modal"></div>
   <script>
     $('.ui.multiple.progress').progress({
       text: {
         percent: '{value}'
       }
     })
+    
+    function load_reserved(id) {
+      // show modal and set content id
+      console.log(id)
+      $('.ui.modal').modal('show')
+      var url = '{% url 'component-type-reserve' 0 %}'.replace('0', id)
+      $('.ui.modal').load(url)
+    }
+    
   </script>
 {% endblock %}

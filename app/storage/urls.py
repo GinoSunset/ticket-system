@@ -14,4 +14,9 @@ urlpatterns = [
         views.ComponentCreateView.as_view(),
         name="component-create",
     ),
+    path(
+        "component-type/<int:pk>/reserve/",
+        views.ComponentTypeReserveView.as_view(),
+        name="component-type-reserve",
+    ),
 ]
