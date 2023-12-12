@@ -42,19 +42,20 @@ def reserve_component(component_type: ComponentType, nomenclature: Nomenclature)
         )
     else:
         q_conditions |= Q(date_delivery__isnull=False)
-    component, created = Component.objects.filter(q_conditions).get_or_create(
-        component_type=component_type,
-        is_reserve=False,
-        defaults={
-            "nomenclature": nomenclature,
-            "name": component_type.name,
-            "is_reserve": True,
-        },
+    components = Component.objects.filter(
+        q_conditions, component_type=component_type, is_reserve=False
     )
-    if created:
-        logging.info(f"Create component {component} to reserve")
+    if components.exists():
+        component = components.first()
+        logging.info(f"Update component {component} to reserve")
+        component.nomenclature = nomenclature
+        component.is_reserve = True
+        component.save()
         return
-    logging.info(f"Update component {component} to reserve")
-    component.nomenclature = nomenclature
-    component.is_reserve = True
-    component.save()
+
+    component = Component.objects.create(
+        component_type=component_type,
+        nomenclature=nomenclature,
+        is_reserve=True,
+    )
+    logging.info(f"Create component {component} to reserve")
