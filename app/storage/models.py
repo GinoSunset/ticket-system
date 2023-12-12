@@ -2,7 +2,10 @@ from django.db import models
 
 
 class Component(models.Model):
-    name = models.CharField(max_length=255, verbose_name="Название компонента")
+    class Meta:
+        verbose_name = "Компонент"
+        verbose_name_plural = "Компоненты"
+
     component_type = models.ForeignKey(
         "ComponentType", verbose_name="Тип компонента", on_delete=models.CASCADE
     )

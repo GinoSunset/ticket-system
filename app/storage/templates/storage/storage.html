@@ -1,0 +1,72 @@
+{% extends 'ticsys/index.html' %}
+{% load progress %}
+{% block header_style %}
+  <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
+{% endblock %}
+
+{% block content %}
+  <div id="app">
+    <h1>Склад</h1>
+    <div class="row">
+      <div class="col-md-6">
+        <a class="ui button basic blue" href="{% url 'component-type-create' %}">Создать тип компонент</a>
+        <a class="ui button basic green" href="{% url 'component-create' %}">Добавить компонент на склад</a>
+        <a class="ui button basic disabled">Добавить доставку</a>
+
+        <table class="ui celled table">
+          <thead>
+            <tr>
+              <th>Тип компонента</th>
+              <th>На складе</th>
+              <th>Необходимо</th>
+              <th>На доставке</th>
+              <th>Диаграмма</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for component in components %}
+              <tr class="{{ component.get_status_color }}">
+                <td>{{ component.component_type_name }}</td>
+                <td>{{ component.in_stock }}</td>
+                <td>{{ component.in_reserve }}</td>
+                <td>{{ component.in_delivery }}</td>
+
+                <td>
+                  <div class="ui multiple progress" data-total="{{ component.count }}" data-value="{{ component|get_value_progress }}">
+                    {% comment %};#// в резерве без наличия{% endcomment %}
+                    <div class="red bar">
+                      <div class="progress"></div>
+                    </div>
+                    {% comment %};#// в резерве и с доставкой{% endcomment %}
+                    <div class="violet bar">
+                      <div class="progress"></div>
+                    </div>
+                    {% comment %};#// с доставкой{% endcomment %}
+                    <div class="blue bar">
+                      <div class="progress"></div>
+                    </div>
+                    {% comment %};#// в резерве в наличии{% endcomment %}
+                    <div class="purple bar">
+                      <div class="progress"></div>
+                    </div>
+                    {% comment %};#// в наличии{% endcomment %}
+                    <div class="green bar">
+                      <div class="progress"></div>
+                    </div>
+                  </div>
+                </td>
+              </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+  <script>
+    $('.ui.multiple.progress').progress({
+      text: {
+        percent: '{value}'
+      }
+    })
+  </script>
+{% endblock %}

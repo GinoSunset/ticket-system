@@ -21,7 +21,6 @@ class AliasAdmin(admin.ModelAdmin):
 
 class ComponentAdmin(admin.ModelAdmin):
     list_display = (
-        "name",
         "component_type",
         "serial_number",
         "is_stock",
@@ -31,7 +30,7 @@ class ComponentAdmin(admin.ModelAdmin):
     )
     list_filter = ("component_type", "is_stock", "is_reserve")
     search_fields = (
-        "name",
+        "component_type__name",
         "serial_number",
     )
 
