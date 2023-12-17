@@ -1,4 +1,6 @@
 from typing import Any
+from django.forms.models import BaseModelForm
+from django.http import HttpResponse, HttpResponseRedirect
 from django.shortcuts import render
 from django.urls import reverse_lazy
 from django.db import models
@@ -64,6 +66,55 @@ class ComponentCreateView(CreateView):
     template_name = "storage/component_create.html"
     form_class = ComponentForm
     success_url = reverse_lazy("component-list")
+
+    def form_valid(self, form: BaseModelForm) -> HttpResponse:
+        component_type = form.cleaned_data["component_type"]
+        if form.cleaned_data["is_stock"]:
+            component_to_reserve = self.get_component_to_reserve(component_type)
+            if component_to_reserve.exists():
+                component: Component = component_to_reserve.first()
+                component.is_stock = True
+                if serial_number := form.cleaned_data["serial_number"]:
+                    component.serial_number = serial_number
+                if date_delivery := form.cleaned_data["date_delivery"]:
+                    component.date_delivery = date_delivery
+                component.save()
+                self.object = component
+                return HttpResponseRedirect(self.get_success_url())
+        if date_delivery := form.cleaned_data["date_delivery"]:
+            # TODO: this if and higher if is the same
+            component_to_reserve = self.get_component_to_reserve_by_date_delivery(
+                component_type, date_delivery
+            )
+            if component_to_reserve.exists():
+                component: Component = component_to_reserve.first()
+                if date_delivery := form.cleaned_data["date_delivery"]:
+                    component.date_delivery = date_delivery
+                if serial_number := form.cleaned_data["serial_number"]:
+                    component.serial_number = serial_number
+                component.save()
+                self.object = component
+                return HttpResponseRedirect(self.get_success_url())
+        return super().form_valid(form)
+
+    def get_component_to_reserve(self, component_type):
+        # TODO: do this method to model
+        return Component.objects.filter(
+            component_type=component_type,
+            is_reserve=True,
+            is_stock=False,
+            date_delivery__isnull=True,
+        )
+
+    def get_component_to_reserve_by_date_delivery(self, component_type, date_delivery):
+        # TODO: do this method to model
+        return Component.objects.filter(
+            component_type=component_type,
+            is_reserve=True,
+            is_stock=False,
+            nomenclature__manufacture__date_shipment__gte=date_delivery,
+            date_delivery__isnull=True,
+        )
 
 
 class ComponentTypeReserveView(ListView):

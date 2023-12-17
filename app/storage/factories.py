@@ -14,7 +14,6 @@ class ComponentFactory(factory.django.DjangoModelFactory):
     class Meta:
         model = Component
 
-    name = factory.Faker("name")
     component_type = factory.SubFactory(ComponentTypeFactory)
     is_reserve = factory.Faker("boolean")
     is_stock = factory.Faker("boolean")

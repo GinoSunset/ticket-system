@@ -22,6 +22,8 @@ from manufactures.factories import (
     ClientManufFactory,
 )
 
+from storage.factories import ComponentTypeFactory, ComponentFactory
+
 register(TicketFactory)
 register(UserFactory)
 register(CustomerFactory)
@@ -35,6 +37,9 @@ register(ShareFactory)
 register(ManufactureFactory)
 register(NomenclatureFactory)
 register(ClientManufFactory, _name="manufacture_client")
+# storage
+register(ComponentTypeFactory)
+register(ComponentFactory)
 
 
 @pytest.fixture

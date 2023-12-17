@@ -4,7 +4,7 @@ from datetime import date
 from storage.models import Component
 from manufactures.models import Nomenclature, FrameTypeOption
 from storage.models import ComponentType
-from storage.facroties import ComponentFactory, ComponentTypeFactory
+from storage.factories import ComponentFactory, ComponentTypeFactory
 
 
 def create_components_rs_type(
