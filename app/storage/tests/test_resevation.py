@@ -37,7 +37,7 @@ def test_create_components_with_type_with_sub_component(nomenclature_factory):
     nomenclature_factory(frame_type=FrameTypeOption.objects.get(name="РЧ"))
 
     assert Component.objects.count() == 2
-    assert Component.objects.filter(name=name_sub_component).exists()
+    assert Component.objects.filter(component_type=inner_component_type).exists()
 
 
 class TestReservation:

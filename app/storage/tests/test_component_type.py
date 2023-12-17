@@ -14,7 +14,7 @@ def test_create_type_component(client):
     }
     response = client.post(url, data)
     assert response.status_code == 302
-    assert ComponentType.objects.count() == 2
+    assert ComponentType.objects.count() == 1
     assert ComponentType.objects.get().name == "Test Component Type"
 
 
