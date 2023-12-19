@@ -35,7 +35,7 @@ class TestComponentCreateView:
         )
 
         view = ComponentCreateView()
-        components = view.get_component_to_reserve(component_type)
+        components = view.get_components_to_reserve(component_type)
 
         assert len(components) == 1
         assert component1 in components
@@ -67,30 +67,22 @@ class TestComponentCreateView:
             component_type=component_type,
             is_reserve=True,
             is_stock=False,
-            date_delivery=date_delivery,
             nomenclature=nomenclature,
+            date_delivery=None,
         )
         component3 = component_factory(
             component_type=component_type,
             is_reserve=True,
-            is_stock=False,
-            date_delivery=date_delivery,
-            nomenclature=nomenclature,
-        )
-        component4 = component_factory(
-            component_type=component_type,
-            is_reserve=True,
             is_stock=True,
-            date_delivery=date_delivery,
             nomenclature=nomenclature,
+            date_delivery=None,
         )
 
         view = ComponentCreateView()
-        components = view.get_component_to_reserve_by_date_delivery(
+        components = view.get_components_to_reserve_by_date_delivery(
             component_type, date_delivery
         )
-        # assert len(components) == 2
+        assert len(components) == 1
         assert component1 not in components
         assert component2 in components
-        assert component3 in components
-        assert component4 not in components
+        assert component3 not in components

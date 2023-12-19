@@ -1,5 +1,6 @@
 from django import forms
 from django.forms import ModelForm
+from django.core.exceptions import ValidationError
 from .models import ComponentType, Alias, Component
 
 
@@ -40,3 +41,14 @@ class ComponentForm(ModelForm):
                 attrs={"class": "ui dropdown search clearable"}
             ),
         }
+
+    def clean(self):
+        cleaned_data = super().clean()
+        is_stock = cleaned_data.get("is_stock")
+        is_reserve = cleaned_data.get("is_reserve")
+        date_delivery = cleaned_data.get("date_delivery")
+
+        if not is_stock and not is_reserve and not date_delivery:
+            raise ValidationError(
+                "Необходимо указать статус компонента (в наличии или в резерве) или указать дату поставки"
+            )
