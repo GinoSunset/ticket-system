@@ -1,128 +1,123 @@
-<div id="form_nomenclature_{{form.prefix}}" class="ui raised red segment form-nomenclature">
-    {{ form.non_field_errors }}
-    <div class="field">
-        {{form.id}}
-        <div class="eight fields">
-            <div class="field">
-                <label>{{form.frame_type.label}}</label>
-                {{form.frame_type}}
-                {{form.frame_type.error}}
-            </div>
-            <div class="field">
-                <label>{{form.body.label}}</label>
-                {{form.body}}
-                {{form.body.error}}
-            </div>    
-            <div class="field">
-                <label>{{form.tx_count.label}}</label>
-                {{form.tx_count}}
-                {{form.tx_count.error}}
-            </div>    
-            <div class="field">
-                <label>{{form.rx_count.label}}</label>
-                {{form.rx_count}}
-                {{form.rx_count.error}}
-            </div>
-            <div class="field">
-                <label>{{form.bp_type.label}}</label>
-                {{form.bp_type}}
-                {{form.bp_type.error}}
-            </div>
-            <div class="field">
-                <label>{{form.bp_count.label}}</label>
-                {{form.bp_count}}
-                {{form.bp_count.error}}
-            </div>
-            <div class="field">
-                <label>{{form.status.label}}</label>
-                {{form.status}}
-                {{form.status.error}}
-            </div>
-            <div class="field">
-                <label>{{form.illumination.label}}</label>
-                <div class="ui right aligned toggle checkbox">
-                {{form.illumination}}
-                </div>
-                {{form.illumination.error}}
-            </div>
+<div id="form_nomenclature_{{ form.prefix }}" class="ui raised red segment form-nomenclature">
+  {{ form.non_field_errors }}
+  {% if form.id.value %}
+    <div class="ui red right ribbon icon label label_id">
+      <span>#{{ form.id.value }}</span>
+    </div>
+  {% endif %}
+  <div class="field">
+    {{ form.id }}
+    <div class="eight fields">
+      <div class="field">
+        <label>{{ form.frame_type.label }}</label>
+        {{ form.frame_type }}
+        {{ form.frame_type.error }}
+      </div>
+      <div class="field">
+        <label>{{ form.body.label }}</label>
+        {{ form.body }}
+        {{ form.body.error }}
+      </div>
+      <div class="field">
+        <label>{{ form.tx_count.label }}</label>
+        {{ form.tx_count }}
+        {{ form.tx_count.error }}
+      </div>
+      <div class="field">
+        <label>{{ form.rx_count.label }}</label>
+        {{ form.rx_count }}
+        {{ form.rx_count.error }}
+      </div>
+      <div class="field">
+        <label>{{ form.bp_type.label }}</label>
+        {{ form.bp_type }}
+        {{ form.bp_type.error }}
+      </div>
+      <div class="field">
+        <label>{{ form.bp_count.label }}</label>
+        {{ form.bp_count }}
+        {{ form.bp_count.error }}
+      </div>
+      <div class="field">
+        <label>{{ form.status.label }}</label>
+        {{ form.status }}
+        {{ form.status.error }}
+      </div>
+      <div class="field">
+        <label>{{ form.illumination.label }}</label>
+        <div class="ui right aligned toggle checkbox">{{ form.illumination }}</div>
+        {{ form.illumination.error }}
+      </div>
+    </div>
+  </div>
+  <div class="field">
+    <div class="tree fields">
+      <div class="field">
+        <div class="ui segment">
+          <div class="field ui right aligned toggle checkbox">
+            <label>{{ form.mdg.label }}</label>
+            {{ form.mdg }}
+            {{ form.mdg.error }}
+          </div>
+          <div class="field ui right aligned toggle checkbox">
+            <label>{{ form.md.label }}</label>
+            {{ form.md }}
+            {{ form.md.error }}
+          </div>
+          <div class="field ui right aligned toggle checkbox">
+            <label>{{ form.wifi.label }}</label>
+            {{ form.wifi }}
+            {{ form.wifi.error }}
+          </div>
         </div>
-    </div>
-    <div class="field">
-        <div class="tree fields">
-            <div class="field">
+      </div>
 
-            <div class="ui segment">
-                <div class="field ui right aligned toggle checkbox">
-                    <label>{{form.mdg.label}}</label>
-                    {{form.mdg}}
-                    {{form.mdg.error}}
-                </div>
-                <div class="field ui right aligned toggle checkbox">
-                    <label>{{form.md.label}}</label>
-                    {{form.md}}
-                    {{form.md.error}}
-                </div>
-                <div class="field ui right aligned toggle checkbox">
-                    <label>{{form.wifi.label}}</label>
-                    {{form.wifi}}
-                    {{form.wifi.error}}
-                </div>
+      <div class="field" id="amperag-field-{{ form.prefix }}" style="display:none">
+        <label>Ампераж БП</label>
+        <div class="tree fields">
+          <div class="field">
+            <div class="ui checkbox">
+              {{ form.amperage_6 }}
+              <label>{{ form.amperage_6.label }}</label>
+              {{ form.amperage_6.error }}
             </div>
+          </div>
+          <div class="field">
+            <div class="ui checkbox">
+              {{ form.amperage_3_2 }}
+              <label>{{ form.amperage_3_2.label }}</label>
+              {{ form.amperage_3_2.error }}
             </div>
-            
-            <div class="field" id="amperag-field-{{form.prefix}}" style="display:none">
-                <label>Ампераж БП</label>
-                <div class="tree fields">
-                    <div class="field">
-                        <div class="ui checkbox">
-                            {{form.amperage_6}}
-                            <label>{{form.amperage_6.label}}</label>
-                            {{form.amperage_6.error}}
-                        </div>
-                    </div>
-                    <div class="field">
-                        <div class="ui checkbox">
-                            {{form.amperage_3_2}}
-                            <label>{{form.amperage_3_2.label}}</label>
-                            {{form.amperage_3_2.error}}
-                        </div>
-                    </div>
-                </div>
+          </div>
+        </div>
+      </div>
+      <div class="field" id="amperag-AM-field-{{ form.prefix }}" style="display:none">
+        <label>Ампераж БП</label>
+        <div class="tree fields">
+          <div class="field">
+            <div class="ui checkbox">
+              {{ form.amperage_1 }}
+              <label>{{ form.amperage_1.label }}</label>
+              {{ form.amperage_1.error }}
             </div>
-            <div class="field" id="amperag-AM-field-{{form.prefix}}" style="display:none">
-                <label>Ампераж БП</label>
-                <div class="tree fields">
-                    <div class="field">
-                        <div class="ui checkbox">
-                            {{form.amperage_1}}
-                            <label>{{form.amperage_1.label}}</label>
-                            {{form.amperage_1.error}}
-                        </div>
-                    </div>
-                    <div class="field">
-                        <div class="ui checkbox">
-                            {{form.amperage_2}}
-                            <label>{{form.amperage_2.label}}</label>
-                            {{form.amperage_2.error}}
-                        </div>
-                    </div>
-                </div>
+          </div>
+          <div class="field">
+            <div class="ui checkbox">
+              {{ form.amperage_2 }}
+              <label>{{ form.amperage_2.label }}</label>
+              {{ form.amperage_2.error }}
             </div>
-            <div class=" eight wide field">
-                {{form.comment}}
-                {{form.comment.error}}
-                
-            </div>
-            <div class="field">
-                <a class="ui icon basic button mini" id="btn_add_comment_{{form.prefix}}" onclick="append_comment('{{form.prefix}}')">
-                    <i class="magic icon"></i>
-                </a>
-            </div>
-        </div>    
-    </div>    
-    <div class="ui bottom right attached label">
-        <a class="ui icon red label" id="btn_remove_nom_{{form.prefix}}" onclick="remove_nomenclature('{{form.prefix}}')">
-            <i class="trash icon"></i>
-        </a>
+          </div>
+        </div>
+      </div>
+      <div class="eight wide field">{{ form.comment }}
+        {{ form.comment.error }}</div>
+      <div class="field">
+        <a class="ui icon basic button mini" id="btn_add_comment_{{ form.prefix }}" onclick="append_comment('{{ form.prefix }}')"><i class="magic icon"></i></a>
+      </div>
     </div>
+  </div>
+  <div class="ui bottom right attached label">
+    <a class="ui icon red label" id="btn_remove_nom_{{ form.prefix }}" onclick="remove_nomenclature('{{ form.prefix }}')"><i class="trash icon"></i></a>
+  </div>
 </div>

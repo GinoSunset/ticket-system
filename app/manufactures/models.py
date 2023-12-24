@@ -204,4 +204,5 @@ class Nomenclature(models.Model):
             options.append("WIFI")
         options = "/".join(options)
         illumination = "💡" if self.illumination else ""
-        return f"[{self.pk}]{self.frame_type} {self.body} RX:{self.tx_count} TX:{self.rx_count} {options} {self.bp_type} {self.bp_count} {illumination}"
+        manufacture = f"(Man: {self.manufacture.pk})" if self.manufacture else ""
+        return f"[{self.pk}]{self.frame_type} {self.body} RX:{self.tx_count} TX:{self.rx_count} {options} {self.bp_type} {self.bp_count} {illumination} {manufacture}"

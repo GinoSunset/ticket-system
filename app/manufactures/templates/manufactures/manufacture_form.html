@@ -156,6 +156,13 @@
     new_form.find("div").each(function () {
       let div = $(this)
       let id_div = div.attr("id")
+      let class_div = div.attr("class")
+      if (skip_id) {
+        if (class_div.indexOf("label_id") !== -1) {
+          $(this).remove();
+          return
+        }
+      }
       if (id_div) {
         div.attr("id", id_div.replace(start_index, new_index))
       }
