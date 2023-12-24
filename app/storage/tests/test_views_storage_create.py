@@ -96,3 +96,50 @@ class TestComponentCreateView:
         component2 = Component.objects.get(pk=2)
         assert component2.serial_number is not None
         assert component2.serial_number != component.serial_number
+
+    def test_reservation_component_who_not_in_stock_after_add_to_stock(
+        self, client, component_factory
+    ):
+        component = component_factory(
+            is_reserve=True,
+            is_stock=False,
+            date_delivery=None,
+        )
+        form_data = {
+            "component_type": component.component_type.pk,
+            "is_stock": True,
+            "count": 1,
+        }
+        url = reverse("component-create")
+        response = client.post(url, data=form_data)
+        assert response.status_code == 302
+        component.refresh_from_db()
+        assert component.is_stock is True
+        assert component.is_reserve is True
+        assert Component.objects.count() == 1
+
+    def test_reserve_and_create_component_in_delivery(
+        self, client, component_factory, nomenclature_factory
+    ):
+        nomenclature = nomenclature_factory(manufacture__date_shipment=date(2021, 1, 2))
+
+        component = component_factory(
+            is_reserve=True,
+            is_stock=False,
+            date_delivery=None,
+            nomenclature=nomenclature,
+        )
+        form_data = {
+            "component_type": component.component_type.pk,
+            "is_stock": False,
+            "count": 2,
+            "date_delivery": date(2021, 1, 1),
+        }
+        url = reverse("component-create")
+        response = client.post(url, data=form_data)
+        assert response.status_code == 302
+        component.refresh_from_db()
+        assert component.is_stock is False
+        assert component.is_reserve is True
+        assert component.date_delivery == date(2021, 1, 1)
+        assert Component.objects.count() == 2

@@ -94,11 +94,12 @@ class ComponentCreateView(CreateView):
                 serial_number = Component.generate_serial_number(
                     form.cleaned_data["component_type"]
                 )
-            self.reserve_exist_component(
+            result = self.reserve_exist_component(
                 form,
                 serial_number,
-                count_create_component,
             )
+            if result:
+                count_create_component -= 1
 
         for _ in range(count_create_component):
             if generate_serial_number:
@@ -114,7 +115,6 @@ class ComponentCreateView(CreateView):
         self,
         form,
         serial_number,
-        count_create_component,
     ):
         component_type = form.cleaned_data["component_type"]
         is_stock = form.cleaned_data["is_stock"]
@@ -138,7 +138,8 @@ class ComponentCreateView(CreateView):
                 date_delivery,
             )
             self.object = component
-            count_create_component -= 1
+            return True
+        return False
 
     def get_components_to_reserve(self, component_type):
         # TODO: do this method to model
