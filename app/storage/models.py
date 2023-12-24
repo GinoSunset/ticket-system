@@ -1,4 +1,5 @@
 from django.db import models
+import uuid
 
 
 class Component(models.Model):
@@ -24,6 +25,13 @@ class Component(models.Model):
         blank=True,
         null=True,
     )
+
+    @classmethod
+    def generate_serial_number(cls, component_type):
+        while True:
+            serial_number = f"{component_type.name[:2]}-{uuid.uuid4().hex[:8]}".upper()
+            if not Component.objects.filter(serial_number=serial_number).exists():
+                return serial_number
 
     def get_status_color(self):
         if not self.is_stock and self.is_reserve and not self.date_delivery:

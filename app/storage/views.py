@@ -68,7 +68,11 @@ class ComponentCreateView(CreateView):
     success_url = reverse_lazy("component-list")
 
     def update_component(
-        self, component, is_stock=False, serial_number=None, date_delivery=None
+        self,
+        component,
+        is_stock=False,
+        serial_number=None,
+        date_delivery=None,
     ):
         component.is_stock = is_stock
         if serial_number:
@@ -79,11 +83,41 @@ class ComponentCreateView(CreateView):
         return component
 
     def form_valid(self, form: BaseModelForm) -> HttpResponse:
+        count = form.cleaned_data["count"]
+        generate_serial_number = form.cleaned_data["generate_serial_number"]
+        serial_number = None
+
+        count_create_component = count
+        for _ in range(count):
+            if generate_serial_number:
+                serial_number = Component.generate_serial_number(
+                    form.cleaned_data["component_type"]
+                )
+            self.reserve_exist_component(
+                form,
+                serial_number,
+                count_create_component,
+            )
+
+        for _ in range(count_create_component):
+            if generate_serial_number:
+                form.instance.serial_number = Component.generate_serial_number(
+                    form.cleaned_data["component_type"]
+                )
+            if self.object and self.object.pk:
+                self.object.pk = None
+            self.object = form.save()
+        return HttpResponseRedirect(self.get_success_url())
+
+    def reserve_exist_component(
+        self,
+        form,
+        serial_number,
+        count_create_component,
+    ):
         component_type = form.cleaned_data["component_type"]
         is_stock = form.cleaned_data["is_stock"]
-        serial_number = form.cleaned_data["serial_number"]
         date_delivery = form.cleaned_data["date_delivery"]
-
         components_to_reserve = None
 
         if is_stock:
@@ -97,12 +131,13 @@ class ComponentCreateView(CreateView):
         if components_to_reserve and components_to_reserve.exists():
             component = components_to_reserve.first()
             component = self.update_component(
-                component, is_stock, serial_number, date_delivery
+                component,
+                is_stock,
+                serial_number,
+                date_delivery,
             )
             self.object = component
-            return HttpResponseRedirect(self.get_success_url())
-
-        return super().form_valid(form)
+            count_create_component -= 1
 
     def get_components_to_reserve(self, component_type):
         # TODO: do this method to model

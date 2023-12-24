@@ -65,3 +65,31 @@ class TestComponentCreateView:
         assert response.status_code == 302
         component = Component.objects.get(pk=1)
         assert component.is_stock is True
+
+    def test_form_create_component_more_one_count(self, client, component_factory):
+        component = component_factory()
+        form_data = {
+            "component_type": component.component_type.pk,
+            "is_stock": True,
+            "count": 2,
+        }
+        url = reverse("component-create")
+        response = client.post(url, data=form_data)
+        assert response.status_code == 302
+        assert Component.objects.count() == 3
+
+    def test_form_create_save_serial_number(self, client, component_type):
+        form_data = {
+            "component_type": component_type.pk,
+            "is_stock": True,
+            "generate_serial_number": True,
+            "count": 2,
+        }
+        url = reverse("component-create")
+        response = client.post(url, data=form_data)
+        assert response.status_code == 302
+        component = Component.objects.get(pk=1)
+        assert component.serial_number is not None
+        component2 = Component.objects.get(pk=2)
+        assert component2.serial_number is not None
+        assert component2.serial_number != component.serial_number

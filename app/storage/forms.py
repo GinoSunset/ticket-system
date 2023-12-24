@@ -21,6 +21,20 @@ class ComponentTypeForm(ModelForm):
 
 
 class ComponentForm(ModelForm):
+    count = forms.IntegerField(
+        required=True,
+        label="Количество компонентов",
+        initial=1,
+        min_value=1,
+        help_text="Количество компонентов, которые необходимо добавить",
+    )
+    generate_serial_number = forms.BooleanField(
+        required=False,
+        label="Сгенерировать серийный номер",
+        initial=False,
+        help_text="нужно ли генерировать серийный номер компонентов у которых из нет",
+    )
+
     class Meta:
         model = Component
         fields = [

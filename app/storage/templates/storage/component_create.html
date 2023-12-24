@@ -2,45 +2,65 @@
 
 {% block content %}
   <h1>Добавить компонент на склад</h1>
+
   <form class="ui form" method="post">
     {% csrf_token %}
-    <div class="field">
-      <label>{{ form.component_type.label }}</label>
-      {{ form.component_type }}
-      {{ form.component_type.errors }}
-    </div>
-    <div class="three fields">
-      <div class="field">
-        <label>{{ form.serial_number.label }}</label>
-        {{ form.serial_number }}
-        {{ form.serial_number.errors }}
-      </div>
-      <div class="field">
-        <label>{{ form.nomenclature.label }}</label>
-
-        {{ form.nomenclature }}
-        {{ form.nomenclature.errors }}
-      </div>
-      <a id="clear" class="ui button basic" style="margin-top: 24px;">x</a>
-      <div class="field">
-        <label>{{ form.date_delivery.label }}</label>
-        {{ form.date_delivery }}
-        {{ form.date_delivery.errors }}
-      </div>
-    </div>
-    <div class="fields">
-      <div class="field">
-        <div class="ui checkbox">
-          {{ form.is_reserve }}
-          <label>{{ form.is_reserve.label }}</label>
-          {{ form.is_reserve.errors }}
+    <div class="ui segment">
+      <div class="two fields">
+        <div class="field">
+          <label>{{ form.component_type.label }}</label>
+          {{ form.component_type }}
+          {{ form.component_type.errors }}
+        </div>
+        <div class="field" id="serial_number_div">
+          <label>{{ form.serial_number.label }}</label>
+          {{ form.serial_number }}
+          {{ form.serial_number.errors }}
+        </div>
+        <div class="field" id="generate_serial_number_div">
+          <div class="ui checkbox">
+            {{ form.generate_serial_number }}
+            <label>{{ form.generate_serial_number.label }}</label>
+            {{ form.generate_serial_number.errors }}
+          </div>
         </div>
       </div>
-      <div class="field">
-        <div class="ui checkbox">
-          {{ form.is_stock }}
-          <label>{{ form.is_stock.label }}</label>
-          {{ form.is_stock.errors }}
+      <div class="five fields">
+        <div class="field">
+          <label>{{ form.count.label }}</label>
+          {{ form.count }}
+          {{ form.count.errors }}
+        </div>
+
+        <div class="six wide field">
+          <label>{{ form.nomenclature.label }}</label>
+          <div class="fields">
+            <div class="fourteen wide field">{{ form.nomenclature }}
+              {{ form.nomenclature.errors }}</div>
+            <div class="field">
+              <a id="clear" class="ui button basic">x</a>
+            </div>
+          </div>
+        </div>
+
+        <div class="field">
+          <label>{{ form.date_delivery.label }}</label>
+          {{ form.date_delivery }}
+          {{ form.date_delivery.errors }}
+        </div>
+        <div class="field">
+          <div class="ui checkbox">
+            {{ form.is_reserve }}
+            <label>{{ form.is_reserve.label }}</label>
+            {{ form.is_reserve.errors }}
+          </div>
+        </div>
+        <div class="field">
+          <div class="ui checkbox">
+            {{ form.is_stock }}
+            <label>{{ form.is_stock.label }}</label>
+            {{ form.is_stock.errors }}
+          </div>
         </div>
       </div>
     </div>
@@ -54,5 +74,24 @@
     $('#clear').on('click', function () {
       $('.clearable').dropdown('clear')
     })
+    
+    function toggle_serial_number_controll() {
+      var count = parseInt($(this).val())
+      console.log(count)
+      if (count > 1) {
+        console.log('show')
+        $('#generate_serial_number_div').show()
+        $('#serial_number_div').hide()
+        $('id_serial_number').val('')
+      } else {
+        console.log('hide')
+        $('#generate_serial_number_div').hide()
+        $('#serial_number_div').show()
+        $('#id_generate_serial_number').prop('checked', false)
+      }
+    }
+    
+    $('#id_count').on('click', toggle_serial_number_controll)
+    toggle_serial_number_controll()
   </script>
 {% endblock %}
