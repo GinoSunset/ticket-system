@@ -16,6 +16,7 @@
             <tr>
               <th>Компонент</th>
               <th>Резерв</th>
+              <th>Серийный номер</th>
               <th>Дата ближайшей доставки доставки</th>
             </tr>
           </thead>
@@ -36,6 +37,7 @@
                   {% comment %} Дата отгрузки: {{ component.nomenclature.manufacture.date_shipment|date:"d.m.Y" }} {% endcomment %}
                   {% endif %}
                 </td>
+                <td>{{ component.serial_number }}</td>
                 <td>{% firstof component.date_delivery %}</td>
               </tr>
             {% endfor %}

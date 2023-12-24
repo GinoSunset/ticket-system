@@ -13,6 +13,7 @@ class ComponentListView(ListView):
     model = Component
     template_name = "storage/component_list.html"
     context_object_name = "components"
+    ordering = ["component_type", "-id"]
 
 
 class StorageListView(ListView):

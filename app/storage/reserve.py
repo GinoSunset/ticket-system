@@ -38,7 +38,7 @@ def reserve_component(component_type: ComponentType, nomenclature: Nomenclature)
     q_conditions = Q(is_stock=True)
     if nomenclature.manufacture and nomenclature.manufacture.date_shipment:
         q_conditions |= Q(date_delivery__isnull=False) & Q(
-            date_delivery__gte=nomenclature.manufacture.date_shipment
+            date_delivery__lte=nomenclature.manufacture.date_shipment
         )
     else:
         q_conditions |= Q(date_delivery__isnull=False)

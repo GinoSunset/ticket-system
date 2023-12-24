@@ -63,13 +63,13 @@ class TestReservation:
         component = ComponentFactory(
             component_type_name="РЧ",
             is_reserve=False,
-            date_delivery=date(2021, 1, 2),
+            date_delivery=date(2021, 1, 1),
             is_stock=False,
         )
 
         nomenclature = nomenclature_factory(
             frame_type=FrameTypeOption.objects.get(name="РЧ"),
-            manufacture__date_shipment=date(2021, 1, 1),
+            manufacture__date_shipment=date(2021, 1, 2),
         )
 
         assert Component.objects.count() == 1
@@ -83,7 +83,7 @@ class TestReservation:
         component = ComponentFactory(
             component_type_name="РЧ",
             is_reserve=False,
-            date_delivery=date(2021, 1, 1),
+            date_delivery=date(2021, 1, 3),
             is_stock=False,
         )
 
