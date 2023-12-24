@@ -7,7 +7,7 @@ class AliasInline(admin.TabularInline):
 
 
 class ComponentTypeAdmin(admin.ModelAdmin):
-    list_display = ("name", "parent_component_type", "is_internal")
+    list_display = ("name", "is_internal")
     list_filter = ("parent_component_type", "is_internal")
     search_fields = ("name",)
     inlines = [AliasInline]

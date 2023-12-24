@@ -4,9 +4,15 @@ from storage.models import ComponentType, Component
 
 
 @pytest.mark.django_db
-def test_ComponentTypeForm_valid():
-    form = ComponentTypeForm(data={"name": "Test Component", "is_internal": True})
-    assert form.is_valid()
+def test_ComponentTypeForm_valid(component_type):
+    form = ComponentTypeForm(
+        data={
+            "name": "Test Component",
+            "is_internal": True,
+            "parent_component_type": [component_type.pk],
+        }
+    )
+    assert form.is_valid(), form.errors
 
 
 @pytest.mark.django_db

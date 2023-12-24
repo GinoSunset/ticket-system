@@ -60,13 +60,14 @@ class Alias(models.Model):
 
 
 class ComponentType(models.Model):
+    class Meta:
+        verbose_name = "Тип компонента"
+        verbose_name_plural = "Типы компонентов"
+
     name = models.CharField(max_length=255, verbose_name="Название типа компонента")
-    parent_component_type = models.ForeignKey(
+    parent_component_type = models.ManyToManyField(
         "ComponentType",
         verbose_name="Тип родительского подкомпонента",
-        on_delete=models.SET_NULL,
-        blank=True,
-        null=True,
         related_name="sub_components_type",
         help_text="Выберите тип компонента, в состав которого входит данный компонент",
     )

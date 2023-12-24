@@ -17,6 +17,9 @@ class ComponentTypeForm(ModelForm):
 
         widgets = {
             "is_internal": forms.CheckboxInput(attrs={"class": "ui checkbox"}),
+            "parent_component_type": forms.SelectMultiple(
+                attrs={"class": "ui dropdown search"}
+            ),
         }
 
 
