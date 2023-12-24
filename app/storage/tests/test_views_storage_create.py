@@ -30,7 +30,8 @@ class TestComponentCreateView:
         form_data = {
             "component_type": needed_component.component_type.pk,
             "is_stock": False,
-            "serial_number": "ABC123",
+            "count": 1,
+            "generate_serial_number": True,
             "date_delivery": date(2021, 1, 1),
         }
         url = reverse("component-create")
@@ -38,7 +39,7 @@ class TestComponentCreateView:
         assert response.status_code == 302
         needed_component.refresh_from_db()
         assert needed_component.is_stock is False
-        assert needed_component.serial_number == "ABC123"
+        assert needed_component.serial_number is not None
         assert needed_component.date_delivery == date(2021, 1, 1)
 
     def test_form_valid_with_stock_component(self, client, component_factory):
@@ -48,6 +49,7 @@ class TestComponentCreateView:
         form_data = {
             "component_type": component.component_type.pk,
             "is_stock": True,
+            "count": 1,
         }
         url = reverse("component-create")
         response = client.post(url, data=form_data)
@@ -59,6 +61,7 @@ class TestComponentCreateView:
         form_data = {
             "component_type": component_type.pk,
             "is_stock": True,
+            "count": 1,
         }
         url = reverse("component-create")
         response = client.post(url, data=form_data)

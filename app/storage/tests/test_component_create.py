@@ -23,10 +23,11 @@ def test_ComponentForm_valid():
     form = ComponentForm(
         data={
             "component_type": component_type.pk,
-            "serial_number": "123456",
             "is_stock": True,
             "date_delivery": "2022-01-01",
             "is_reserve": False,
+            "count": "1",
+            "generate_serial_number": True,
         }
     )
     result = form.is_valid()
