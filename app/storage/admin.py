@@ -29,6 +29,7 @@ class ComponentAdmin(admin.ModelAdmin):
         "nomenclature",
     )
     list_filter = ("component_type", "is_stock", "is_reserve")
+    list_editable = ("is_stock", "is_reserve")
     search_fields = (
         "component_type__name",
         "serial_number",
