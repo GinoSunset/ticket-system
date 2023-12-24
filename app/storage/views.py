@@ -1,7 +1,7 @@
 from typing import Any
 from django.forms.models import BaseModelForm
 from django.http import HttpResponse, HttpResponseRedirect
-from django.shortcuts import render
+from django.shortcuts import get_object_or_404, render
 from django.urls import reverse_lazy
 from django.db import models
 from django.views.generic import ListView, CreateView
@@ -67,6 +67,14 @@ class ComponentCreateView(CreateView):
     template_name = "storage/component_create.html"
     form_class = ComponentForm
     success_url = reverse_lazy("component-list")
+
+    def get_form_kwargs(self):
+        kwargs = super().get_form_kwargs()
+        component_type_id = self.request.GET.get("component_type")
+        if component_type_id:
+            component_type = get_object_or_404(ComponentType, id=component_type_id)
+            kwargs["initial"]["component_type"] = component_type
+        return kwargs
 
     def update_component(
         self,

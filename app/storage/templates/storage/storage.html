@@ -18,6 +18,7 @@
           <thead>
             <tr>
               <th>Тип компонента</th>
+              <th></th>
               <th>На складе</th>
               <th>Необходимо</th>
               <th>На доставке</th>
@@ -28,7 +29,10 @@
             {% for component in components %}
               <tr>
                 <td class="selectable">
-                  <a>{{ component.component_type_name }}</a>
+                  <span>{{ component.component_type_name }}</span>
+                </td>
+                <td class="collapsing">
+                  <a href="{% url 'component-create' %}?component_type={{ component.component_type }}" class="circular mini green basic alight left ui icon button"><i class="plus icon"></i></a>
                 </td>
                 <td>{{ component.in_stock }}</td>
                 <td class="reserved_popup">
