@@ -15,12 +15,14 @@ def processing_reserved_component(nomenclature: Nomenclature):
 def get_components_type_from_nomenclature(
     nomenclature: Nomenclature,
 ) -> list[ComponentType] | None:
-    try:
-        # TODO: get type components from all options nomenclature (body, frame, etc.)
-        type_component = ComponentType.objects.get(name=nomenclature.frame_type.name)
-    except ComponentType.DoesNotExist:
-        return None
-    list_components_type = get_sub_component_from_component(type_component)
+    components = nomenclature.get_components()
+    list_components_type = []
+    for component in components:
+        try:
+            type_component = ComponentType.objects.get(name=component)
+        except ComponentType.DoesNotExist:
+            continue
+        list_components_type.extend(get_sub_component_from_component(type_component))
     return list_components_type
 
 
