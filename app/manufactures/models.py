@@ -213,29 +213,44 @@ class Nomenclature(models.Model):
         manufacture = f"(Man: {self.manufacture.pk})" if self.manufacture else ""
         return f"[{self.pk}]{self.frame_type} {self.body} RX:{self.tx_count} TX:{self.rx_count} {options} {self.bp_type} {self.bp_count} {illumination} {manufacture}"
 
-    def take_components(self) -> list:
+    def get_components(self) -> list:
         """return list components from nomenclature"""
         components = []
         components.extend(self.get_components_from_rx())
         components.extend(self.get_components_from_tx())
+        components.extend(self.get_components_from_body())
+        if self.mdg:
+            components.extend(self.get_components_from_mdg())
         return components
 
     def get_components_from_rx(self) -> list:
         """return list components from rx"""
-        components = [f"плата {self.frame_type} RX" for _ in range(self.rx_count)]
+        components = [f"Плата {self.frame_type} RX" for _ in range(self.rx_count)]
         return components
 
     def get_components_from_tx(self) -> list:
         """return list components from tx"""
-        components = [f"плата {self.frame_type} TX" for _ in range(self.tx_count)]
+        components = [f"Плата {self.frame_type} TX" for _ in range(self.tx_count)]
         return components
 
+    def get_components_from_body(self) -> list:
+        """return list components from body"""
+        components = [f"Корпус {self.frame_type} {self.body}"]
+        return components
 
-# - Корпус РЧ plex.... и т.д
-# - Корпус АМ plex .....
-# - БП РЧ
-# - БП АМ
-# Плата РЧ МДГ ТХ
-# - Плата РЧ МДГ RX
-# - Плата AM МДГ TX
-# - Плата AM МДГ RX
+    def get_components_from_mdg(self) -> list:
+        """return list components from mdg"""
+        components = []
+        components.extend(self.get_components_from_mdg_rx())
+        components.extend(self.get_components_from_mdg_tx())
+        return components
+
+    def get_components_from_mdg_rx(self) -> list:
+        """return list components from mdg rx"""
+        components = [f"Плата {self.frame_type} MDG RX" for _ in range(self.rx_count)]
+        return components
+
+    def get_components_from_mdg_tx(self) -> list:
+        """return list components from mdg tx"""
+        components = [f"Плата {self.frame_type} MDG TX" for _ in range(self.tx_count)]
+        return components
