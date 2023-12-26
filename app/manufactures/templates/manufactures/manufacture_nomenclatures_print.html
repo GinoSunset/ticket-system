@@ -16,14 +16,17 @@
                 {% else %}
                 <i class="lightbulb outline icon big">-</i>
                 {% endif %}
+                <br>
+                <a class="ui  mini label">#{{nomenclature.pk}}</a>
             </div>
             <div class="content">
                
-                <div class="header"> <span class="ui {% if nomenclature.status == "RD"  %}green  {% elif  nomenclature.status == "IP"  %} yellow {% endif %} text">Тип: {{ nomenclature.get_frame_type_display}}. Корпус: {{ nomenclature.get_body_display}}</span>  <div class="ui basic  horizontal label">{{ nomenclature.get_status_display}}</div></div>
+                <div class="header"> <span class="ui {% if nomenclature.status == "RD"  %}green  {% elif  nomenclature.status == "IP"  %} yellow {% endif %} text">Тип: {{ nomenclature.get_frame_type_display}}. Корпус: {{ nomenclature.body}}</span>  <div class="ui basic  horizontal label">{{ nomenclature.get_status_display}}</div></div>
         
                 <div class="meta">
                     <span class="">TX: {{nomenclature.tx_count}}</span>
                     <span class="">RX: {{nomenclature.rx_count}}</span>
+                    <a class="ui grey circular label">2</a>
                 </div>
                 <div class="description">
                     <p>Тип БП: <b>{{ nomenclature.get_bp_type_display}}</b> ({{ nomenclature.bp_count}} шт.) 

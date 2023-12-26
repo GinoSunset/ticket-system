@@ -25,12 +25,25 @@ class Option(models.Model):
 
 
 class FrameTypeOption(Option):
-    pass
+    class Meta:
+        verbose_name = "Тип платы"
+        verbose_name_plural = "Типы плат"
 
     @classmethod
     def get_default(cls):
         frame_type, _ = cls.objects.get_or_create(name="АМ")
         return frame_type.pk
+
+
+class BodyOption(Option):
+    class Meta:
+        verbose_name = "Тип корпуса"
+        verbose_name_plural = "Типы корпусов"
+
+    @classmethod
+    def get_default(cls):
+        body_type, _ = cls.objects.get_or_create(name="Плекс")
+        return body_type.pk
 
 
 class Manufacture(models.Model):
@@ -110,13 +123,6 @@ class Nomenclature(models.Model):
         verbose_name_plural = "Номенклатуры"
         ordering = ["date_create"]
 
-    class Body(models.TextChoices):
-        PLEX = "PL", "Плекс"
-        PROFILE = "PR", "Профиль"
-        S_WHITE = "SW", "S Белый"
-        S_GREY = "SG", "S Серый"
-        S_BLACK = "SB", "S Черный"
-
     class BDType(models.TextChoices):
         OUTER = "OU", "Внешний"
         INNER = "IN", "Внутренний"
@@ -144,11 +150,11 @@ class Nomenclature(models.Model):
         default=FrameTypeOption.get_default,
     )
 
-    body = models.CharField(
+    body = models.ForeignKey(
+        BodyOption,
         verbose_name="Корпус",
-        choices=Body.choices,
-        default=Body.PLEX,
-        max_length=2,
+        on_delete=models.PROTECT,
+        default=BodyOption.get_default,
     )
 
     tx_count = models.IntegerField(verbose_name="Количество TX", default=1)
@@ -206,3 +212,30 @@ class Nomenclature(models.Model):
         illumination = "💡" if self.illumination else ""
         manufacture = f"(Man: {self.manufacture.pk})" if self.manufacture else ""
         return f"[{self.pk}]{self.frame_type} {self.body} RX:{self.tx_count} TX:{self.rx_count} {options} {self.bp_type} {self.bp_count} {illumination} {manufacture}"
+
+    def take_components(self) -> list:
+        """return list components from nomenclature"""
+        components = []
+        components.extend(self.get_components_from_rx())
+        components.extend(self.get_components_from_tx())
+        return components
+
+    def get_components_from_rx(self) -> list:
+        """return list components from rx"""
+        components = [f"плата {self.frame_type} RX" for _ in range(self.rx_count)]
+        return components
+
+    def get_components_from_tx(self) -> list:
+        """return list components from tx"""
+        components = [f"плата {self.frame_type} TX" for _ in range(self.tx_count)]
+        return components
+
+
+# - Корпус РЧ plex.... и т.д
+# - Корпус АМ plex .....
+# - БП РЧ
+# - БП АМ
+# Плата РЧ МДГ ТХ
+# - Плата РЧ МДГ RX
+# - Плата AM МДГ TX
+# - Плата AM МДГ RX

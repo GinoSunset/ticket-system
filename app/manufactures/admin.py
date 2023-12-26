@@ -1,5 +1,5 @@
 from django.contrib import admin
-from .models import Nomenclature, Manufacture, Client, FrameTypeOption
+from .models import Nomenclature, Manufacture, Client, FrameTypeOption, BodyOption
 
 
 class NomeclatureAdmin(admin.ModelAdmin):
@@ -11,3 +11,4 @@ admin.site.register(Manufacture)
 admin.site.register(Client)
 
 admin.site.register(FrameTypeOption)
+admin.site.register(BodyOption)
