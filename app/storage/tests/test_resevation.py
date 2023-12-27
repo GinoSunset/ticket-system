@@ -10,7 +10,9 @@ from storage.factories import ComponentFactory, ComponentTypeFactory
 def create_components_rs_type(
     inner_component_type: ComponentType | None = None,
 ) -> ComponentType:
-    component: ComponentType = ComponentTypeFactory(name="РЧ", is_internal=True)
+    component: ComponentType = ComponentTypeFactory(
+        name="Плата РЧ RX", is_internal=True
+    )
     if inner_component_type:
         inner_component_type.parent_component_type.add(component)
         inner_component_type.save()
@@ -46,7 +48,7 @@ class TestReservation:
     @pytest.mark.django_db
     def test_reserve_already_exists_component_first(self, nomenclature_factory):
         component = ComponentFactory(
-            component_type_name="РЧ", is_reserve=False, is_stock=True
+            component_type_name="Плата РЧ RX", is_reserve=False, is_stock=True
         )
 
         nomenclature = nomenclature_factory(
@@ -63,7 +65,7 @@ class TestReservation:
         nomenclature_factory,
     ):
         component = ComponentFactory(
-            component_type_name="РЧ",
+            component_type_name="Плата РЧ RX",
             is_reserve=False,
             date_delivery=date(2021, 1, 1),
             is_stock=False,
@@ -83,7 +85,7 @@ class TestReservation:
         nomenclature_factory,
     ):
         component = ComponentFactory(
-            component_type_name="РЧ",
+            component_type_name="Плата РЧ RX",
             is_reserve=False,
             date_delivery=date(2021, 1, 3),
             is_stock=False,
