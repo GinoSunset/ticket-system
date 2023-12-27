@@ -1,5 +1,5 @@
 import pytest
-from manufactures.models import Nomenclature
+from manufactures.models import Nomenclature, FrameTypeOption
 
 
 @pytest.mark.django_db
@@ -83,4 +83,24 @@ def test_nomenclature_get_components_from_mdg_tx(nomenclature_factory):
     expected_components = [
         f"Плата {nomenclature.frame_type} MDG TX" for _ in range(nomenclature.tx_count)
     ]
+    assert components == expected_components
+
+
+@pytest.mark.django_db
+def test_nomenclature_get_components_from_bp(nomenclature_factory):
+    nomenclature = nomenclature_factory(
+        bp_count=2, frame_type=FrameTypeOption.objects.get(name="АМ")
+    )
+    components = nomenclature.get_components_from_bp()
+    expected_components = ["БП АМ 1А", "БП АМ 1А", "Плата БП АМ", "Плата БП АМ"]
+    assert components == expected_components
+
+
+@pytest.mark.django_db
+def test_nomenclature_get_components_from_bp_rs(nomenclature_factory):
+    nomenclature = nomenclature_factory(
+        bp_count=2, frame_type=FrameTypeOption.objects.get(name="РЧ")
+    )
+    components = nomenclature.get_components_from_bp()
+    expected_components = ["БП РЧ 3.2А", "БП РЧ 3.2А"]
     assert components == expected_components

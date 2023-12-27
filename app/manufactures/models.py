@@ -219,6 +219,7 @@ class Nomenclature(models.Model):
         components.extend(self.get_components_from_rx())
         components.extend(self.get_components_from_tx())
         components.extend(self.get_components_from_body())
+        components.extend(self.get_components_from_bp())
         if self.mdg:
             components.extend(self.get_components_from_mdg())
         return components
@@ -253,4 +254,25 @@ class Nomenclature(models.Model):
     def get_components_from_mdg_tx(self) -> list:
         """return list components from mdg tx"""
         components = [f"Плата {self.frame_type} MDG TX" for _ in range(self.tx_count)]
+        return components
+
+    def get_components_from_bp(self) -> list:
+        """return list components from bp"""
+        if self.frame_type == FrameTypeOption.objects.get(name="АМ"):
+            return self.get_components_from_bp_am()
+        return self.get_components_from_bp_rf()
+
+    def get_components_from_bp_am(self) -> list:
+        """return list components from bp am"""
+        amperage = "2А" if self.amperage_2 else "1А"
+        components = [f"БП АМ {amperage}" for _ in range(self.bp_count)]
+        components.extend([f"Плата БП АМ" for _ in range(self.bp_count)])
+        return components
+
+    def get_components_from_bp_rf(self) -> list:
+        """return list components from bp rf"""
+        components = []
+        if self.bp_type == "OU":
+            amperage = "6А" if self.amperage_6 else "3.2А"
+            components = [f"БП РЧ {amperage}" for _ in range(self.bp_count)]
         return components
