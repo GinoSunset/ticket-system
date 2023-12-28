@@ -86,7 +86,10 @@ class Manufacture(models.Model):
         """return list with count nomenclatures in work and in status ready"""
         list_progress = [
             self.nomenclatures.filter(status=Nomenclature.Status.IN_PROGRESS).count(),
-            self.nomenclatures.filter(status=Nomenclature.Status.READY).count(),
+            (
+                self.nomenclatures.filter(status=Nomenclature.Status.READY).count()
+                + self.nomenclatures.filter(status=Nomenclature.Status.SHIPPED).count()
+            ),
         ]
         return ",".join([str(i) for i in list_progress])
 
@@ -136,6 +139,8 @@ class Nomenclature(models.Model):
         NEW = 1, "Новый"
         IN_PROGRESS = 2, "В работе"
         READY = 3, "Готово"
+        SHIPPED = 4, "Отгружено"
+        CANCELED = 5, "Отменено"
 
     status = models.IntegerField(
         verbose_name="Статус",

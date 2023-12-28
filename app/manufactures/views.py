@@ -138,6 +138,8 @@ class ManufactureUpdateView(UpdateView):
             1: Dictionary.objects.get(code="new_manufacture_task"),
             2: Dictionary.objects.get(code="in_progress"),
             3: Dictionary.objects.get(code="ready"),
+            4: Dictionary.objects.get(code="shipped"),
+            5: Dictionary.objects.get(code="canceled"),
         }
         min_status_nomenclature = min(
             [nomenclature.status for nomenclature in self.object.nomenclatures.all()],

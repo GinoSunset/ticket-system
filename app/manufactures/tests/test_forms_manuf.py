@@ -139,6 +139,7 @@ def test_change_status_by_form(
         ([3], "ready"),
         ([3, 3, 3], "ready"),
         ([], "new_manufacture_task"),
+        ([4], "shipped"),
     ),
 )
 def test_min_status_by_nomenclature(
