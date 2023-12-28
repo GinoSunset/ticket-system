@@ -10,6 +10,8 @@ class Component(models.Model):
     component_type = models.ForeignKey(
         "ComponentType", verbose_name="Тип компонента", on_delete=models.CASCADE
     )
+    is_archive = models.BooleanField(default=False, verbose_name="В архиве")
+
     serial_number = models.CharField(
         max_length=255, verbose_name="Серийный номер", null=True, blank=True
     )
