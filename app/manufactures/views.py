@@ -173,6 +173,19 @@ class ManufactureStatusUpdateView(LoginRequiredMixin, UpdateView):
     success_url = reverse_lazy("manufactures-list")
     template_name = "manufactures/manufacture_change_status.html"
 
+    def form_valid(self, form):
+        self.object = form.save()
+        if self.object.status.code in ["shipped", "ready"]:
+            if self.object.status.code == "shipped":
+                self.object.nomenclatures.filter(
+                    status__lte=Nomenclature.Status.SHIPPED
+                ).update(status=Nomenclature.Status.SHIPPED)
+            else:
+                self.object.nomenclatures.filter(
+                    status__lte=Nomenclature.Status.READY
+                ).update(status=Nomenclature.Status.READY)
+        return super().form_valid(form)
+
 
 class ManufactureNomenclaturesPrintView(LoginRequiredMixin, DetailView):
     model = Manufacture

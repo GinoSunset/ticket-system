@@ -22,6 +22,7 @@ def test_nomenclature_get_components(nomenclature_factory):
             f"Плата {nomenclature.frame_type} MDG TX"
             for _ in range(nomenclature.tx_count)
         ]
+    expected_components += ["БП АМ 1А", "Плата БП АМ"]
     assert components == expected_components
 
 

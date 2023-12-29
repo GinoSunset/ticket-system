@@ -5,7 +5,7 @@ from manufactures.models import Manufacture, Nomenclature
 from additionally.models import Dictionary
 from manufactures.factories import ManufactureFactory, NomenclatureFactory
 from manufactures.forms import NomenclatureForm, ManufactureChangeStatusForm
-from manufactures.views import ManufactureUpdateView
+from manufactures.views import ManufactureUpdateView, ManufactureStatusUpdateView
 
 # For not process nomenclature in form use this value because in form we have 1 form by default
 DO_NOT_PROCESS_NOMENCLATURE = -1
@@ -110,27 +110,6 @@ def test_change_status_by_form(
 
 
 @pytest.mark.django_db
-def test_change_status_by_form(
-    client, operator, nomenclature_factory, manufacture_factory
-):
-    manuf = manufacture_factory()
-    status_work = Dictionary.objects.get(code="in_progress")
-    nomenclature = nomenclature_factory(status=Nomenclature.Status.READY)
-    manuf.nomenclatures.add(nomenclature)
-    manuf.save()
-    client.force_login(operator)
-    res = client.post(
-        reverse("manufacture-update-status", kwargs={"pk": manuf.pk}),
-        data={
-            "status": status_work.pk,
-        },
-    )
-
-    manuf_after_update = Manufacture.objects.get(pk=manuf.pk)
-    assert manuf_after_update.status == status_work
-
-
-@pytest.mark.django_db
 @pytest.mark.parametrize(
     "statuses, expected_status",
     (
@@ -154,4 +133,43 @@ def test_min_status_by_nomenclature(
     view.object = manuf
     assert view.get_status_from_nomenclatures() == Dictionary.objects.get(
         code=expected_status
+    )
+
+
+@pytest.mark.django_db
+@pytest.mark.parametrize(
+    "statuses",
+    (
+        ([1]),
+        ([1, 4, 2]),
+        ([1, 4]),
+        ([1, 4, 5]),
+    ),
+)
+def test_update_status_to_nomenclature_by_manufacture_ready(
+    client, manufacture_factory, nomenclature_factory, operator, statuses
+):
+    manuf = manufacture_factory()
+    for nomenclature_status in statuses:
+        manuf.nomenclatures.add(nomenclature_factory(status=nomenclature_status))
+    manuf.save()
+
+    client.force_login(operator)
+    client.post(
+        reverse("manufacture-update-status", kwargs={"pk": manuf.pk}),
+        data={
+            "status": Dictionary.objects.get(code="ready").pk,
+        },
+    )
+
+    expected_status = []
+    for nomenclature_status in statuses:
+        if nomenclature_status <= Nomenclature.Status.READY:
+            expected_status.append(Nomenclature.Status.READY.value)
+        else:
+            expected_status.append(nomenclature_status)
+
+    assert (
+        list(manuf.nomenclatures.all().values_list("status", flat=True))
+        == expected_status
     )
