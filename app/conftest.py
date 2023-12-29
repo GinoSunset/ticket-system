@@ -1,4 +1,7 @@
 import pytest
+from testcontainers.core.waiting_utils import wait_for_logs
+from testcontainers.core.container import DockerContainer
+
 
 from pytest_factoryboy import register
 from ticket.factory import TicketFactory, CommentFactory
@@ -43,7 +46,7 @@ register(ComponentFactory)
 
 
 @pytest.fixture
-def monkeypatch_delay_send_email_on_celery(monkeypatch):
+def monkeypatch_delay_send_email_on_celery(monkeypatch, redis):
     def mock_delay(*args, **kwargs):
         return send_email(*args, **kwargs)
 
@@ -90,3 +93,23 @@ def status_new():
 @pytest.fixture
 def status_in_work():
     return Dictionary.get_status_ticket("work")
+
+
+@pytest.fixture(scope="session")
+def redis():
+    with DockerContainer("redis:latest").with_bind_ports(6379, 6379) as redis:
+        wait_for_logs(redis, "Ready to accept connections")
+        yield redis
+
+
+@pytest.fixture(scope="session")
+def rabbitmq():
+    with DockerContainer("rabbitmq:3-management").with_bind_ports(
+        5672, 5672
+    ) as rabbitmq:
+        yield rabbitmq
+
+
+@pytest.fixture(autouse=True)
+def setup_test_env(settings):
+    settings.TG_BOT_NOTIFICATION_URI = "https://test.com"

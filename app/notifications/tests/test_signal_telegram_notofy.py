@@ -54,6 +54,7 @@ def test_telegram_notify_has_needed_text(
     assert len(mocker_bot_sender.messages) == 1
     assert exp_subject in mocker_bot_sender.messages[telegram_id]
 
+
 @pytest.mark.skip
 @pytest.mark.django_db
 def test_send_telegram_notify_when_ticket_status_to_done(

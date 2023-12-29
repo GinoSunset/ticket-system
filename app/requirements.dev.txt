@@ -5,3 +5,4 @@ pytest-django==4.5.2
 factory_boy==3.2.1 
 pytest-factoryboy==2.5.1
 django-stubs==1.13.1
+testcontainers==3.7.1
