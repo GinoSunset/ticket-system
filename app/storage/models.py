@@ -2,6 +2,12 @@ from django.db import models
 import uuid
 
 
+# create objects manager with filter is_archive=False
+class ComponentManager(models.Manager):
+    def get_queryset(self):
+        return super().get_queryset().filter(is_archive=False)
+
+
 class Component(models.Model):
     class Meta:
         verbose_name = "Компонент"
@@ -29,6 +35,8 @@ class Component(models.Model):
         blank=True,
         null=True,
     )
+    active_components = ComponentManager()
+    objects = models.Manager()
 
     @classmethod
     def generate_serial_number(cls, component_type):

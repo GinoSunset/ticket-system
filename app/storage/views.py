@@ -22,7 +22,7 @@ class StorageListView(ListView):
     context_object_name = "components"
 
     def get_queryset(self):
-        return Component.objects.values(
+        return Component.active_components.values(
             "component_type",
         ).annotate(
             count=models.Count("component_type"),
@@ -151,7 +151,7 @@ class ComponentCreateView(CreateView):
 
     def get_components_to_reserve(self, component_type):
         # TODO: do this method to model
-        return Component.objects.filter(
+        return Component.active_components.filter(
             component_type=component_type,
             is_reserve=True,
             is_stock=False,
@@ -160,7 +160,7 @@ class ComponentCreateView(CreateView):
 
     def get_components_to_reserve_by_date_delivery(self, component_type, date_delivery):
         # TODO: do this method to model
-        return Component.objects.filter(
+        return Component.active_components.filter(
             component_type=component_type,
             is_reserve=True,
             is_stock=False,
@@ -177,7 +177,9 @@ class ComponentTypeReserveView(ListView):
     def get_queryset(self):
         componentType = ComponentType.objects.get(id=self.kwargs["pk"])
         manufactures = (
-            Component.objects.filter(component_type=componentType, is_reserve=True)
+            Component.active_components.filter(
+                component_type=componentType, is_reserve=True
+            )
             .values(
                 "nomenclature__manufacture",
                 "nomenclature__manufacture__date_shipment",

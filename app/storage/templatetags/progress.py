@@ -7,7 +7,9 @@ register = template.Library()
 @register.filter
 def get_value_progress(component):
     in_reserve_not_in_stock_not_in_delivery = (
-        Component.objects.filter(component_type_id=component["component_type"])
+        Component.active_components.filter(
+            component_type_id=component["component_type"]
+        )
         .filter(
             is_reserve=True,
             is_stock=False,
@@ -16,7 +18,9 @@ def get_value_progress(component):
         .count()
     )
     in_reserve_not_in_stock_in_delivery = (
-        Component.objects.filter(component_type_id=component["component_type"])
+        Component.active_components.filter(
+            component_type_id=component["component_type"]
+        )
         .filter(
             is_reserve=True,
             is_stock=False,
@@ -25,7 +29,9 @@ def get_value_progress(component):
         .count()
     )
     in_delivery = (
-        Component.objects.filter(component_type_id=component["component_type"])
+        Component.active_components.filter(
+            component_type_id=component["component_type"]
+        )
         .filter(
             is_reserve=False,
             is_stock=False,
@@ -34,7 +40,9 @@ def get_value_progress(component):
         .count()
     )
     in_reserve_in_stock_not_in_delivery = (
-        Component.objects.filter(component_type_id=component["component_type"])
+        Component.active_components.filter(
+            component_type_id=component["component_type"]
+        )
         .filter(
             is_reserve=True,
             is_stock=True,
@@ -43,7 +51,9 @@ def get_value_progress(component):
         .count()
     )
     in_stock = (
-        Component.objects.filter(component_type_id=component["component_type"])
+        Component.active_components.filter(
+            component_type_id=component["component_type"]
+        )
         .filter(
             is_reserve=False,
             is_stock=True,
