@@ -61,3 +61,8 @@ def reserve_component(component_type: ComponentType, nomenclature: Nomenclature)
         is_reserve=True,
     )
     logging.info(f"Create component {component} to reserve")
+
+
+def components_from_nomenclature_to_archive(nomenclature: Nomenclature):
+    Component.objects.filter(nomenclature=nomenclature).update(is_archive=True)
+    logging.info(f"All components with nomenclature {nomenclature} are archived")

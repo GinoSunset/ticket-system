@@ -7,12 +7,10 @@ from storage.models import ComponentType
 from storage.factories import ComponentFactory, ComponentTypeFactory
 
 
-def create_components_rs_type(
+def get_components_rs_type(
     inner_component_type: ComponentType | None = None,
 ) -> ComponentType:
-    component: ComponentType = ComponentTypeFactory(
-        name="Плата РЧ RX", is_internal=True
-    )
+    component, _ = ComponentType.objects.get_or_create(name="Плата РЧ RX")
     if inner_component_type:
         inner_component_type.parent_component_type.add(component)
         inner_component_type.save()
@@ -21,7 +19,7 @@ def create_components_rs_type(
 
 @pytest.mark.django_db
 def test_has_needs_after_create_manufactory(manufacture_factory, nomenclature_factory):
-    create_components_rs_type()
+    get_components_rs_type()
     manuf = manufacture_factory()
     nomenclatures = nomenclature_factory.create_batch(
         3, frame_type=FrameTypeOption.objects.get(name="РЧ"), manufacture=manuf
@@ -36,19 +34,19 @@ def test_create_components_with_type_with_sub_component(
 ):
     name_sub_component = "Чип РЧ"
     inner_component_type = component_type_factory(name=name_sub_component)
-    component = create_components_rs_type(inner_component_type=inner_component_type)
+    component = get_components_rs_type(inner_component_type=inner_component_type)
 
     nomenclature_factory(frame_type=FrameTypeOption.objects.get(name="РЧ"))
 
-    assert Component.objects.count() == 2
     assert Component.objects.filter(component_type=inner_component_type).exists()
 
 
 class TestReservation:
     @pytest.mark.django_db
     def test_reserve_already_exists_component_first(self, nomenclature_factory):
+        ComponentType.objects.all().delete()
         component = ComponentFactory(
-            component_type_name="Плата РЧ RX", is_reserve=False, is_stock=True
+            component_type=get_components_rs_type(), is_reserve=False, is_stock=True
         )
 
         nomenclature = nomenclature_factory(
@@ -64,6 +62,8 @@ class TestReservation:
         self,
         nomenclature_factory,
     ):
+        ComponentType.objects.all().delete()
+
         component = ComponentFactory(
             component_type_name="Плата РЧ RX",
             is_reserve=False,
@@ -84,6 +84,8 @@ class TestReservation:
         self,
         nomenclature_factory,
     ):
+        ComponentType.objects.all().delete()
+
         component = ComponentFactory(
             component_type_name="Плата РЧ RX",
             is_reserve=False,

@@ -7,20 +7,25 @@ from storage.models import Component
 
 @pytest.mark.django_db
 def test_create_type_component(client, component_type):
+    start_count = ComponentType.objects.count()
     url = reverse("component-type-create")
     data = {
         "name": "Test Component Type",
         "is_internal": False,
         "parent_component_type": [component_type.pk],
     }
+
     response = client.post(url, data)
+
     assert response.status_code == 302
-    assert ComponentType.objects.count() == 2
+    assert ComponentType.objects.count() - start_count == 1
     assert ComponentType.objects.last().name == "Test Component Type"
 
 
 @pytest.mark.django_db
 def test_create_type_component_with_sub_component(client):
+    start_count = ComponentType.objects.count()
+
     component = ComponentType.objects.create(
         name="Test Component Type", is_internal=False
     )
@@ -32,7 +37,7 @@ def test_create_type_component_with_sub_component(client):
     }
     response = client.post(url, data)
     assert response.status_code == 302
-    assert ComponentType.objects.count() == 2
+    assert ComponentType.objects.count() - start_count == 2
     assert (
         ComponentType.objects.get(name="Test Component Type 2")
         .parent_component_type.get()

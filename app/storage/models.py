@@ -8,7 +8,9 @@ class Component(models.Model):
         verbose_name_plural = "Компоненты"
 
     component_type = models.ForeignKey(
-        "ComponentType", verbose_name="Тип компонента", on_delete=models.CASCADE
+        "ComponentType",
+        verbose_name="Тип компонента",
+        on_delete=models.CASCADE,
     )
     is_archive = models.BooleanField(default=False, verbose_name="В архиве")
 
@@ -66,7 +68,9 @@ class ComponentType(models.Model):
         verbose_name = "Тип компонента"
         verbose_name_plural = "Типы компонентов"
 
-    name = models.CharField(max_length=255, verbose_name="Название типа компонента")
+    name = models.CharField(
+        max_length=255, verbose_name="Название типа компонента", unique=True
+    )
     parent_component_type = models.ManyToManyField(
         "ComponentType",
         verbose_name="Тип родительского подкомпонента",

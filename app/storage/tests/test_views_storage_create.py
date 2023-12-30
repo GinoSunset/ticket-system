@@ -2,7 +2,7 @@ import pytest
 from datetime import date
 from django.urls import reverse
 from django.test import Client
-from storage.models import Component
+from storage.models import Component, ComponentType
 
 from storage.forms import ComponentForm
 from storage.views import ComponentCreateView
@@ -70,6 +70,8 @@ class TestComponentCreateView:
         assert component.is_stock is True
 
     def test_form_create_component_more_one_count(self, client, component_factory):
+        ComponentType.objects.all().delete()
+
         component = component_factory()
         form_data = {
             "component_type": component.component_type.pk,
@@ -100,6 +102,7 @@ class TestComponentCreateView:
     def test_reservation_component_who_not_in_stock_after_add_to_stock(
         self, client, component_factory
     ):
+        ComponentType.objects.all().delete()
         component = component_factory(
             is_reserve=True,
             is_stock=False,
@@ -121,6 +124,7 @@ class TestComponentCreateView:
     def test_reserve_and_create_component_in_delivery(
         self, client, component_factory, nomenclature_factory
     ):
+        ComponentType.objects.all().delete()
         nomenclature = nomenclature_factory(manufacture__date_shipment=date(2021, 1, 2))
 
         component = component_factory(
