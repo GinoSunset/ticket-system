@@ -5,18 +5,22 @@ from django.shortcuts import get_object_or_404, render
 from django.urls import reverse_lazy
 from django.db import models
 from django.views.generic import ListView, CreateView
+from django.contrib.auth.mixins import LoginRequiredMixin
+
+from ticket.mixin import AccessOperatorMixin
+
 from .models import Component, ComponentType, Alias
 from .forms import ComponentTypeForm, ComponentForm
 
 
-class ComponentListView(ListView):
+class ComponentListView(AccessOperatorMixin, LoginRequiredMixin, ListView):
     model = Component
     template_name = "storage/component_list.html"
     context_object_name = "components"
     ordering = ["component_type", "-id"]
 
 
-class StorageListView(ListView):
+class StorageListView(AccessOperatorMixin, LoginRequiredMixin, ListView):
     model = Component
     template_name = "storage/storage.html"
     context_object_name = "components"
@@ -55,14 +59,14 @@ class StorageListView(ListView):
         )
 
 
-class ComponentTypeCreateView(CreateView):
+class ComponentTypeCreateView(AccessOperatorMixin, LoginRequiredMixin, CreateView):
     model = ComponentType
     template_name = "storage/component_type_create.html"
     form_class = ComponentTypeForm
     success_url = reverse_lazy("component-list")
 
 
-class ComponentCreateView(CreateView):
+class ComponentCreateView(AccessOperatorMixin, LoginRequiredMixin, CreateView):
     model = Component
     template_name = "storage/component_create.html"
     form_class = ComponentForm
@@ -169,7 +173,7 @@ class ComponentCreateView(CreateView):
         )
 
 
-class ComponentTypeReserveView(ListView):
+class ComponentTypeReserveView(AccessOperatorMixin, LoginRequiredMixin, ListView):
     model = ComponentType
     template_name = "storage/component_type_modal.html"
     context_object_name = "manufacturers"
