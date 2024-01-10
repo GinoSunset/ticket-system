@@ -113,3 +113,9 @@ def rabbitmq():
 @pytest.fixture(autouse=True)
 def setup_test_env(settings):
     settings.TG_BOT_NOTIFICATION_URI = "https://test.com"
+
+
+@pytest.fixture
+def operator_client(operator, client):
+    client.force_login(operator)
+    return client

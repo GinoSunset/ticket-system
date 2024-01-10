@@ -14,3 +14,15 @@ class TestComponentModel:
         assert serial_number.startswith("TE")
         assert len(serial_number) == 11
         assert not Component.objects.filter(serial_number=serial_number).exists()
+
+
+@pytest.mark.django_db
+class TestComponentTypeModel:
+    def test_subcomponents_has_count(self, component_type_factory):
+        component_type = component_type_factory()
+        sub_component_type = component_type_factory()
+
+        sub_component_type.parent_component_type.add(
+            component_type, through_defaults={"count_sub_components": 2}
+        )
+        assert False

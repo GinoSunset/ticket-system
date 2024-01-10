@@ -6,8 +6,8 @@ import pytest
 
 
 @pytest.mark.django_db
-def test_exist_storage_list_view(client):
-    response = client.get(reverse("component-list"))
+def test_exist_storage_list_view(operator_client):
+    response = operator_client.get(reverse("component-list"))
     assert response.status_code == 200
 
 
