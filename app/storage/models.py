@@ -84,6 +84,7 @@ class ComponentType(models.Model):
         verbose_name="Тип родительского подкомпонента",
         related_name="sub_components_type",
         help_text="Выберите тип компонента, в состав которого входит данный компонент",
+        through="SubComponentTypeRelation",
     )
     is_internal = models.BooleanField(
         default=False,
@@ -92,7 +93,25 @@ class ComponentType(models.Model):
     )
 
     def __str__(self) -> str:
-        return f"{self.name} {f'[{self.sub_components_type.count()}]' if self.sub_components_type.all() else ''}"
+        return f"{self.name}"
+
+
+class SubComponentTypeRelation(models.Model):
+    parent_component_type = models.ForeignKey(
+        "ComponentType",
+        verbose_name="Родительский компонент",
+        related_name="sub_components",
+        on_delete=models.PROTECT,
+    )
+    sub_component_type = models.ForeignKey(
+        "ComponentType",
+        verbose_name="Тип подкомпонента",
+        related_name="parent_components",
+        on_delete=models.CASCADE,
+    )
+    count_sub_components = models.PositiveIntegerField(
+        verbose_name="Количество", default=1
+    )
 
 
 class Delivery(models.Model):
