@@ -1,7 +1,9 @@
 from django import forms
 from django.forms import ModelForm
+from django.forms.formsets import formset_factory
 from django.core.exceptions import ValidationError
-from .models import ComponentType, Alias, Component
+
+from .models import ComponentType, Alias, Component, SubComponentTypeRelation
 
 
 class AliasForm(ModelForm):
@@ -13,13 +15,10 @@ class AliasForm(ModelForm):
 class ComponentTypeForm(ModelForm):
     class Meta:
         model = ComponentType
-        fields = ["name", "is_internal", "parent_component_type"]
+        fields = ["name", "is_internal"]
 
         widgets = {
             "is_internal": forms.CheckboxInput(attrs={"class": "ui checkbox"}),
-            "parent_component_type": forms.SelectMultiple(
-                attrs={"class": "ui dropdown search"}
-            ),
         }
 
 
@@ -69,3 +68,18 @@ class ComponentForm(ModelForm):
             raise ValidationError(
                 "Необходимо указать статус компонента (в наличии или в резерве) или указать дату поставки"
             )
+
+
+class ParentTypeForm(ModelForm):
+    class Meta:
+        model = SubComponentTypeRelation
+        fields = ["parent_component_type", "count_sub_components"]
+
+        widgets = {
+            "parent_component_type": forms.Select(
+                attrs={"class": "ui dropdown search", "placeholder": "Выберите тип"}
+            ),
+        }
+
+
+ParentFormSet = formset_factory(ParentTypeForm)

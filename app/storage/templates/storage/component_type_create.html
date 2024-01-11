@@ -2,15 +2,13 @@
 
 {% block content %}
   <h1>Создание типов компонента</h1>
-  <form class="ui form" method="post">
+  <form class="ui form" id="form-create-type-component" method="post">
     {{ form.non_field_errors }}
     {% csrf_token %}
-    <div class="two fields">
-      <div class="field">
-        <label>{{ form.name.label }}</label>
-        {{ form.name }}
-        {{ form.name.errors }}
-      </div>
+    <div class="field">
+      <label>{{ form.name.label }}</label>
+      {{ form.name }}
+      {{ form.name.errors }}
     </div>
     <div class="field">
       <div class="ui checkbox">
@@ -19,16 +17,57 @@
         {{ form.is_internal.errors }}
       </div>
     </div>
-    <div>
-      <label>{{ form.parent_component_type.label }}</label>
-      {{ form.parent_component_type }}
-      {{ form.parent_component_type.errors }}
+
+    {{ parent_forms.management_form }}
+    <div class="contanireParentForm">
+      {% for parent_form in parent_forms %}
+        <div class="two fields">
+          <div class="field">
+            <label>{{ parent_form.parent_component_type.label }}</label>
+            {{ parent_form.parent_component_type }}
+            {{ parent_form.parent_component_type.errors }}
+          </div>
+          <div class="field">
+            <label>{{ parent_form.count_sub_components.label }}</label>
+            {{ parent_form.count_sub_components }}
+            {{ parent_form.count_sub_components.errors }}
+          </div>
+        </div>
+      {% endfor %}
     </div>
+    <a class="ui button basic green" id="add_parent_btn">+</a>
 
     <button class="ui button basic green" type="submit">Создать</button>
   </form>
+
   <script>
     $('.ui.checkbox').checkbox()
     $('select').dropdown()
+  </script>
+{% endblock %}
+
+{% block script %}
+  <script>
+    let parentForm = document.querySelectorAll('.contanireParentForm')
+    let container = document.querySelector('#form-create-type-component')
+    let addButton = document.querySelector('#add_parent_btn')
+    let totalForms = document.querySelector('#id_parents-TOTAL_FORMS')
+    
+    let formNum = parentForm.length - 1
+    addButton.addEventListener('click', addForm)
+    
+    function addForm(e) {
+      e.preventDefault()
+    
+      let newForm = parentForm[0].cloneNode(true)
+      let formRegex = RegExp(`parents-(\\d){1}-`, 'g')
+    
+      formNum++
+      newForm.innerHTML = newForm.innerHTML.replace(formRegex, `parents-${formNum}-`)
+      container.insertBefore(newForm, addButton)
+    
+      totalForms.setAttribute('value', `${formNum + 1}`)
+      $('.dropdown').dropdown()
+    }
   </script>
 {% endblock %}

@@ -10,7 +10,7 @@ from django.contrib.auth.mixins import LoginRequiredMixin
 from ticket.mixin import AccessOperatorMixin
 
 from .models import Component, ComponentType, Alias
-from .forms import ComponentTypeForm, ComponentForm
+from .forms import ComponentTypeForm, ComponentForm, ParentFormSet
 
 
 class ComponentListView(AccessOperatorMixin, LoginRequiredMixin, ListView):
@@ -63,7 +63,24 @@ class ComponentTypeCreateView(AccessOperatorMixin, LoginRequiredMixin, CreateVie
     model = ComponentType
     template_name = "storage/component_type_create.html"
     form_class = ComponentTypeForm
-    success_url = reverse_lazy("component-list")
+    success_url = reverse_lazy("storage")
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context["parent_forms"] = ParentFormSet(prefix="parents")
+        return context
+
+    def form_valid(self, form):
+        self.object = form.save()
+        parent_forms = ParentFormSet(self.request.POST, prefix="parents")
+        if not parent_forms.is_valid():
+            return self.form_invalid(form)
+        for parent_form in parent_forms:
+            parent_type = parent_form.save(commit=False)
+            parent_type.sub_component_type = self.object
+            parent_type.save()
+
+        return super().form_valid(form)
 
 
 class ComponentCreateView(AccessOperatorMixin, LoginRequiredMixin, CreateView):

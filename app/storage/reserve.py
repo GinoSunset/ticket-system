@@ -1,6 +1,6 @@
 from django.db.models import Q
 from manufactures.models import Manufacture, Nomenclature
-from .models import Component, ComponentType
+from .models import Component, ComponentType, SubComponentTypeRelation
 import logging
 
 
@@ -32,7 +32,14 @@ def get_sub_component_from_component(
     components_type = [component_type]
     if sub_components_type := component_type.sub_components_type.all():
         for sub_component_type in sub_components_type:
-            components_type.extend(get_sub_component_from_component(sub_component_type))
+            count_sub_components = SubComponentTypeRelation.objects.get(
+                parent_component_type=component_type,
+                sub_component_type=sub_component_type,
+            ).count_sub_components
+            for _ in range(count_sub_components):
+                components_type.extend(
+                    get_sub_component_from_component(sub_component_type)
+                )
     return components_type
 
 

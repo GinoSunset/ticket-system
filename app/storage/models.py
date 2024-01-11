@@ -40,8 +40,13 @@ class Component(models.Model):
 
     @classmethod
     def generate_serial_number(cls, component_type):
+        def get_prefix():
+            if " " in component_type.name:
+                return "".join([word[0] for word in component_type.name.split()])
+            return component_type.name[:2]
+
         while True:
-            serial_number = f"{component_type.name[:2]}-{uuid.uuid4().hex[:8]}".upper()
+            serial_number = f"{get_prefix()}-{uuid.uuid4().hex[:8]}".upper()
             if not Component.objects.filter(serial_number=serial_number).exists():
                 return serial_number
 
@@ -79,11 +84,10 @@ class ComponentType(models.Model):
     name = models.CharField(
         max_length=255, verbose_name="Название типа компонента", unique=True
     )
-    parent_component_type = models.ManyToManyField(
+    sub_components_type = models.ManyToManyField(
         "ComponentType",
-        verbose_name="Тип родительского подкомпонента",
-        related_name="sub_components_type",
-        help_text="Выберите тип компонента, в состав которого входит данный компонент",
+        verbose_name="Тип подкомпонента",
+        related_name="parent_component_type",
         through="SubComponentTypeRelation",
     )
     is_internal = models.BooleanField(
@@ -97,6 +101,10 @@ class ComponentType(models.Model):
 
 
 class SubComponentTypeRelation(models.Model):
+    class Meta:
+        verbose_name = "Связь типов компонентов"
+        verbose_name_plural = "Связь типов компонентов"
+
     parent_component_type = models.ForeignKey(
         "ComponentType",
         verbose_name="Родительский компонент",
@@ -112,6 +120,9 @@ class SubComponentTypeRelation(models.Model):
     count_sub_components = models.PositiveIntegerField(
         verbose_name="Количество", default=1
     )
+
+    def __str__(self) -> str:
+        return f"{self.parent_component_type.name} -> {self.sub_component_type} [{self.count_sub_components}]"
 
 
 class Delivery(models.Model):
