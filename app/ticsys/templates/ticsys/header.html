@@ -21,7 +21,7 @@
     </a>
     </a>
     {% endif%}
-    {% if user.is_operator  or user.is_staff or user.is_manufacturer %}
+    {% if user.is_operator  or user.is_staff or user.is_manufacturer or user.is_has_operator_access %}
     <a class="item {% if url_name == 'manufactures-list' %}active{% endif %}" href="{% url 'manufactures-list' %}">
       Производство
     </a>
