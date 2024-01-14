@@ -75,6 +75,10 @@ class User(AbstractUser):
         return Customer.objects.none()
 
     @property
+    def is_has_operator_access(self):
+        return self.is_operator or self.groups.filter(name=self.Role.OPERATOR).exists()
+
+    @property
     def is_operator(self):
         return self.role == self.Role.OPERATOR
 

@@ -29,7 +29,7 @@ class AccessOperatorMixin(UserPassesTestMixin):
             return False
         if user.is_staff:
             return True
-        if user.is_operator:
+        if user.is_has_operator_access:
             return True
         return False
 
