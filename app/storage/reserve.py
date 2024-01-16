@@ -73,3 +73,18 @@ def reserve_component(component_type: ComponentType, nomenclature: Nomenclature)
 def components_from_nomenclature_to_archive(nomenclature: Nomenclature):
     Component.objects.filter(nomenclature=nomenclature).update(is_archive=True)
     logging.info(f"All components with nomenclature {nomenclature} are archived")
+
+
+def unreserve_components(nomenclature: Nomenclature):
+    count_remove = Component.objects.filter(
+        nomenclature=nomenclature,
+        is_stock=False,
+        is_reserve=True,
+        date_delivery__isnull=True,
+    ).delete()
+    count_update = Component.objects.filter(
+        nomenclature=nomenclature, is_reserve=True
+    ).update(is_reserve=False, nomenclature=None)
+    logging.info(
+        f"Remove {count_remove} component. Unreserve {count_update} component for Nomenclature {nomenclature} "
+    )

@@ -60,6 +60,10 @@ class Component(models.Model):
         if self.is_reserve:
             return "yellow"
 
+    def __str__(self) -> str:
+        sn = f" {self.serial_number}" or ""
+        return f"[{self.pk}]{self.component_type.name}{sn}"
+
 
 class Alias(models.Model):
     class Meta:

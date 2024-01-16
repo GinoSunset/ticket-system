@@ -1,10 +1,11 @@
 import pytest
-from datetime import date
+from datetime import date, datetime
 
 from storage.models import Component
 from manufactures.models import Nomenclature, FrameTypeOption
 from storage.models import ComponentType
 from storage.factories import ComponentFactory, ComponentTypeFactory
+from storage.reserve import unreserve_components
 
 
 def get_components_rs_type(
@@ -101,3 +102,108 @@ class TestReservation:
         assert Component.objects.count() == 2
         assert Component.objects.filter(is_reserve=True).count() == 1
         assert Component.objects.filter(is_reserve=False).first() == component
+
+
+@pytest.mark.django_db
+class TestUnreserveComponents:
+    def test_unreserve_components(self, nomenclature_factory, component_factory):
+        nomenclature = nomenclature_factory()
+        component1 = component_factory(
+            nomenclature=nomenclature,
+            is_stock=False,
+            is_reserve=True,
+            date_delivery=None,
+        )
+        component2 = component_factory(
+            nomenclature=nomenclature,
+            is_stock=False,
+            is_reserve=True,
+            date_delivery=datetime.now(),
+        )
+        component3 = component_factory(
+            nomenclature=nomenclature,
+            is_stock=True,
+            is_reserve=True,
+            date_delivery=None,
+        )
+
+        unreserve_components(nomenclature)
+        component2.refresh_from_db()
+        component3.refresh_from_db()
+
+        assert Component.objects.filter(pk=component1.pk).exists() is False
+        assert component2.is_reserve is False
+        assert component3.is_reserve is False
+
+        assert Component.objects.filter(nomenclature=nomenclature).count() == 0
+
+
+@pytest.mark.django_db
+class TestSignalReservation:
+    def test_signal_after_update_component(self, nomenclature_factory):
+        nomenclature = nomenclature_factory()
+        component_bp = Component.objects.filter(
+            nomenclature=nomenclature, component_type__name__contains="БП АМ"
+        )
+        count_before_add = component_bp.count()
+
+        nomenclature.bp_count *= 2
+        nomenclature.save()
+
+        components = Component.objects.filter(
+            nomenclature=nomenclature, component_type__name__contains="БП АМ"
+        )
+        assert components.count() == count_before_add * 2
+
+    def test_reduce_count_components_after_update_nomenclature(
+        self, nomenclature_factory, component_factory
+    ):
+        """
+        Создается 2 компонента БП АМ 1А
+        Создается номенклатура с 2 компонентами БП АМ 1А
+        После обновления номенклатуры кол-во компонентов БП АМ 1А должно уменьшиться на 1
+        """
+        component_type_bp = ComponentType.objects.filter(name__contains="БП АМ 1А")
+        for component_type in component_type_bp:
+            component_factory(
+                component_type=component_type, is_stock=True, nomenclature=None
+            )
+            component_factory(
+                component_type=component_type, is_stock=True, nomenclature=None
+            )
+
+        nomenclature = nomenclature_factory(bp_count=2)
+
+        components_bp_before_update = Component.objects.filter(
+            component_type__name__contains="БП АМ 1А",
+            is_reserve=True,
+            nomenclature=nomenclature,
+        )
+
+        count_before_update = components_bp_before_update.count()
+        pks_before_update = list(
+            components_bp_before_update.values_list("pk", flat=True)
+        )
+
+        nomenclature.bp_count = 1
+        nomenclature.save()
+
+        assert (
+            Component.objects.filter(
+                component_type__name__contains="БП АМ 1А",
+                is_reserve=True,
+                nomenclature=nomenclature,
+            ).count()
+            == count_before_update / 2
+        )
+
+        components_after_update = Component.objects.filter(pk__in=pks_before_update)
+
+        assert (
+            components_after_update.filter(is_reserve=True).count()
+            == count_before_update / 2
+        )
+        assert (
+            components_after_update.filter(is_reserve=False).count()
+            == count_before_update / 2
+        )
