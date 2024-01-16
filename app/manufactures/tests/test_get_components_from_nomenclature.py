@@ -1,4 +1,7 @@
 import pytest
+from django.db.models import signals
+import factory
+
 from manufactures.models import Nomenclature, FrameTypeOption
 
 
@@ -105,3 +108,32 @@ def test_nomenclature_get_components_from_bp_rs(nomenclature_factory):
     components = nomenclature.get_components_from_bp()
     expected_components = ["БП РЧ 3.2А", "БП РЧ 3.2А"]
     assert components == expected_components
+
+
+@pytest.mark.django_db
+@pytest.mark.parametrize(
+    "comment, expected_components, count",
+    [
+        ("необходимо {деатоватор 4 шт}", ["деатоватор"], 4),
+        (
+            "необходимо {деатоватор 4 шт} {преобразователь 2 шт}",
+            ["деатоватор", "преобразователь"],
+            6,
+        ),
+        (
+            "необходимо {деатоватор 4 шт} {преобразователь 2 шт} {преобразователь 2 шт}",
+            ["деатоватор", "преобразователь"],
+            8,
+        ),
+    ],
+)
+@factory.django.mute_signals(signals.post_save)
+def test_get_components_from_comment(
+    nomenclature_factory, comment, expected_components, count
+):
+    nomenclature = nomenclature_factory(comment=comment)
+    components = nomenclature.get_components_from_comment()
+
+    assert len(components) == count
+    for component in expected_components:
+        assert component in components

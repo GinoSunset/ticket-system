@@ -1,8 +1,12 @@
+import re
+
 from django.db import models
 from django.urls import reverse
 
 from additionally.models import Dictionary
 from users.models import Operator
+
+import logging
 
 
 def get_default_new_manufacture_status():
@@ -227,6 +231,7 @@ class Nomenclature(models.Model):
         components.extend(self.get_components_from_bp())
         if self.mdg:
             components.extend(self.get_components_from_mdg())
+        components.extend(self.get_components_from_comment())
         return components
 
     def get_components_from_rx(self) -> list:
@@ -280,4 +285,23 @@ class Nomenclature(models.Model):
         if self.bp_type == "OU":
             amperage = "6А" if self.amperage_6 else "3.2А"
             components = [f"БП РЧ {amperage}" for _ in range(self.bp_count)]
+        return components
+
+    def get_components_from_comment(self) -> list:
+        """return list components from comment"""
+        components = []
+        if self.comment:
+            """
+            взять компонент из комментария которые находятся в фигурных скобках
+            и в конце указано количество через пробел
+            например: 'нужно {деактиватор 2 шт} и {плата * 3}'
+            """
+
+            matches = re.findall(r"{(.*?)}", self.comment)
+            logging.debug(f"matches: {matches}")
+            for match in matches:
+                component, count = re.findall(r"(.*)\s(\d+)", match)[0]
+                component = component.strip()
+                logging.debug(f"component: {component}, count: {count}")
+                components.extend([component for _ in range(int(count))])
         return components
