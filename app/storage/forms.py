@@ -77,9 +77,13 @@ class ParentTypeForm(ModelForm):
 
         widgets = {
             "parent_component_type": forms.Select(
-                attrs={"class": "ui dropdown search", "placeholder": "Выберите тип"}
+                attrs={
+                    "class": "ui dropdown search",
+                    "placeholder": "Выберите тип",
+                    "required": True,
+                }
             ),
         }
 
 
-ParentFormSet = formset_factory(ParentTypeForm)
+ParentFormSet = formset_factory(ParentTypeForm, min_num=1, validate_min=True, extra=0)

@@ -22,7 +22,7 @@
     <div class="contanireParentForm">
       {% for parent_form in parent_forms %}
         <div class="two fields">
-          <div class="field">
+          <div class="{% if parent_form.parent_component_type.errors %}{% endif %} field">
             <label>{{ parent_form.parent_component_type.label }}</label>
             {{ parent_form.parent_component_type }}
             {{ parent_form.parent_component_type.errors }}

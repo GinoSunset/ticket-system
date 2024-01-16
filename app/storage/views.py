@@ -6,6 +6,8 @@ from django.urls import reverse_lazy
 from django.db import models
 from django.views.generic import ListView, CreateView
 from django.contrib.auth.mixins import LoginRequiredMixin
+from django.db.transaction import atomic
+from django.forms.formsets import all_valid
 
 from ticket.mixin import AccessOperatorMixin
 
@@ -67,18 +69,24 @@ class ComponentTypeCreateView(AccessOperatorMixin, LoginRequiredMixin, CreateVie
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context["parent_forms"] = ParentFormSet(prefix="parents")
+        if "parent_forms" not in kwargs:
+            context["parent_forms"] = ParentFormSet(prefix="parents")
         return context
 
+    @atomic()
     def form_valid(self, form):
         self.object = form.save()
         parent_forms = ParentFormSet(self.request.POST, prefix="parents")
-        if not parent_forms.is_valid():
-            return self.form_invalid(form)
+        if not all_valid(parent_forms):
+            self.object.delete()
+            return self.render_to_response(
+                self.get_context_data(form=form, parent_forms=parent_forms)
+            )
+
         for parent_form in parent_forms:
-            parent_type = parent_form.save(commit=False)
-            parent_type.sub_component_type = self.object
-            parent_type.save()
+            parrent = parent_form.save(commit=False)
+            parrent.sub_component_type = self.object
+            parrent.save()
 
         return super().form_valid(form)
 
