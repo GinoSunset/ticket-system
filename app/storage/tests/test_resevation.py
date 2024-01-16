@@ -205,5 +205,18 @@ class TestSignalReservation:
         )
         assert (
             components_after_update.filter(is_reserve=False).count()
-            == count_before_update / 2
+            == count_before_update / 2,
+            pks_before_update,
         )
+
+
+@pytest.mark.django_db
+def test_reservation_component_from_comment(
+    nomenclature_factory, component_type_factory
+):
+    ct = component_type_factory(name="деатоватор")
+    comment = "необходимо {деатоватор  4 шт}"
+    nomenclature = nomenclature_factory(comment=comment)
+
+    assert Component.objects.filter(component_type=ct).count() == 4
+    assert Component.objects.filter(component_type=ct, is_reserve=True).count() == 4
