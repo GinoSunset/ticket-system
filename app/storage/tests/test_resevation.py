@@ -163,12 +163,13 @@ class TestSignalReservation:
         Создается номенклатура с 2 компонентами БП АМ 1А
         После обновления номенклатуры кол-во компонентов БП АМ 1А должно уменьшиться на 1
         """
+        Component.objects.all().delete()
         component_type_bp = ComponentType.objects.filter(name__contains="БП АМ 1А")
         for component_type in component_type_bp:
-            component_factory(
+            c1 = component_factory(
                 component_type=component_type, is_stock=True, nomenclature=None
             )
-            component_factory(
+            c2 = component_factory(
                 component_type=component_type, is_stock=True, nomenclature=None
             )
 
@@ -181,9 +182,8 @@ class TestSignalReservation:
         )
 
         count_before_update = components_bp_before_update.count()
-        pks_before_update = list(
-            components_bp_before_update.values_list("pk", flat=True)
-        )
+        pks_before_update = [component.pk for component in components_bp_before_update]
+        print(pks_before_update)
 
         nomenclature.bp_count = 1
         nomenclature.save()
@@ -199,14 +199,13 @@ class TestSignalReservation:
 
         components_after_update = Component.objects.filter(pk__in=pks_before_update)
 
+        assert components_after_update.filter(pk=c1.pk).exists()
+        assert Component.objects.filter(pk=c2.pk).exists()
         assert (
-            components_after_update.filter(is_reserve=True).count()
-            == count_before_update / 2
-        )
-        assert (
-            components_after_update.filter(is_reserve=False).count()
-            == count_before_update / 2,
-            pks_before_update,
+            Component.objects.filter(
+                nomenclature=nomenclature, component_type__name__contains="БП АМ 1А"
+            ).count()
+            == 1
         )
 
 
