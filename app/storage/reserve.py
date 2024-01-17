@@ -19,7 +19,7 @@ def get_components_type_from_nomenclature(
     list_components_type = []
     for component in components:
         try:
-            type_component = ComponentType.objects.get(name=component)
+            type_component = ComponentType.objects.get(name__icontains=component)
         except ComponentType.DoesNotExist:
             continue
         list_components_type.extend(get_sub_component_from_component(type_component))
@@ -51,7 +51,7 @@ def reserve_component(component_type: ComponentType, nomenclature: Nomenclature)
         )
     else:
         q_conditions |= Q(date_delivery__isnull=False)
-    components = Component.objects.filter(
+    components = Component.objects.select_for_update().filter(
         q_conditions, component_type=component_type, is_reserve=False
     )
     if components.exists():
