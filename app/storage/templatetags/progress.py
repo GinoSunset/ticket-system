@@ -1,4 +1,6 @@
 from django import template
+from django.db.models import Q
+
 from storage.models import ComponentType, Component
 
 register = template.Library()
@@ -44,9 +46,9 @@ def get_value_progress(component):
             component_type_id=component["component_type"]
         )
         .filter(
+            Q(date_delivery__isnull=True) | Q(date_delivery__isnull=False),
             is_reserve=True,
             is_stock=True,
-            date_delivery__isnull=True,
         )
         .count()
     )
@@ -55,9 +57,9 @@ def get_value_progress(component):
             component_type_id=component["component_type"]
         )
         .filter(
+            Q(date_delivery__isnull=True) | Q(date_delivery__isnull=False),
             is_reserve=False,
             is_stock=True,
-            date_delivery__isnull=True,
         )
         .count()
     )
