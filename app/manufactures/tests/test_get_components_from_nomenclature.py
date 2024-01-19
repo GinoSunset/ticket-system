@@ -50,10 +50,18 @@ def test_nomenclature_get_components_from_tx(nomenclature_factory):
 
 
 @pytest.mark.django_db
-def test_nomenclature_get_components_from_body(nomenclature_factory):
-    nomenclature = nomenclature_factory()
+@pytest.mark.parametrize(
+    "rx_count, tx_count, expected_count", ([1, 1, 2], [2, 2, 4], [1, 2, 3], [2, 1, 3])
+)
+def test_nomenclature_get_components_from_body(
+    nomenclature_factory, rx_count, tx_count, expected_count
+):
+    nomenclature = nomenclature_factory(rx_count=rx_count, tx_count=tx_count)
     components = nomenclature.get_components_from_body()
-    expected_components = [f"Корпус {nomenclature.frame_type} {nomenclature.body}"]
+    expected_components = [
+        f"Корпус {nomenclature.frame_type} {nomenclature.body}"
+        for _ in range(expected_count)
+    ]
     assert components == expected_components
 
 

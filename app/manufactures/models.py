@@ -246,7 +246,10 @@ class Nomenclature(models.Model):
 
     def get_components_from_body(self) -> list:
         """return list components from body"""
-        components = [f"Корпус {self.frame_type} {self.body}"]
+        components = [
+            f"Корпус {self.frame_type} {self.body}"
+            for _ in range(self.rx_count + self.tx_count)
+        ]
         return components
 
     def get_components_from_mdg(self) -> list:
