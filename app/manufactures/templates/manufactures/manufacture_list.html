@@ -5,6 +5,18 @@
 <script type="text/javascript" src="{% static 'DataTables/DataTables-1.13.1/js/jquery.dataTables.min.js' %}"></script>
 <script type="text/javascript" src="{% static 'DataTables/DataTables-1.13.1/js/dataTables.semanticui.min.js' %}"></script>
 <style>
+
+  .code{
+    background-color: rgba(0, 0, 0, 0.08);
+    border-radius: 3px;
+    display: inline-block;
+    font-family: "Monaco","Menlo","Ubuntu Mono","Consolas","source-code-pro",monospace;
+    font-size: 0.875em;
+    font-weight: bold;
+    padding: 1px 6px;
+    vertical-align: baseline;
+  }
+
   .reloadbtn{
     position: fixed;
     bottom: 20px;
@@ -259,6 +271,7 @@ function getDetails(id){
                 div
                     .html( res )
                     .removeClass( 'loading' );
+                prettyComment();
             }
         } );
      
@@ -287,6 +300,16 @@ function printDetails(id){
       }, 1000);
 
     }
+  });
+}
+function prettyComment(){
+  $(".componentsComment").each(function(){
+    let text = $(this).text();
+    if (text.indexOf('{') == -1){
+      return;
+    }
+    let new_text = text.replace(/{([^}]+)}/g, '<span class="code">$1</span>');
+    $(this).html(new_text);
   });
 }
 
