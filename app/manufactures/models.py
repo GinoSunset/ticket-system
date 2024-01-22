@@ -300,11 +300,20 @@ class Nomenclature(models.Model):
             например: 'нужно {деактиватор 2 шт} и {плата * 3}'
             """
 
-            matches = re.findall(r"{(.*?)}", self.comment)
-            logging.debug(f"matches: {matches}")
+            matches = extract_template_components(self.comment)
             for match in matches:
-                component, count = re.findall(r"(.*)\s(\d+)", match)[0]
+                component, count = split_component_count(match)
                 component = component.strip()
                 logging.debug(f"component: {component}, count: {count}")
                 components.extend([component for _ in range(int(count))])
         return components
+
+
+def split_component_count(match):
+    return re.findall(r"(.*)\s(\d+)", match)[0]
+
+
+def extract_template_components(comment: str) -> list:
+    matches = re.findall(r"{(.*?)}", comment)
+    logging.debug(f"matches: {matches}")
+    return matches
