@@ -329,7 +329,7 @@
     if (is_mdg) {
       multiply = 6
     }
-    var message = `Ферриты(${count_tx * multiply})`
+    var message = `{Ферриты ${count_tx * multiply} шт.}`
     return message
   }
 
@@ -352,7 +352,7 @@
       message += ` | UTP 2m - ${bp_count * amperage} шт.`;
     }
     if (is_mdg & (bp_type === "OU")) {
-      message += ` | БП 3,2А - ${count_tx} шт.`;
+      message += ` | {БП РЧ 3.2А ${count_tx} шт.}`;
     }
     return message
   }
