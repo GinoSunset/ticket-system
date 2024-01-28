@@ -2,7 +2,7 @@
   {{ form.non_field_errors }}
   {% if form.id.value %}
     <div class="ui red right ribbon icon label label_id">
-      <span>#{{ form.id.value }}</span>
+      <a href="{% url 'nomenclature-components' form.id.value %}">#{{ form.id.value }}</a>
     </div>
   {% endif %}
   <div class="field">

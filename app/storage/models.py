@@ -54,11 +54,11 @@ class Component(models.Model):
         if not self.is_stock and self.is_reserve and not self.date_delivery:
             return "red"
         if not self.is_stock and self.is_reserve and self.date_delivery:
-            return "orange"
+            return "violet"
+        if self.is_stock and self.is_reserve:
+            return "purple"
         if self.date_delivery:
             return "blue"
-        if self.is_reserve:
-            return "yellow"
 
     def __str__(self) -> str:
         sn = f" {self.serial_number}" or ""

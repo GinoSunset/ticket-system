@@ -10,7 +10,13 @@
         <a class="ui button basic blue" href="{% url 'component-type-create' %}">Создать тип компонент</a>
         <a class="ui button basic green" href="{% url 'component-create' %}">Добавить компонент на склад</a>
         <a class="ui button basic green" href="{% url 'component-type-create' %}">Добавить доставку</a>
-
+        <div class="ui horizontal right aligned divider header legent">
+          <a class="ui mini red label">отсутвует</a>
+          <a class="ui mini violet label">в резерве на доставе</a>
+          <a class="ui mini blue label">в доставке</a>
+          <a class="ui mini purple label">зарезервирован</a>
+          <a class="ui mini green label">свободны</a>
+        </div>
         <table class="ui celled table">
           <thead>
             <tr>
@@ -22,8 +28,8 @@
           </thead>
           <tbody>
             {% for component in components %}
-              <tr class="{{ component.get_status_color }}">
-                <td>
+              <tr>
+                <td class="right {{ component.get_status_color }} marked">
                   {{ component.component_type.name }} 
                 </td>
                 <td>
@@ -31,13 +37,11 @@
                   <div class="content">
                     <a href={{component.nomenclature.manufacture.get_absolute_url}}> {{component.nomenclature}}</a>
                     </div>
-                    <div class="ui label">
                       {{ component.nomenclature.manufacture.date_shipment|date:"d.m.Y" }}
-                    </div>
                   {% comment %} Дата отгрузки: {{ component.nomenclature.manufacture.date_shipment|date:"d.m.Y" }} {% endcomment %}
                   {% endif %}
                 </td>
-                <td>{{ component.serial_number }}</td>
+                <td>{% firstof component.serial_number %}</td>
                 <td>{% firstof component.date_delivery %}</td>
               </tr>
             {% endfor %}
