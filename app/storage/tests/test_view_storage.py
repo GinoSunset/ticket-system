@@ -1,7 +1,12 @@
 from django.urls import reverse
 from datetime import datetime, timedelta
+from django.db.models import signals
+
 
 from storage.views import ComponentCreateView
+from storage.reserve import processing_reserved_component
+from storage.models import Component
+import factory
 import pytest
 
 
@@ -93,3 +98,18 @@ class TestComponentCreateView:
         assert component1 not in components
         assert component2 in components
         assert component3 not in components
+
+
+@pytest.mark.django_db
+class TestComponentByNomenclature:
+    @factory.django.mute_signals(signals.post_save)
+    def test_page_with_components_only_by_nomenclature(
+        self, nomenclature_factory, admin_client
+    ):
+        n = nomenclature_factory()
+        processing_reserved_component(n)
+        components_n = Component.objects.filter(nomenclature=n)
+
+        res = admin_client.get(reverse("nomenclature-components", kwargs={"pk": n.pk}))
+        assert res.status_code == 200
+        assert set(res.context_data.get("components")) == set(components_n)

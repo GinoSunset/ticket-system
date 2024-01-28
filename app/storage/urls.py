@@ -19,4 +19,9 @@ urlpatterns = [
         views.ComponentTypeReserveView.as_view(),
         name="component-type-reserve",
     ),
+    path(
+        "nomenclature-components/<int:pk>/",
+        views.NomenclatureComponents.as_view(),
+        name="nomenclature-components",
+    ),
 ]

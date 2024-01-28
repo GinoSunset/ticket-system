@@ -15,7 +15,6 @@ def reserve_component_on_nomenclature(sender, instance, created, **kwargs):
         processing_reserved_component(instance)
         return
     if not created and instance.manufacture:
-        # TODO: testings this
         unreserve_components(instance)
         processing_reserved_component(instance)
         if instance.status == Nomenclature.Status.SHIPPED:

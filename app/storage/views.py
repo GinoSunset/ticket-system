@@ -1,4 +1,5 @@
 from typing import Any
+from django.db.models.query import QuerySet
 from django.forms.models import BaseModelForm
 from django.http import HttpResponse, HttpResponseRedirect
 from django.shortcuts import get_object_or_404, render
@@ -224,3 +225,22 @@ class ComponentTypeReserveView(AccessOperatorMixin, LoginRequiredMixin, ListView
 
         # get all manufacture from nomenclatures with distinct
         return manufactures
+
+
+class NomenclatureComponents(AccessOperatorMixin, LoginRequiredMixin, ListView):
+    model = Component
+    template_name = "storage/component_list.html"
+    context_object_name = "components"
+    ordering = ["component_type", "-id"]
+
+    def get_context_data(self, **kwargs: Any) -> dict[str, Any]:
+        data = super().get_context_data(**kwargs)
+        data["page_name"] = f"Компоненты номенклатуры №{self.kwargs.get('pk')}"
+        return data
+
+    def get_queryset(self) -> QuerySet[Any]:
+        qs = super().get_queryset()
+        nomenclature_pk = self.kwargs.get("pk")
+        if nomenclature_pk:
+            qs = qs.filter(nomenclature=nomenclature_pk)
+        return qs

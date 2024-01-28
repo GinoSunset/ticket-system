@@ -10,7 +10,9 @@
         <i class="lightbulb outline icon big"></i>
         {% endif %}
         <br>
-        <a class="ui  mini label">#{{nomenclature.pk}}</a>
+        <span class="ui small text grey">#{{nomenclature.pk}}</span>
+        <br>
+        <a href="{% url 'nomenclature-components' nomenclature.pk %}" class="ui  label mini">компоненты</a>
 
         
     </div>

@@ -4,7 +4,7 @@
 {% endblock %}
 
 {% block content %}
-    <h1>Склад</h1>
+    <h1>{% firstof page_name 'Склад' %}</h1>
     <div class="row">
       <div class="col-md-6">
         <a class="ui button basic blue" href="{% url 'component-type-create' %}">Создать тип компонент</a>
