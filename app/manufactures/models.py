@@ -128,7 +128,7 @@ class Nomenclature(models.Model):
     class Meta:
         verbose_name = "Номенклатура"
         verbose_name_plural = "Номенклатуры"
-        ordering = ["date_create"]
+        ordering = ["-date_create"]
 
     class BDType(models.TextChoices):
         OUTER = "OU", "Внешний"

@@ -34,7 +34,7 @@ class ComponentForm(ModelForm):
         required=False,
         label="Сгенерировать серийный номер",
         initial=False,
-        help_text="нужно ли генерировать серийный номер компонентов у которых из нет",
+        help_text="нужно ли генерировать серийный номер компонентов у которых их нет",
     )
 
     class Meta:
@@ -49,7 +49,9 @@ class ComponentForm(ModelForm):
         ]
 
         widgets = {
-            "is_stock": forms.CheckboxInput(attrs={"class": "ui checkbox"}),
+            "is_stock": forms.CheckboxInput(
+                attrs={"class": "ui checkbox", "checked": True},
+            ),
             "is_reserve": forms.CheckboxInput(attrs={"class": "ui checkbox"}),
             "date_delivery": forms.DateInput(attrs={"type": "date"}),
             "component_type": forms.Select(attrs={"class": "ui dropdown search "}),
