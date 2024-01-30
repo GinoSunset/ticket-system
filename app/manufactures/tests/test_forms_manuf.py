@@ -170,6 +170,10 @@ def test_update_status_to_nomenclature_by_manufacture_ready(
             expected_status.append(nomenclature_status)
 
     assert (
-        list(manuf.nomenclatures.all().values_list("status", flat=True))
+        list(
+            manuf.nomenclatures.all()
+            .order_by("date_create")
+            .values_list("status", flat=True)
+        )
         == expected_status
     )
