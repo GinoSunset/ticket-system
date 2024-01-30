@@ -1,0 +1,71 @@
+{% extends 'ticsys/index.html' %}
+
+{% block content %}
+  <h1>Создание доставки</h1>
+  <form class="ui form" id="form-create-delivery" method="post">
+    {{ form.non_field_errors }}
+    {% csrf_token %}
+    <div class="field">
+      <label>{{ form.date_delivery.label }}</label>
+      {{ form.date_delivery }}
+      {{ form.date_delivery.errors }}
+    </div>
+    <div class="field">
+      <label>{{ form.comment.label }}</label>
+      {{ form.comment }}
+      {{ form.comment.errors }}
+    </div>
+
+    {{ type_count_forms.management_form }}
+    <div class="containerComponents">
+      {% for type_count_form in type_count_forms %}
+        <div class="two fields">
+          <div class="{% if type_count_form.component_type.errors %}{% endif %} field">
+            <label>{{ type_count_form.component_type.label }}</label>
+            {{ type_count_form.component_type }}
+            {{ type_count_form.component_type.errors }}
+          </div>
+          <div class="field">
+            <label>{{ type_count_form.count.label }}</label>
+            {{ type_count_form.count }}
+            {{ type_count_form.count.errors }}
+          </div>
+        </div>
+      {% endfor %}
+    </div>
+    <a class="ui button basic green" id="add_parent_btn">+</a>
+
+    <button class="ui button basic green" type="submit">Создать</button>
+  </form>
+
+  <script>
+    $('.ui.checkbox').checkbox()
+    $('select').dropdown()
+  </script>
+{% endblock %}
+
+{% block script %}
+  <script>
+    let parentForm = document.querySelectorAll('.containerComponents')
+    let container = document.querySelector('#form-create-delivery')
+    let addButton = document.querySelector('#add_parent_btn')
+    let totalForms = document.querySelector('#id_type_count-TOTAL_FORMS')
+    
+    let formNum = parentForm.length - 1
+    addButton.addEventListener('click', addForm)
+    
+    function addForm(e) {
+      e.preventDefault()
+    
+      let newForm = parentForm[0].cloneNode(true)
+      let formRegex = RegExp(`parents-(\\d){1}-`, 'g')
+    
+      formNum++
+      newForm.innerHTML = newForm.innerHTML.replace(formRegex, `parents-${formNum}-`)
+      container.insertBefore(newForm, addButton)
+    
+      totalForms.setAttribute('value', `${formNum + 1}`)
+      $('.dropdown').dropdown()
+    }
+  </script>
+{% endblock %}

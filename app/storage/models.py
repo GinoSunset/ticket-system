@@ -152,3 +152,6 @@ class Delivery(models.Model):
         choices=Status.choices,
         default=Status.NEW,
     )
+
+    def __str__(self) -> str:
+        return f"#{self.pk} [{self.date_delivery}] {self.component_set.count()} - Компонент(а)ов"

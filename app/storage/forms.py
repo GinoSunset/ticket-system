@@ -94,14 +94,27 @@ ParentFormSet = formset_factory(ParentTypeForm, min_num=1, validate_min=True, ex
 class DeliveryForm(ModelForm):
     class Meta:
         model = Delivery
-        fields = ["date_delivery", "comment", "status"]
+        fields = ["date_delivery", "comment"]
+
+        widgets = {
+            "date_delivery": forms.DateInput(attrs={"type": "date"}),
+        }
 
 
 class TypeComponentCountForm(Form):
     component_type = forms.ModelChoiceField(
-        queryset=ComponentType.objects.all(), required=True
+        queryset=ComponentType.objects.all(),
+        label="Тип компонента",
+        required=True,
+        widget=forms.Select(
+            attrs={
+                "class": "ui dropdown search",
+                "placeholder": "Выберите тип",
+                "required": True,
+            }
+        ),
     )
-    count = forms.IntegerField(min_value=1, initial=1)
+    count = forms.IntegerField(min_value=1, initial=1, label="Количество в доставке")
 
 
 TypeComponentCountFormSet = formset_factory(

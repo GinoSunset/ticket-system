@@ -1,5 +1,5 @@
 from django.contrib import admin
-from .models import Component, ComponentType, Alias, SubComponentTypeRelation
+from .models import Component, ComponentType, Alias, SubComponentTypeRelation, Delivery
 
 
 class AliasInline(admin.TabularInline):
@@ -51,7 +51,14 @@ class SubComponentTypeRelationAdmin(admin.ModelAdmin):
     list_editable = ("count_sub_components",)
 
 
+class DeliveryAdmin(admin.ModelAdmin):
+    list_display = ("id", "date_create", "date_delivery", "status")
+    list_editable = ("status", "date_delivery")
+    list_filter = ("status", "date_delivery")
+
+
 admin.site.register(Component, ComponentAdmin)
 admin.site.register(ComponentType, ComponentTypeAdmin)
 admin.site.register(Alias, AliasAdmin)
 admin.site.register(SubComponentTypeRelation, SubComponentTypeRelationAdmin)
+admin.site.register(Delivery, DeliveryAdmin)
