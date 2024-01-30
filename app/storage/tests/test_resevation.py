@@ -164,21 +164,26 @@ class TestSignalReservation:
         После обновления номенклатуры кол-во компонентов БП АМ 1А должно уменьшиться на 1
         """
         Component.objects.all().delete()
-        component_type_bp = ComponentType.objects.filter(name__contains="БП АМ 1А")
-        for component_type in component_type_bp:
-            c1 = component_factory(
-                component_type=component_type, is_stock=True, nomenclature=None
-            )
-            c2 = component_factory(
-                component_type=component_type, is_stock=True, nomenclature=None
-            )
+        component_type_bp = ComponentType.objects.filter(
+            name__contains="БП АМ 1А"
+        ).first()
+        c1 = component_factory(
+            component_type=component_type_bp,
+            is_stock=True,
+            nomenclature=None,
+            is_reserve=False,
+        )
+        c2 = component_factory(
+            component_type=component_type_bp,
+            is_stock=True,
+            nomenclature=None,
+            is_reserve=False,
+        )
 
         nomenclature = nomenclature_factory(bp_count=2)
 
         components_bp_before_update = Component.objects.filter(
-            component_type__name__contains="БП АМ 1А",
-            is_reserve=True,
-            nomenclature=nomenclature,
+            component_type=component_type_bp, is_reserve=True, nomenclature=nomenclature
         )
 
         count_before_update = components_bp_before_update.count()
@@ -190,7 +195,7 @@ class TestSignalReservation:
 
         assert (
             Component.objects.filter(
-                component_type__name__contains="БП АМ 1А",
+                component_type=component_type_bp,
                 is_reserve=True,
                 nomenclature=nomenclature,
             ).count()
@@ -203,7 +208,8 @@ class TestSignalReservation:
         assert Component.objects.filter(pk=c2.pk).exists()
         assert (
             Component.objects.filter(
-                nomenclature=nomenclature, component_type__name__contains="БП АМ 1А"
+                nomenclature=nomenclature,
+                component_type=component_type_bp,
             ).count()
             == 1
         )

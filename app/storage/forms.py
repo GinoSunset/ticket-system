@@ -1,9 +1,9 @@
 from django import forms
-from django.forms import ModelForm
+from django.forms import ModelForm, Form
 from django.forms.formsets import formset_factory
 from django.core.exceptions import ValidationError
 
-from .models import ComponentType, Alias, Component, SubComponentTypeRelation
+from .models import ComponentType, Alias, Component, SubComponentTypeRelation, Delivery
 
 
 class AliasForm(ModelForm):
@@ -89,3 +89,21 @@ class ParentTypeForm(ModelForm):
 
 
 ParentFormSet = formset_factory(ParentTypeForm, min_num=1, validate_min=True, extra=0)
+
+
+class DeliveryForm(ModelForm):
+    class Meta:
+        model = Delivery
+        fields = ["date_delivery", "comment", "status"]
+
+
+class TypeComponentCountForm(Form):
+    component_type = forms.ModelChoiceField(
+        queryset=ComponentType.objects.all(), required=True
+    )
+    count = forms.IntegerField(min_value=1, initial=1)
+
+
+TypeComponentCountFormSet = formset_factory(
+    TypeComponentCountForm, min_num=1, validate_min=True, extra=0
+)

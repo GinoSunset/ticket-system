@@ -12,8 +12,8 @@ from django.forms.formsets import all_valid
 
 from ticket.mixin import AccessOperatorMixin
 
-from .models import Component, ComponentType, Alias
-from .forms import ComponentTypeForm, ComponentForm, ParentFormSet
+from .models import Component, ComponentType, Alias, Delivery
+from .forms import ComponentTypeForm, ComponentForm, ParentFormSet, DeliveryForm
 
 
 class ComponentListView(AccessOperatorMixin, LoginRequiredMixin, ListView):
@@ -244,3 +244,10 @@ class NomenclatureComponents(AccessOperatorMixin, LoginRequiredMixin, ListView):
         if nomenclature_pk:
             qs = qs.filter(nomenclature=nomenclature_pk)
         return qs
+
+
+class DeliveryCreateView(AccessOperatorMixin, LoginRequiredMixin, CreateView):
+    model = Delivery
+    template_name = "storage/storage_create.html"
+    form_class = DeliveryForm
+    success_url = reverse_lazy("component-list")

@@ -27,6 +27,9 @@ class Component(models.Model):
     date_delivery = models.DateField(
         verbose_name="Дата получения", blank=True, null=True
     )
+    delivery = models.ForeignKey(
+        "Delivery", verbose_name="Доставка", on_delete=models.CASCADE, null=True
+    )
     is_reserve = models.BooleanField(default=False, verbose_name="Резерв")
     nomenclature = models.ForeignKey(
         "manufactures.Nomenclature",
@@ -130,13 +133,22 @@ class SubComponentTypeRelation(models.Model):
 
 
 class Delivery(models.Model):
+    class Meta:
+        verbose_name = "Доставка"
+        verbose_name_plural = "Доставки"
+        ordering = ["-date_delivery"]
+
+    class Status(models.IntegerChoices):
+        NEW = 10, "Создана"
+        READY = 30, "Завершена"
+        CANCELED = 50, "Отменена"
+
     date_create = models.DateTimeField(auto_now_add=True)
     date_update = models.DateTimeField(auto_now=True)
     date_delivery = models.DateField(verbose_name="Дата получения")
     comment = models.TextField(verbose_name="Комментарий", blank=True, null=True)
-    components = models.ManyToManyField(
-        "Component",
-        verbose_name="Компоненты",
-        related_name="deliveries",
-        blank=True,
+    status = models.IntegerField(
+        verbose_name="Статус",
+        choices=Status.choices,
+        default=Status.NEW,
     )
