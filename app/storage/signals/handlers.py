@@ -6,6 +6,7 @@ from storage.reserve import (
     processing_reserved_component,
     components_from_nomenclature_to_archive,
     unreserve_components,
+    re_reserved_component_delivery,
 )
 from storage.models import Delivery
 
@@ -27,4 +28,5 @@ def change_data_on_component(sender, instance, created, **kwargs):
     if not created:
         components = instance.component_set.all()
         components.update(date_delivery=instance.date_delivery)
-        re_reserved_component_delivery()
+        for component in components:
+            re_reserved_component_delivery(component)

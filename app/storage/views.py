@@ -269,6 +269,7 @@ class DeliveryCreateView(AccessOperatorMixin, LoginRequiredMixin, CreateView):
         self.object: Delivery = form.save(commit=False)
         self.object.status = Delivery.Status.NEW
         self.object.save()
+        date_delivery = self.object.date_delivery
         type_count_forms = TypeComponentCountFormSet(
             self.request.POST, prefix="type_count"
         )
@@ -282,10 +283,14 @@ class DeliveryCreateView(AccessOperatorMixin, LoginRequiredMixin, CreateView):
             count = type_count_form.cleaned_data["count"]
             cmnt_type = type_count_form.cleaned_data["component_type"]
             for _ in range(count):
-                Component.objects.create(
+                component, created = Component.objects.update_or_create(
                     component_type=cmnt_type,
-                    date_delivery=self.object.date_delivery,
-                    delivery=self.object,
+                    nomenclature__manufacture__date_shipment__gte=date_delivery,
+                    defaults={
+                        "date_delivery": date_delivery,
+                        "delivery": self.object,
+                    },
                 )
+                # TODO: logging
 
         return super().form_valid(form)

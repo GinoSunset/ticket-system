@@ -77,13 +77,38 @@ def test_update_delivery_upper_change_resevation(
     # Test component not reserve and has no nomeclature, create new component
     component.refresh_from_db()
     assert not component.is_reserve
-    assert component.nomnclature is None
+    assert component.nomenclature is None
     assert component.date_delivery == delivery.date_delivery
 
     assert Component.objects.filter(
         component_type=ct, is_reserve=True, is_stock=False, nomenclature=nomenclature
+    ).exists()
+
+
+@pytest.mark.django_db
+def test_create_delivery_may_reserved_needed_component(
+    component_type_factory, nomenclature_factory, manufacture_factory, operator_client
+):
+    ct = component_type_factory()
+
+    date_delivery = datetime.date.today()
+    manufacture = manufacture_factory(date_shipment=date_delivery)
+    nomenclature = nomenclature_factory(
+        comment="{" + ct.name + " 1шт}", manufacture=manufacture
     )
+    component = Component.objects.filter(
+        nomenclature=nomenclature, component_type=ct
+    ).first()
+    data = {
+        "type_count-0-component_type": ct.pk,
+        "type_count-0-count": 1,
+        "date_delivery": date_delivery,
+        "type_count-TOTAL_FORMS": 1,
+        "type_count-INITIAL_FORMS": "0",
+    }
 
+    res = operator_client.post(reverse("delivery-create"), data=data, format="json")
 
-def test_create_delivery_may_reserved_needed_component():
-    assert False
+    component.refresh_from_db()
+    assert component.is_reserve
+    assert component.date_delivery == date_delivery
