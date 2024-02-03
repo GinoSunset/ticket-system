@@ -33,22 +33,17 @@
         </div>
       {% endfor %}
     </div>
-    <a class="ui button basic green" id="add_parent_btn">+</a>
-
+    <button class="ui button basic green" id="add_btn">+</button>
     <button class="ui button basic green" type="submit">Создать</button>
   </form>
 
   <script>
+    $('.dropdown').dropdown()
     $('.ui.checkbox').checkbox()
-    $('select').dropdown()
-  </script>
-{% endblock %}
-
-{% block script %}
-  <script>
+    
     let parentForm = document.querySelectorAll('.containerComponents')
     let container = document.querySelector('#form-create-delivery')
-    let addButton = document.querySelector('#add_parent_btn')
+    let addButton = document.querySelector('#add_btn')
     let totalForms = document.querySelector('#id_type_count-TOTAL_FORMS')
     
     let formNum = parentForm.length - 1
@@ -58,15 +53,16 @@
       e.preventDefault()
     
       let newForm = parentForm[0].cloneNode(true)
-      let formRegex = RegExp(`parents-(\\d){1}-`, 'g')
+      let formRegex = RegExp(`type_count-(\\d){1}-`, 'g')
     
       formNum++
-      newForm.innerHTML = newForm.innerHTML.replace(formRegex, `parents-${formNum}-`)
+      newForm.innerHTML = newForm.innerHTML.replace(formRegex, `type_count-${formNum}-`)
       container.insertBefore(newForm, addButton)
     
       totalForms.setAttribute('value', `${formNum + 1}`)
       $('.dropdown').dropdown()
     }
+    
     $('#date_calendar_date_delivery').calendar({
       type: 'date',
       firstDayOfWeek: 1,
