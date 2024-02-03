@@ -1,0 +1,19 @@
+{% for delivery in delivers %}
+  <div class=" {{ delivery.get_color }} card">
+    <div class="content">
+      <div class="header">#{{ delivery.id }}</div>
+      <div class="meta">
+        <span class="right floated time">{{ delivery.date_delivery }}</span>
+        <span class="category">{{ delivery.component_set.count }} шт.</span>
+      </div>
+      <div class="description">{{ delivery.comment }}</div>
+    </div>
+    <div class="extra content">
+      <div class="ui two buttons">
+        <div class="ui basic green button">Доставленно</div>
+        <div class="ui basic red button">Изменить</div>
+      </div>
+    </div>
+  </div>
+{% endfor %}
+<div></div>

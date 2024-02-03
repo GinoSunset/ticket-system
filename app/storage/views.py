@@ -1,7 +1,7 @@
 from typing import Any
 from django.db.models.query import QuerySet
 from django.forms.models import BaseModelForm
-from django.http import HttpResponse, HttpResponseRedirect
+from django.http import HttpRequest, HttpResponse, HttpResponseRedirect
 from django.shortcuts import get_object_or_404, render
 from django.urls import reverse_lazy
 from django.db import models
@@ -256,7 +256,7 @@ class DeliveryCreateView(AccessOperatorMixin, LoginRequiredMixin, CreateView):
     model = Delivery
     template_name = "storage/delivery_create.html"
     form_class = DeliveryForm
-    success_url = reverse_lazy("component-list")
+    success_url = reverse_lazy("storage")
 
     def get_context_data(self, **kwargs: Any) -> dict[str, Any]:
         kwargs = super().get_context_data(**kwargs)
@@ -294,3 +294,10 @@ class DeliveryCreateView(AccessOperatorMixin, LoginRequiredMixin, CreateView):
                 # TODO: logging
 
         return super().form_valid(form)
+
+
+class DeliveryListView(AccessOperatorMixin, LoginRequiredMixin, ListView):
+    model = Delivery
+    template_name = "storage/include/list_delivery.html"
+    context_object_name = "delivers"
+    ordering = ["date_delivery"]

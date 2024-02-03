@@ -2,7 +2,7 @@ from django import forms
 from django.forms import ModelForm, Form
 from django.forms.formsets import formset_factory
 from django.core.exceptions import ValidationError
-
+from ticket.widgets import CalendarInput
 from .models import ComponentType, Alias, Component, SubComponentTypeRelation, Delivery
 
 
@@ -97,7 +97,7 @@ class DeliveryForm(ModelForm):
         fields = ["date_delivery", "comment"]
 
         widgets = {
-            "date_delivery": forms.DateInput(attrs={"type": "date"}),
+            "date_delivery": CalendarInput(),
         }
 
 

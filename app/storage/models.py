@@ -1,5 +1,6 @@
-from django.db import models
+import datetime
 import uuid
+from django.db import models
 
 
 # create objects manager with filter is_archive=False
@@ -155,3 +156,18 @@ class Delivery(models.Model):
 
     def __str__(self) -> str:
         return f"#{self.pk} [{self.date_delivery}] {self.component_set.count()} - Компонент(а)ов"
+
+    def get_color(self):
+        match self.status:
+            case self.Status.NEW if self.is_outdate:
+                return "red"
+            case self.Status.NEW:
+                return "green"
+            case self.Status.READY:
+                return "black"
+            case _:
+                return ""
+
+    @property
+    def is_outdate(self):
+        return self.date_delivery < datetime.date.today()

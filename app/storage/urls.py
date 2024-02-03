@@ -27,4 +27,5 @@ urlpatterns = [
     path(
         "create-delivery/", views.DeliveryCreateView.as_view(), name="delivery-create"
     ),
+    path("get_delivery/", views.DeliveryListView.as_view(), name="delivery-list"),
 ]
