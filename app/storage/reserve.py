@@ -98,6 +98,8 @@ def re_reserved_component_delivery(component: Component):
     nomenclature_from_component = component.nomenclature
     if not nomenclature_from_component:
         return
+    if nomenclature_from_component.manufacture.date_shipment is None:
+        return
     if (
         not nomenclature_from_component.manufacture.date_shipment
         < component.date_delivery
