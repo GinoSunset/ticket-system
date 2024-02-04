@@ -1,5 +1,5 @@
 import factory
-from .models import Component, ComponentType
+from .models import Component, ComponentType, Delivery
 
 
 class ComponentTypeFactory(factory.django.DjangoModelFactory):
@@ -28,3 +28,10 @@ class ComponentFactory(factory.django.DjangoModelFactory):
         if extracted:
             self.component_type.name = extracted
             self.component_type.save()
+
+
+class DeliveryFactory(factory.django.DjangoModelFactory):
+    class Meta:
+        model = Delivery
+
+    date_delivery = factory.Faker("date")

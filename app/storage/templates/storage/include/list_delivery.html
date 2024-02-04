@@ -10,8 +10,8 @@
     </div>
     <div class="extra content">
       <div class="ui two buttons">
-        <div class="ui basic green button">Доставленно</div>
-        <div class="ui basic red button">Изменить</div>
+        <a href="{% url 'done_delivery' delivery.pk %}" class="ui basic button">Доставленно</a>
+        <a href="{% url 'update_delivery' delivery.pk %}" class="ui basic button">Изменить</a>
       </div>
     </div>
   </div>

@@ -1,7 +1,7 @@
 {% extends 'ticsys/index.html' %}
 
 {% block content %}
-  <h1>Создание доставки</h1>
+  <h1>{% firstof name_page 'Создание доставки' %}</h1>
   <form class="ui form" id="form-create-delivery" method="post">
     {{ form.non_field_errors }}
     {% csrf_token %}
@@ -17,8 +17,8 @@
     </div>
 
     {{ type_count_forms.management_form }}
-    <div class="containerComponents">
-      {% for type_count_form in type_count_forms %}
+    {% for type_count_form in type_count_forms %}
+      <div class="containerComponents">
         <div class="two fields">
           <div class="{% if type_count_form.component_type.errors %}{% endif %} field">
             <label>{{ type_count_form.component_type.label }}</label>
@@ -31,10 +31,10 @@
             {{ type_count_form.count.errors }}
           </div>
         </div>
-      {% endfor %}
-    </div>
+      </div>
+    {% endfor %}
     <button class="ui button basic green" id="add_btn">+</button>
-    <button class="ui button basic green" type="submit">Создать</button>
+    <button class="ui button basic green" type="submit">{% firstof name_btn 'Создать' %}</button>
   </form>
 
   <script>

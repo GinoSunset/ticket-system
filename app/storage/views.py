@@ -1,3 +1,4 @@
+import logging
 from typing import Any
 from django.db.models.query import QuerySet
 from django.forms.models import BaseModelForm
@@ -5,10 +6,10 @@ from django.http import HttpRequest, HttpResponse, HttpResponseRedirect
 from django.shortcuts import get_object_or_404, render
 from django.urls import reverse_lazy
 from django.db import models
-from django.views.generic import ListView, CreateView
+from django.views.generic import ListView, CreateView, UpdateView, View
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.db.transaction import atomic
-from django.forms.formsets import all_valid
+from django.forms.formsets import all_valid, formset_factory
 
 from ticket.mixin import AccessOperatorMixin
 
@@ -19,7 +20,9 @@ from .forms import (
     ParentFormSet,
     DeliveryForm,
     TypeComponentCountFormSet,
+    TypeComponentCountForm,
 )
+from .reserve import reserve_component
 
 
 class ComponentListView(AccessOperatorMixin, LoginRequiredMixin, ListView):
@@ -269,7 +272,6 @@ class DeliveryCreateView(AccessOperatorMixin, LoginRequiredMixin, CreateView):
         self.object: Delivery = form.save(commit=False)
         self.object.status = Delivery.Status.NEW
         self.object.save()
-        date_delivery = self.object.date_delivery
         type_count_forms = TypeComponentCountFormSet(
             self.request.POST, prefix="type_count"
         )
@@ -282,16 +284,8 @@ class DeliveryCreateView(AccessOperatorMixin, LoginRequiredMixin, CreateView):
         for type_count_form in type_count_forms:
             count = type_count_form.cleaned_data["count"]
             cmnt_type = type_count_form.cleaned_data["component_type"]
-            for _ in range(count):
-                component, created = Component.objects.update_or_create(
-                    component_type=cmnt_type,
-                    nomenclature__manufacture__date_shipment__gte=date_delivery,
-                    defaults={
-                        "date_delivery": date_delivery,
-                        "delivery": self.object,
-                    },
-                )
-                # TODO: logging
+            create_delivery_component(self.object, count, cmnt_type)
+            # TODO: logging
 
         return super().form_valid(form)
 
@@ -301,3 +295,107 @@ class DeliveryListView(AccessOperatorMixin, LoginRequiredMixin, ListView):
     template_name = "storage/include/list_delivery.html"
     context_object_name = "delivers"
     ordering = ["date_delivery"]
+    # TODO: filter only not done
+
+
+class DeliveryUpdateView(AccessOperatorMixin, LoginRequiredMixin, UpdateView):
+    model = Delivery
+    template_name = "storage/delivery_create.html"
+    form_class = DeliveryForm
+    success_url = reverse_lazy("storage")
+
+    def get_context_data(self, **kwargs: Any) -> dict[str, Any]:
+        kwargs = super().get_context_data(**kwargs)
+        kwargs["name_page"] = "Редактирование доставки"
+        kwargs["name_btn"] = "Обновить"
+        if "type_count_forms" not in kwargs:
+            cts = (
+                Component.objects.filter(delivery=self.object)
+                .values("component_type")
+                .annotate(count=models.Count("component_type"))
+            )
+
+            kwargs["type_count_forms"] = TypeComponentCountFormSet(
+                initial=cts, prefix="type_count"
+            )
+        return kwargs
+
+    def form_valid(self, form):
+        type_count_forms = TypeComponentCountFormSet(
+            self.request.POST, prefix="type_count"
+        )
+        if not all_valid(type_count_forms):
+            return self.render_to_response(
+                self.get_context_data(form=form, type_count_forms=type_count_forms)
+            )
+        for type_count_form in type_count_forms:
+            count = type_count_form.cleaned_data["count"]
+            cmnt_type = type_count_form.cleaned_data["component_type"]
+            self.change_if_needed(self.object, cmnt_type, count)
+        return super().form_valid(form)
+
+    @staticmethod
+    def change_if_needed(delivery: Delivery, cmnt_type: ComponentType, count: int):
+        count_in_db = Component.objects.filter(
+            delivery=delivery,
+            component_type=cmnt_type,
+        ).count()
+        if count_in_db > count:
+            DeliveryUpdateView.remove_component_delivery(
+                delivery, cmnt_type, count, count_in_db
+            )
+            return
+        if count_in_db < count:
+            DeliveryUpdateView.added_component_delivery(
+                delivery, cmnt_type, count, count_in_db
+            )
+
+    @staticmethod
+    def added_component_delivery(delivery, cmnt_type, count, count_in_db):
+        count_added = count - count_in_db
+        create_delivery_component(
+            delivery=delivery, cmnt_type=cmnt_type, count=count_added
+        )
+
+    @staticmethod
+    def remove_component_delivery(delivery, cmnt_type, count, count_in_db):
+        count_for_delete = count_in_db - count
+        components_for_delete = Component.objects.filter(
+            delivery=delivery,
+            component_type=cmnt_type,
+        ).order_by("-pk")[:count_for_delete]
+        for component_for_delete in components_for_delete:
+            if component_for_delete.nomenclature is not None:
+                component_for_delete.delivery = None
+                component_for_delete.date_delivery = None
+                component_for_delete.save()
+                continue
+            component_for_delete.delete()
+
+
+class DoneDelivery(AccessOperatorMixin, LoginRequiredMixin, View):
+
+    model = Delivery
+
+
+def create_delivery_component(delivery: Delivery, count: int, cmnt_type: ComponentType):
+    date_delivery = delivery.date_delivery
+    for _ in range(count):
+        component = Component.objects.filter(
+            component_type=cmnt_type,
+            nomenclature__manufacture__date_shipment__gte=date_delivery,
+            delivery__isnull=True,
+            date_delivery__isnull=True,
+        ).first()
+        if not component:
+            component = Component.objects.create(
+                component_type=cmnt_type,
+            )
+            logging.info(
+                f"{component.component_type} was create by delivery {delivery}"
+            )
+
+        component.date_delivery = delivery.date_delivery
+        component.delivery = delivery
+        component.save()
+        logging.info(f"{component} was added  delivery {delivery}")
