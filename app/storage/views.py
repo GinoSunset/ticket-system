@@ -385,9 +385,30 @@ class DoneDelivery(AccessOperatorMixin, LoginRequiredMixin, UpdateView):
         return HttpResponse(status=201)
 
     def add_to_stock_component_delivery(self):
-        components = Component.objects.filter(delivery=self.object)
-
-        components.update(date_delivery=self.today)
+        Component.objects.filter(delivery=self.object, is_reserve=True).update(
+            date_delivery=self.today, is_stock=True
+        )
+        free_components = Component.objects.filter(delivery=self.object).exclude(
+            is_reserve=True
+        )
+        for free_component in free_components:
+            component = Component.objects.filter(
+                component_type=free_component.component_type,
+                delivery__isnull=True,
+                is_stock=False,
+                is_reserve=True,
+                date_delivery__isnull=True,
+            ).first()
+            if component:
+                component.delivery = self.object
+                component.date_delivery = self.today
+                component.is_stock = True
+                component.save()
+                free_component.delete()
+                continue
+            free_component.date_delivery = self.today
+            free_component.is_stock = True
+            free_component.save()
 
     @atomic
     def update_delivery(self):

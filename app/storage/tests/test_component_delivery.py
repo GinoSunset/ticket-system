@@ -258,7 +258,7 @@ def test_re_reserve_component_if_ahead_delivery(
         date_shipment=(datetime.date.today() + timedelta(days=1))
     )
     nomenclature = nomenclature_factory(
-        manufacture=manufacture, comment="{" + component_type + " 2шт}"
+        manufacture=manufacture, comment="{" + component_type.name + " 2шт}"
     )
     delivery = delivery_factory(
         date_delivery=datetime.date.today() + timedelta(days=10)
@@ -274,5 +274,60 @@ def test_re_reserve_component_if_ahead_delivery(
 
     res = operator_client.post(url)
 
-    assert Component.objects.get(nomenclature=nomenclature, delivery=delivery).exists()
+    assert Component.objects.filter(
+        nomenclature=nomenclature,
+        delivery=delivery,
+        component_type=component_type,
+        is_stock=True,
+    ).exists()
     assert Component.objects.filter(pk=component.pk).exists() is False
+
+
+@pytest.mark.django_db
+def test_re_reserve_component_if_ahead_delivery_has_more_one_component(
+    manufacture_factory,
+    nomenclature_factory,
+    delivery_factory,
+    component_type,
+    component_factory,
+    operator_client,
+):
+    manufacture = manufacture_factory(
+        date_shipment=(datetime.date.today() + timedelta(days=1))
+    )
+    nomenclature = nomenclature_factory(
+        manufacture=manufacture, comment="{" + component_type.name + " 1шт}"
+    )
+    delivery = delivery_factory(
+        date_delivery=datetime.date.today() + timedelta(days=10)
+    )
+    components = component_factory.create_batch(
+        size=2,
+        nomenclature=None,
+        is_stock=False,
+        delivery=delivery,
+        date_delivery=delivery.date_delivery,
+        component_type=component_type,
+    )
+    url = reverse("done_delivery", kwargs={"pk": delivery.pk})
+
+    res = operator_client.post(url)
+
+    assert (
+        Component.objects.filter(
+            nomenclature=nomenclature,
+            delivery=delivery,
+            component_type=component_type,
+            is_stock=True,
+        ).count()
+        == 1
+    )
+    assert (
+        Component.objects.filter(
+            component_type=component_type,
+            nomenclature__isnull=True,
+            delivery=delivery,
+            is_stock=True,
+        ).count()
+        == 1
+    )
