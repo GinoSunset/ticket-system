@@ -1,3 +1,4 @@
+import datetime
 import logging
 from typing import Any
 from django.db.models.query import QuerySet
@@ -6,7 +7,7 @@ from django.http import HttpRequest, HttpResponse, HttpResponseRedirect
 from django.shortcuts import get_object_or_404, render
 from django.urls import reverse_lazy
 from django.db import models
-from django.views.generic import ListView, CreateView, UpdateView, View
+from django.views.generic import ListView, CreateView, UpdateView
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.db.transaction import atomic
 from django.forms.formsets import all_valid, formset_factory
@@ -373,9 +374,27 @@ class DeliveryUpdateView(AccessOperatorMixin, LoginRequiredMixin, UpdateView):
             component_for_delete.delete()
 
 
-class DoneDelivery(AccessOperatorMixin, LoginRequiredMixin, View):
-
+class DoneDelivery(AccessOperatorMixin, LoginRequiredMixin, UpdateView):
     model = Delivery
+
+    def post(self, request: HttpRequest, *args: str, **kwargs: Any) -> HttpResponse:
+        self.object = self.get_object()
+        self.today = datetime.date.today()
+
+        self.update_delivery()
+        return HttpResponse(status=201)
+
+    def add_to_stock_component_delivery(self):
+        components = Component.objects.filter(delivery=self.object)
+        components.update(date_delivery=self.today)
+
+    @atomic
+    def update_delivery(self):
+        self.object.status = Delivery.Status.DONE
+        if self.object.date_delivery != self.today:
+            self.object.date_delivery = self.today
+            self.add_to_stock_component_delivery()
+        self.object.save()
 
 
 def create_delivery_component(delivery: Delivery, count: int, cmnt_type: ComponentType):

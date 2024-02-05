@@ -230,3 +230,49 @@ def test_create_delivery_component_reserve_many_component(
         == 4
     )
     assert Component.objects.filter(delivery__isnull=False).count() == 5
+
+
+@pytest.mark.django_db
+def test_done_delivery_send_component_to_stock(
+    operator_client, delivery, component_type, component_factory
+):
+    components = component_factory(component_type=component_type, delivery=delivery)
+    url = reverse("done_delivery", kwargs={"pk": delivery.pk})
+    res = operator_client.post(url)
+    assert res.status_code == 201
+    assert Component.objects.filter(component_type=component_type, is_stock=True)
+    delivery.refresh_from_db()
+    assert delivery.status == Delivery.Status.DONE
+
+
+@pytest.mark.django_db
+def test_re_reserve_component_if_ahead_delivery(
+    manufacture_factory,
+    nomenclature_factory,
+    delivery_factory,
+    component_type,
+    component_factory,
+    operator_client,
+):
+    manufacture = manufacture_factory(
+        date_shipment=(datetime.date.today() + timedelta(days=1))
+    )
+    nomenclature = nomenclature_factory(
+        manufacture=manufacture, comment="{" + component_type + " 2шт}"
+    )
+    delivery = delivery_factory(
+        date_delivery=datetime.date.today() + timedelta(days=10)
+    )
+    component = component_factory(
+        nomenclature=None,
+        is_stock=False,
+        delivery=delivery,
+        date_delivery=delivery.date_delivery,
+        component_type=component_type,
+    )
+    url = reverse("done_delivery", kwargs={"pk": delivery.pk})
+
+    res = operator_client.post(url)
+
+    assert Component.objects.get(nomenclature=nomenclature, delivery=delivery).exists()
+    assert Component.objects.filter(pk=component.pk).exists() is False
