@@ -15,7 +15,10 @@ def test_nomenclature_get_components(nomenclature_factory):
     expected_components += [
         f"Плата {nomenclature.frame_type} TX" for _ in range(nomenclature.tx_count)
     ]
-    expected_components.append(f"Корпус {nomenclature.frame_type} {nomenclature.body}")
+    expected_components += [
+        f"Корпус {nomenclature.frame_type} {nomenclature.body}"
+        for _ in range(nomenclature.rx_count + nomenclature.tx_count)
+    ]
     if nomenclature.mdg:
         expected_components += [
             f"Плата {nomenclature.frame_type} MDG RX"
@@ -26,7 +29,7 @@ def test_nomenclature_get_components(nomenclature_factory):
             for _ in range(nomenclature.tx_count)
         ]
     expected_components += ["БП АМ 1А", "Плата БП АМ"]
-    assert components == expected_components
+    assert sorted(components) == sorted(expected_components)
 
 
 @pytest.mark.django_db

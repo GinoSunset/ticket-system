@@ -1,0 +1,21 @@
+{% for delivery in delivers %}
+<div class=" {{ delivery.get_color }} card" id="card-{{ delivery.pk }}">
+  <div class="content">
+    <div class="header">#{{ delivery.id }}</div>
+    <div class="meta">
+      <span class="right floated time">{{ delivery.date_delivery }}</span>
+      <span class="category">{{ delivery.component_set.count }} шт.</span>
+    </div>
+    <div class="description">{{ delivery.comment }}</div>
+  </div>
+  <div class="extra content">
+    <div class="ui two buttons">
+      <a hx-post="{% url 'done_delivery' delivery.pk %}" hx-target="#card-{{ delivery.pk }}" hx-swap="delete"
+        hx-headers='{"X-CSRFTOKEN": "{{ csrf_token }}"}' class="ui basic button">
+        Доставленно</a>
+      <a href="{% url 'update_delivery' delivery.pk %}" class="ui basic button">Изменить</a>
+    </div>
+  </div>
+</div>
+{% endfor %}
+<div></div>

@@ -1,18 +1,54 @@
 {% extends 'ticsys/index.html' %}
 {% load progress %}
+{% load static %}
 {% block header_style %}
+<script type="text/javascript" src="{% static 'js/htmx.min.js' %}"></script>
+
 
 {% endblock %}
 
 {% block content %}
   <div id="app">
-    <h1>Склад</h1>
     <div class="row">
       <div class="col-md-6">
         <a class="ui button basic blue" href="{% url 'component-type-create' %}">Создать тип компонент</a>
         <a class="ui button basic green" href="{% url 'component-create' %}">Добавить компонент на склад</a>
-        <a class="ui button basic disabled">Добавить доставку</a>
+        <a class="ui button basic" href="{% url 'delivery-create' %}">Добавить доставку</a>
         <a class="ui button basic" href="{% url 'component-list' %}">Все компоненты</a>
+
+        
+        <div class="ui accordion">
+          <div class="title">
+            
+            <h3>Доставка<i class="dropdown icon"></i> </h3>
+          </div>
+          <div class="content">
+            <div class="ui cards">
+
+              <div class="ui card loading" hx-get="{% url 'delivery-list' %}" hx-trigger="load" hx-target="this" hx-swap="outerHTML">
+                <div class="content">
+                  <div class="header">#12</div>
+                  <div class="meta">
+                      <span class="right floated time">01.12.12</span>
+                      <span class="category">4 шт.</span>
+                  </div>
+                  <div class="description">
+          
+                      Описание
+                  </div>
+              </div>
+              <div class="extra content">
+                  <div class="ui two buttons">
+                      <div class="ui basic button">Доставленно</div>
+                      <div class="ui basic button">Изменить</div>
+                  </div>
+              </div>
+              </div>
+            </div>  
+          </div>
+        </div>
+      </div>
+        <h1>Склад</h1>
 
         <table class="ui compact table very padded">
           <thead>
@@ -83,6 +119,7 @@
   </div>
   <div class="ui modal"></div>
   <script>
+    $('.ui.accordion').accordion("open",0);
     $('.ui.multiple.progress').progress({
       text: {
         percent: '{value}'

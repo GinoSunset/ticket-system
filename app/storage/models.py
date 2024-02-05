@@ -1,5 +1,6 @@
-from django.db import models
+import datetime
 import uuid
+from django.db import models
 
 
 # create objects manager with filter is_archive=False
@@ -26,6 +27,9 @@ class Component(models.Model):
     is_stock = models.BooleanField(default=False, verbose_name="В наличии")
     date_delivery = models.DateField(
         verbose_name="Дата получения", blank=True, null=True
+    )
+    delivery = models.ForeignKey(
+        "Delivery", verbose_name="Доставка", on_delete=models.CASCADE, null=True
     )
     is_reserve = models.BooleanField(default=False, verbose_name="Резерв")
     nomenclature = models.ForeignKey(
@@ -130,13 +134,42 @@ class SubComponentTypeRelation(models.Model):
 
 
 class Delivery(models.Model):
+    class Meta:
+        verbose_name = "Доставка"
+        verbose_name_plural = "Доставки"
+        ordering = ["-date_delivery"]
+
+    class Status(models.IntegerChoices):
+        NEW = 10, "Создана"
+        DONE = 30, "Завершена"
+        CANCELED = 50, "Отменена"
+
     date_create = models.DateTimeField(auto_now_add=True)
     date_update = models.DateTimeField(auto_now=True)
     date_delivery = models.DateField(verbose_name="Дата получения")
     comment = models.TextField(verbose_name="Комментарий", blank=True, null=True)
-    components = models.ManyToManyField(
-        "Component",
-        verbose_name="Компоненты",
-        related_name="deliveries",
-        blank=True,
+    status = models.IntegerField(
+        verbose_name="Статус",
+        choices=Status.choices,
+        default=Status.NEW,
     )
+
+    def __str__(self) -> str:
+        return f"#{self.pk} [{self.date_delivery}] {self.component_set.count()} - Компонент(а)ов"
+
+    def get_color(self):
+        match self.status:
+            case self.Status.NEW if self.is_outdate:
+                return "red"
+            case self.Status.NEW if self.date_delivery == datetime.date.today():
+                return "yellow"
+            case self.Status.NEW:
+                return "green"
+            case self.Status.DONE:
+                return "black"
+            case _:
+                return ""
+
+    @property
+    def is_outdate(self):
+        return self.date_delivery < datetime.date.today()

@@ -88,3 +88,28 @@ def unreserve_components(nomenclature: Nomenclature):
     logging.info(
         f"Remove {count_remove} component. Unreserve {count_update} component for Nomenclature {nomenclature} "
     )
+
+
+def re_reserved_component_delivery(component: Component):
+    """
+    Проверяет правильность резервирования, и если дата доставки после обновления
+    доставки выше даты отгрузки номенклатуры, то снимаем резерв с товара и ищется новый резерв
+    """
+    nomenclature_from_component = component.nomenclature
+    if not nomenclature_from_component:
+        return
+    if nomenclature_from_component.manufacture.date_shipment is None:
+        return
+    if (
+        not nomenclature_from_component.manufacture.date_shipment
+        < component.date_delivery
+    ):
+        return
+
+    component.is_reserve = False
+    component.nomenclature = None
+    component.save()
+    reserve_component(
+        component_type=component.component_type,
+        nomenclature=nomenclature_from_component,
+    )
