@@ -296,7 +296,7 @@ class DeliveryListView(AccessOperatorMixin, LoginRequiredMixin, ListView):
     template_name = "storage/include/list_delivery.html"
     context_object_name = "delivers"
     ordering = ["date_delivery"]
-    # TODO: filter only not done
+    queryset = Delivery.objects.filter(status=Delivery.Status.NEW)
 
 
 class DeliveryUpdateView(AccessOperatorMixin, LoginRequiredMixin, UpdateView):
@@ -386,6 +386,7 @@ class DoneDelivery(AccessOperatorMixin, LoginRequiredMixin, UpdateView):
 
     def add_to_stock_component_delivery(self):
         components = Component.objects.filter(delivery=self.object)
+
         components.update(date_delivery=self.today)
 
     @atomic
