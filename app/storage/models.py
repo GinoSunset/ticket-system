@@ -141,7 +141,7 @@ class Delivery(models.Model):
 
     class Status(models.IntegerChoices):
         NEW = 10, "Создана"
-        READY = 30, "Завершена"
+        DONE = 30, "Завершена"
         CANCELED = 50, "Отменена"
 
     date_create = models.DateTimeField(auto_now_add=True)
@@ -161,9 +161,11 @@ class Delivery(models.Model):
         match self.status:
             case self.Status.NEW if self.is_outdate:
                 return "red"
+            case self.Status.NEW if self.date_delivery == datetime.date.today():
+                return "yellow"
             case self.Status.NEW:
                 return "green"
-            case self.Status.READY:
+            case self.Status.DONE:
                 return "black"
             case _:
                 return ""
