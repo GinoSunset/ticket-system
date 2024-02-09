@@ -7,6 +7,7 @@ from django.http import HttpRequest, HttpResponse, HttpResponseRedirect
 from django.shortcuts import get_object_or_404, render
 from django.urls import reverse_lazy
 from django.db import models
+from django.db.models import Count
 from django.views.generic import ListView, CreateView, UpdateView
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.db.transaction import atomic
@@ -225,11 +226,11 @@ class ComponentTypeReserveView(AccessOperatorMixin, LoginRequiredMixin, ListView
                 "nomenclature__manufacture__date_shipment",
                 "nomenclature__manufacture__client__name",
             )
-            .distinct()
             .annotate(
                 id=models.F("nomenclature__manufacture"),
                 date_shipment=models.F("nomenclature__manufacture__date_shipment"),
                 client=models.F("nomenclature__manufacture__client__name"),
+                count=Count("id"),
             )
         )
 

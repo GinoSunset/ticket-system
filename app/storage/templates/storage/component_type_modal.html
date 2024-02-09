@@ -2,16 +2,18 @@
   <table class="ui table short">
     <tr>
       <th>Заявка на производство</th>
+      <th>Количество необходимых компонентов</th>
       <th>Клиент</th>
       <th>Дата отгрузки</th>
     </tr>
-    {% for manufature in manufacturers %}
+    {% for manufacture in manufacturers %}
       <tr>
         <td>
-          <a href="{% url 'manufacture-update' manufature.id %}">{{ manufature.id }}</a>
+          <a href="{% url 'manufacture-update' manufacture.id %}">{{ manufacture.id }}</a>
         </td>
-        <td>{{ manufature.client }}</td>
-        <td>{{ manufature.date_shipment|date:'d.m.Y' }}</td>
+        <td>{{ manufacture.count }}</td>
+        <td>{{ manufacture.client }}</td>
+        <td>{{ manufacture.date_shipment|date:'d.m.Y' }}</td>
       </tr>
     {% endfor %}
   </table>
