@@ -215,6 +215,11 @@ class ComponentTypeReserveView(AccessOperatorMixin, LoginRequiredMixin, ListView
     template_name = "storage/component_type_modal.html"
     context_object_name = "manufacturers"
 
+    def get_context_data(self, **kwargs: Any) -> dict[str, Any]:
+        context = super().get_context_data(**kwargs)
+        context["component_type"] = ComponentType.objects.get(pk=self.kwargs.get("pk"))
+        return context
+
     def get_queryset(self):
         componentType = ComponentType.objects.get(id=self.kwargs["pk"])
         manufactures = (

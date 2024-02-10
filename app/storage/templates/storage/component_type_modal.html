@@ -1,11 +1,14 @@
 <div class="content">
-  <table class="ui table short">
-    <tr>
-      <th>Заявка на производство</th>
-      <th>Количество необходимых компонентов</th>
-      <th>Клиент</th>
-      <th>Дата отгрузки</th>
-    </tr>
+  <h3>{{ component_type.name }}</h3>
+  <table class="ui single line table">
+    <thead>
+      <tr>
+        <th>Заявка на производство</th>
+        <th>Количество необходимых компонентов</th>
+        <th>Клиент</th>
+        <th>Дата отгрузки</th>
+      </tr>
+    </thead>
     {% for manufacture in manufacturers %}
       <tr>
         <td>
