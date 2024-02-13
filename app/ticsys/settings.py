@@ -42,6 +42,8 @@ INSTALLED_APPS = [
     "django.contrib.messages",
     "django.contrib.staticfiles",
     "django.contrib.sites",
+    "rest_framework",
+    "django_filters",
     "additionally",
     "ticsys",
     "ticket",
@@ -179,3 +181,15 @@ sentry_sdk.init(
 # Telegram bot
 TG_BOT_URL = env("TG_BOT_URL")
 TG_BOT_NOTIFICATION_URI = env("TG_BOT_NOTIFICATION_URI")
+
+### DRF
+REST_FRAMEWORK = {
+    "DEFAULT_RENDERER_CLASSES": (
+        "rest_framework.renderers.JSONRenderer",
+        "rest_framework_datatables.renderers.DatatablesRenderer",
+    ),
+    "DEFAULT_FILTER_BACKENDS": (
+        "rest_framework_datatables.filters.DatatablesFilterBackend",
+    ),
+    "DEFAULT_PAGINATION_CLASS": "rest_framework_datatables.pagination.DatatablesPageNumberPagination",
+}
