@@ -38,14 +38,14 @@
         {% endif %}
         <th id="planned_execution_date" data-data="planned_execution_date"> Плановая дата выезда/исполнения</th>
         <th id="status" data-data="status">Статус</th>
-        <th id="address" data-data="city">Город</th>
+        <th id="address" data-data="address">Город</th>
         <th id="shop_id" data-data="shop_id">Магазин</th>
-        <th  data-data="detail_ticket_link">Подробнее</th>
+        <th>Подробнее</th>
 
     </tr></thead>
     <tbody>
       {% for ticket in object_list %}
-      {% comment %} {% include 'ticket/ticket_row.html' %} {% endcomment %}
+      {% include 'ticket/ticket_row.html' %}
         {% empty %}
         <tr>
           <td>No tickets yet.</td>
@@ -67,12 +67,24 @@
       }
       
     }
-    
+
+    $.fn.dataTable.ext.search.push(function (settings, data, dataIndex) {
+      var status = data
+      to_hide = $("#filterBtn").dropdown('get value');
+      if (!to_hide){
+        return true;
+      }
+      to_hide = to_hide.split(",");
+      for (var i = 0; i < to_hide.length; i++) {
+        to_hide[i] = to_hide[i].trim();
+        if (status.indexOf(to_hide[i]) >= 0) {
+          return false;
+        }
+      }
+      return true;
+    });
     var table = $('#tableTickets').DataTable({
       stateSave: true,
-      serverSide: true,
-      format: "datatables",
-      ajax : "{% url 'api-tickets' %}?format=datatables",
       columnDefs: [
             {
                 targets: 1,
@@ -86,12 +98,7 @@
         order: [[1, 'desc']],
         language: {
             url: "{% static 'DataTables/ru.json'%}"
-        },
-        createdRow : function(row, data, dataIndex){
-          if (data.status.indexOf("!") > 0){
-            $(row).addClass("violet colored")
-          }
-        },
+        }
         
     });
 
@@ -100,13 +107,7 @@
       onChange: function (value, text, $selectedItem) {
         localStorage.setItem('hidden_value', JSON.stringify(value));
         
-        if (!value || value.lenght===0){
-          table.columns(-4).search('').draw();
-        } else {
-          let to_hide = value.replaceAll(",","|")
-          to_hide = `^(?!.*${to_hide})`
-          table.columns(-4).search(to_hide, true,false,true).draw();
-        }
+        table.draw();
 
       }
     })

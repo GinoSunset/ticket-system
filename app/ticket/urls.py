@@ -1,9 +1,10 @@
 from django.urls import path
-from ticket import views
+from ticket import views, apiviews
 
 
 urlpatterns = [
     path("", views.TicketsListView.as_view(), name="tickets-list"),
+    path("old/", views.TicketsListOldView.as_view(), name="tickets-list-old"),
     path("new", views.TicketFormView.as_view(), name="tickets-new"),
     path("<int:pk>/", views.TicketUpdateView.as_view(), name="ticket-update"),
     path(
@@ -44,4 +45,6 @@ urlpatterns = [
         views.UpdateContractorView.as_view(),
         name="update-contractor",
     ),
+    ###api
+    path("api/tickets/", apiviews.TicketsList.as_view(), name="api-tickets"),
 ]

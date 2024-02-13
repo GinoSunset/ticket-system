@@ -44,6 +44,30 @@ class TicketsListView(LoginRequiredMixin, ListView):
         return super().get(request, *args, **kwargs)
 
 
+class TicketsListOldView(LoginRequiredMixin, ListView):
+    model = Ticket
+    ordering = "-date_create"
+    template_name = "ticket/ticket_list_old.html"
+
+    def get_queryset(self) -> QuerySet[Ticket]:
+        queryset = super().get_queryset()
+        user: Union[Customer, Contractor, Operator] = self.request.user.get_role_user()
+        if user.is_staff:
+            return queryset
+        filter_from_user: dict = user.get_ticket_filter() or {}
+        return queryset.filter(**filter_from_user)
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context["statuses"] = Dictionary.status_tickets()
+        return context
+
+    def get(self, request: HttpRequest, *args: Any, **kwargs: Any) -> HttpResponse:
+        if request.user.is_manufacturer:
+            return redirect("manufactures-list")
+        return super().get(request, *args, **kwargs)
+
+
 class TicketFormView(LoginRequiredMixin, CreateView):
     form_class = TicketsForm
     template_name = "ticket/ticket_form.html"
