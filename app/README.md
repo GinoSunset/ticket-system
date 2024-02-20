@@ -9,6 +9,19 @@ pip install -r requirements.txt
 
 1. Установите переменные окружения или напишите его в файле .env в корне проекта:
 ```bash
+# env for db
+    export POSTGRES_DB="helpdeskdb"
+    export POSTGRES_USER="helpdesk_user"
+    export POSTGRES_PASSWORD=""
+    export POSTGRES_EXTRA_OPTS=-Z1 --schema=public --blobs
+# env for db
+    export POSTGRES_HOST=postgres
+    export SCHEDULE=@daily
+    export BACKUP_KEEP_DAYS=7
+    export BACKUP_KEEP_WEEKS=4
+    export BACKUP_KEEP_MONTHS=6
+    export HEALTHCHECK_PORT=8080
+# other    
     export SECRET_KEY="django-insecure-secret"
     export DATABASE_URL="sqlite:///db.sqlite3"
     export DJANGO_ALLOWED_HOSTS="localhost 127.0.0.1"
@@ -112,16 +125,29 @@ celery -A ticsys worker -B -l info
     
 # Сервисы и инструменты
 
- Django - фреймворк Python для веб-разработки
+Django - фреймворк Python для веб-разработки
 
- [PostgreSQL](https://www.postgresql.org/) - объектно-реляционная система управления базами данных
+[PostgreSQL](https://www.postgresql.org/) - объектно-реляционная система управления базами данных
 
- RabbitMQ - брокер 
- 
- [Celery](https://docs.celeryproject.org/en/stable/) - асинхронная задача для обработки заданий в фоновом режиме
+RabbitMQ - брокер 
 
- [Redis](https://redis.io/) - документно-ориентированная система управления данными
+[Celery](https://docs.celeryproject.org/en/stable/) - асинхронная задача для обработки заданий в фоновом режиме
 
- [Sentry](https://sentry.io/) - платформа мониторинга ошибок
+[Redis](https://redis.io/) - документно-ориентированная система управления данными
+
+[Sentry](https://sentry.io/) - платформа мониторинга ошибок
+
+[Postgres-backup-local](https://github.com/prodrigestivill/docker-postgres-backup-local) - Резервное копирование PostgresSQL в локальную файловую систему с периодической ротацией резервных копий на основе schickling / postgres-backup-s3. Резервное копирование нескольких баз данных с одного хоста путем установки имен баз данных в POSTGRES_DB, разделенных запятыми или пробелами. 
+
 
  Telegram Bot API - API для создания ботов в Telegram
+
+
+
+## Резервное копирование вручную
+По умолчанию `prodrigestivill/postgres-backup-local` контейнер создает ежедневные резервные копии, но вы можете запустить резервное копирование вручную, выполнив /backup.sh.
+Этот скрипт в качестве примера создает одну резервную копию от имени запущенного пользователя и сохраняет ее в рабочей папке.
+
+```sh
+docker run --rm -v "$PWD:/backups" -u "$(id -u):$(id -g)" -e POSTGRES_HOST=postgres -e POSTGRES_DB=dbname -e POSTGRES_USER=user -e POSTGRES_PASSWORD=password  prodrigestivill/postgres-backup-local /backup.sh
+```

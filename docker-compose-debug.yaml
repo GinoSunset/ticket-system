@@ -76,3 +76,27 @@ services:
     ports:
       - 8025:8025
       - 1025:1025
+
+  postgres:
+    image: postgres
+    volumes:
+      - postgres_data:/var/lib/postgresql/data/
+    env_file:
+      - ./.env
+    
+  pgbackups:
+    image: prodrigestivill/postgres-backup-local
+    restart: always
+    user: postgres:postgres
+    volumes:
+        - ./pgbackups:/backups
+    links:
+        - postgres
+    depends_on:
+        - postgres
+    env_file:
+      - ./.env
+
+volumes:
+  rabbitmq:
+  postgres_data:
