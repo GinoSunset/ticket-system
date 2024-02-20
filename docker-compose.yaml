@@ -2,7 +2,7 @@ version: '3.8'
 
 services:
   web:
-    #user: "502:20"
+    user: "1000:1000"
     image: helpdesk:latest
     restart: always
     command: daphne -b 0.0.0.0 -p 8000 ticsys.asgi:application --access-log=logs/daphne.access.log
@@ -16,7 +16,7 @@ services:
   beat:
     image: helpdesk:latest
     restart: always
-    #user: "502:20"
+    user: "1000:1000"
     command: celery -A ticsys beat -l info
     volumes:
       - ./app/:/usr/src/app/
@@ -30,7 +30,7 @@ services:
   worker:
     image: helpdesk:latest
     restart: always
-    #user: "502:20"
+    user: "1000:1000"
     command: celery -A ticsys worker -l info
     volumes:
       - ./app/:/usr/src/app/
@@ -66,7 +66,7 @@ services:
   pgbackups:
     image: prodrigestivill/postgres-backup-local
     restart: always
-    user: postgres:postgres
+    user: "1000:1000"
     volumes:
         - ./pgbackups:/backups
     links:
