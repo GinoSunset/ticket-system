@@ -1,5 +1,6 @@
 from django.db.models import Q
 from manufactures.models import Manufacture, Nomenclature
+from django.db.transaction import atomic
 from .models import Component, ComponentType, SubComponentTypeRelation
 import logging
 
@@ -43,6 +44,7 @@ def get_sub_component_from_component(
     return components_type
 
 
+@atomic
 def reserve_component(component_type: ComponentType, nomenclature: Nomenclature):
     q_conditions = Q(is_stock=True)
     if nomenclature.manufacture and nomenclature.manufacture.date_shipment:
