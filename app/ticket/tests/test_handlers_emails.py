@@ -16,7 +16,7 @@ from notifications.models import Notification
 
 
 @pytest.mark.django_db
-def test_creating_ticket_form_emails(email_ticket, customer_factory):
+def test_creating_ticket_form_emails(email_ticket, customer_factory, redis):
     customer_factory(email=email_ticket.from_)
     create_ticket_from_email(email_ticket)
     assert Ticket.objects.all().count() > 0
@@ -29,7 +29,7 @@ def test_creating_ticket_form_emails(email_ticket, customer_factory):
 
 @pytest.mark.django_db
 def test_creating_ticket_form_emails_has_default_type_hardware_setup(
-    email_ticket, customer_factory
+    email_ticket, customer_factory, redis
 ):
     customer_factory(email=email_ticket.from_)
     create_ticket_from_email(email_ticket)
@@ -44,6 +44,7 @@ def test_create_DM_ticket(
     customer_factory,
     shop_address,
     sap_number,
+    redis,
 ):
     descriptor, _, added_descriptor, _ = marked_up_text_DM_ticket
 
@@ -65,7 +66,9 @@ def test_create_DM_ticket(
 
 
 @pytest.mark.django_db
-def test_create_comment_from_email(email_ticket, customer_factory, ticket_factory):
+def test_create_comment_from_email(
+    email_ticket, customer_factory, ticket_factory, redis
+):
     customer_factory(email=email_ticket.from_)
     ticket: Ticket = ticket_factory(id_email_message="<asdfasdfasdf@vim.ru>")
     st = create_comment_from_email(email_ticket)
@@ -104,7 +107,9 @@ def test_load_ticket(customer_factory):
 
 
 @pytest.mark.django_db
-def test_creating_comment_from_emails_with_trees(customer_factory, ticket_factory):
+def test_creating_comment_from_emails_with_trees(
+    customer_factory, ticket_factory, redis
+):
     sap_id_from_email = "8001128295"
     with open(
         settings.BASE_DIR / f"ticket/tests/RE_{sap_id_from_email}_tets.eml", "rb"
@@ -121,7 +126,7 @@ def test_creating_comment_from_emails_with_trees(customer_factory, ticket_factor
 
 @pytest.mark.django_db
 def test_create_comment_with_img_from_email(
-    email_with_img, customer_factory, ticket_factory
+    email_with_img, customer_factory, ticket_factory, redis
 ):
     customer = customer_factory(email=email_with_img.from_)
     customer.refresh_from_db()
@@ -134,7 +139,7 @@ def test_create_comment_with_img_from_email(
 
 
 @pytest.mark.django_db
-def test_proceeding_html_text(customer_factory):
+def test_proceeding_html_text(customer_factory, redis):
     with open(settings.BASE_DIR / "ticket/tests/dmv2.eml", "rb") as f:
         data = f.read()
     mail = MailMessage.from_bytes(data)

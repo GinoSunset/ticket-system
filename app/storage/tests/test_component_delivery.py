@@ -49,8 +49,12 @@ def test_update_delivery_update_component_delivery_date(
 
 
 @pytest.mark.django_db
-def test_update_delivery_upper_change_resevation(
-    component_type_factory, manufacture_factory, component_factory, nomenclature_factory
+def test_update_delivery_upper_change_reservation(
+    component_type_factory,
+    manufacture_factory,
+    component_factory,
+    nomenclature_factory,
+    monkeypatch_delay_reserve_component_celery,
 ):
     ct = component_type_factory()
     date_delivery = datetime.date.today()
@@ -88,7 +92,11 @@ def test_update_delivery_upper_change_resevation(
 
 @pytest.mark.django_db
 def test_create_delivery_may_reserved_needed_component(
-    component_type_factory, nomenclature_factory, manufacture_factory, operator_client
+    component_type_factory,
+    nomenclature_factory,
+    manufacture_factory,
+    operator_client,
+    monkeypatch_delay_reserve_component_celery,
 ):
     ct = component_type_factory()
 
@@ -165,7 +173,11 @@ def test_update_delivery_page_has_all_components_count(
 
 @pytest.mark.django_db
 def test_downgrade_component_in_delivery(
-    component_type, component_factory, delivery, nomenclature_factory
+    component_type,
+    component_factory,
+    delivery,
+    nomenclature_factory,
+    monkeypatch_delay_reserve_component_celery,
 ):
     nomenclature = nomenclature_factory()
     c1 = component_factory(
@@ -208,6 +220,7 @@ def test_create_delivery_component_reserve_many_component(
     delivery_factory,
     nomenclature_factory,
     manufacture_factory,
+    monkeypatch_delay_reserve_component_celery,
 ):
     manufacture = manufacture_factory(date_shipment=datetime.date.today())
     nomenclature = nomenclature_factory(manufacture=manufacture)
@@ -253,6 +266,7 @@ def test_re_reserve_component_if_ahead_delivery(
     component_type,
     component_factory,
     operator_client,
+    monkeypatch_delay_reserve_component_celery,
 ):
     manufacture = manufacture_factory(
         date_shipment=(datetime.date.today() + timedelta(days=1))
@@ -291,6 +305,7 @@ def test_re_reserve_component_if_ahead_delivery_has_more_one_component(
     component_type,
     component_factory,
     operator_client,
+    monkeypatch_delay_reserve_component_celery,
 ):
     manufacture = manufacture_factory(
         date_shipment=(datetime.date.today() + timedelta(days=1))

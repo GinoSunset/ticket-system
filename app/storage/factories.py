@@ -18,7 +18,6 @@ class ComponentFactory(factory.django.DjangoModelFactory):
     is_reserve = factory.Faker("boolean")
     is_stock = factory.Faker("boolean")
     serial_number = factory.Faker("ean13")
-    nomenclature = factory.SubFactory("manufactures.factories.NomenclatureFactory")
     date_delivery = factory.Faker("date")
 
     @factory.post_generation

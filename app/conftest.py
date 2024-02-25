@@ -25,6 +25,10 @@ from manufactures.factories import (
     NomenclatureFactory,
     ClientManufFactory,
 )
+from manufactures.tasks import (
+    reservation_component_from_nomenclature,
+    reserve_components,
+)
 
 from storage.factories import ComponentTypeFactory, ComponentFactory, DeliveryFactory
 
@@ -61,6 +65,14 @@ def monkeypatch_delay_send_telegram_on_celery(monkeypatch):
         return send_telegram_notify_handler(*args, **kwargs)
 
     monkeypatch.setattr(send_telegram_notify_task, "delay", mock_delay)
+
+
+@pytest.fixture
+def monkeypatch_delay_reserve_component_celery(monkeypatch):
+    def mock_delay(*args, **kwargs):
+        return reserve_components(*args, **kwargs)
+
+    monkeypatch.setattr(reservation_component_from_nomenclature, "delay", mock_delay)
 
 
 @pytest.fixture
@@ -120,7 +132,6 @@ def rabbitmq():
 
 @pytest.fixture(scope="session")
 def celery(rabbitmq, redis):
-
     with DockerContainer("helpdesk").with_env(
         "CELERY_BROKER_URL",
         f"amqp://{settings.RABBIT_LOGIN}:{settings.RABBIT_PASSWORD}@rabbit:{settings.RABBIT_PORT}/{settings.RABBIT_VHOST}",

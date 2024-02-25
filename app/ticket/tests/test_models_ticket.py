@@ -4,7 +4,7 @@ from django.core.files.uploadedfile import SimpleUploadedFile
 
 
 @pytest.mark.django_db
-def test_save_completion_date_if_status_done(ticket_factory):
+def test_save_completion_date_if_status_done(ticket_factory, redis):
     ticket = ticket_factory()
     assert ticket.completion_date is None
 
@@ -16,7 +16,7 @@ def test_save_completion_date_if_status_done(ticket_factory):
 
 @pytest.mark.django_db
 def test_save_completion_date_if_status_done_and_completion_date_is_set(
-    ticket_factory,
+    ticket_factory, redis
 ):
     ticket = ticket_factory()
     assert ticket.completion_date is None
@@ -27,7 +27,7 @@ def test_save_completion_date_if_status_done_and_completion_date_is_set(
 
 
 @pytest.mark.django_db
-def test_get_colored_status_if_dup_shop(ticket_factory):
+def test_get_colored_status_if_dup_shop(ticket_factory, redis):
     status = Dictionary.objects.get(code="new")
     ticket = ticket_factory(shop_id="qwe", status=status)
     ticket_factory(shop_id="qwe")
@@ -35,14 +35,14 @@ def test_get_colored_status_if_dup_shop(ticket_factory):
 
 
 @pytest.mark.django_db
-def test_get_colored_status_if_not_dup_shop(ticket_factory):
+def test_get_colored_status_if_not_dup_shop(ticket_factory, redis):
     status = Dictionary.objects.get(code="new")
     ticket = ticket_factory(shop_id="qwe", status=status)
     assert ticket.get_colored_status_if_dup_shop() is None
 
 
 @pytest.mark.django_db
-def test_not_change_date_done_if_status_done(ticket_factory):
+def test_not_change_date_done_if_status_done(ticket_factory, redis):
     ticket = ticket_factory()
     assert ticket.completion_date is None
     ticket.status = Dictionary.objects.get(code="done")
@@ -57,7 +57,7 @@ def test_not_change_date_done_if_status_done(ticket_factory):
 
 
 @pytest.mark.django_db
-def test_not_change_date_to_work_if_status_work(ticket_factory):
+def test_not_change_date_to_work_if_status_work(ticket_factory, redis):
     ticket = ticket_factory()
     assert ticket.date_to_work is None
     ticket.status = Dictionary.objects.get(code="work")
@@ -72,7 +72,7 @@ def test_not_change_date_to_work_if_status_work(ticket_factory):
 
 
 @pytest.mark.django_db
-def test_comment_for_report_has_comment_with_empty_text(comment_factory):
+def test_comment_for_report_has_comment_with_empty_text(comment_factory, redis):
     comment = comment_factory(text="", is_for_report=True)
     image = comment.images.create(image=SimpleUploadedFile("test.jpg", b"test"))
 
@@ -83,7 +83,7 @@ def test_comment_for_report_has_comment_with_empty_text(comment_factory):
 @pytest.mark.parametrize(
     "status_stage", ["work", "search_contractor", "consideration", "revision"]
 )
-def test_remove_completion_date_on_work_status(ticket_factory, status_stage):
+def test_remove_completion_date_on_work_status(ticket_factory, status_stage, redis):
     ticket = ticket_factory()
     ticket.status = Dictionary.objects.get(code="done")
     ticket.save()
