@@ -24,6 +24,7 @@ env = environ.Env(
     APP_ENV_SENTRY=(str, "development"),
     TG_BOT_URL=(str, ""),
     TG_BOT_NOTIFICATION_URI=(str, ""),
+    DATABASE_URL=(str, "sqlite:///db.sqlite3"),
 )
 BASE_DIR = Path(__file__).resolve().parent.parent
 
@@ -88,7 +89,7 @@ TEMPLATES = [
 ]
 
 WSGI_APPLICATION = "ticsys.wsgi.application"
-
+DATABASE_URL = env("DATABASE_URL")
 DATABASES = {
     "default": env.db(),
 }

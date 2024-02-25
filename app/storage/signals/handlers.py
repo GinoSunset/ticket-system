@@ -9,18 +9,12 @@ from storage.reserve import (
     re_reserved_component_delivery,
 )
 from storage.models import Delivery
+from manufactures.tasks import reservation_component_from_nomenclature
 
 
 @receiver(post_save, sender=Nomenclature)
 def reserve_component_on_nomenclature(sender, instance, created, **kwargs):
-    if created and instance.manufacture:
-        processing_reserved_component(instance)
-        return
-    if not created and instance.manufacture:
-        unreserve_components(instance)
-        processing_reserved_component(instance)
-        if instance.status == Nomenclature.Status.SHIPPED:
-            components_from_nomenclature_to_archive(instance)
+    reservation_component_from_nomenclature.delay(instance.pk, created)
 
 
 @receiver(post_save, sender=Delivery)

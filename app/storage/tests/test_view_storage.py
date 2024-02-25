@@ -61,6 +61,7 @@ class TestComponentCreateView:
         component_factory,
         manufacture_factory,
         nomenclature_factory,
+        monkeypatch_delay_reserve_component_celery,
     ):
         date_delivery = datetime.now().date() + timedelta(days=1)
         date_shipment = datetime.now().date() + timedelta(days=2)

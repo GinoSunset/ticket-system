@@ -1,5 +1,7 @@
 import pytest
+import factory
 
+from django.db.models import signals
 from django.urls import reverse
 from manufactures.models import Manufacture, Nomenclature
 from additionally.models import Dictionary
@@ -30,6 +32,7 @@ def test_save_auto_save(operator, client):
     assert manuf_after_update.status != manufacture.status
 
 
+@factory.django.mute_signals(signals.post_save)
 @pytest.mark.django_db
 def test_save_status_if_change_nomenclature(
     operator, nomenclature_factory, manufacture_factory, client
@@ -62,6 +65,7 @@ def test_save_status_if_change_nomenclature(
     assert manuf_after_update.status != manufacture.status
 
 
+@factory.django.mute_signals(signals.post_save)
 @pytest.mark.django_db
 def test_save_status_change_and_status_manuf_change(
     client, operator, nomenclature_factory, manufacture_factory
@@ -88,6 +92,7 @@ def test_save_status_change_and_status_manuf_change(
     assert manuf_after_update.status == status_work
 
 
+@factory.django.mute_signals(signals.post_save)
 @pytest.mark.django_db
 def test_change_status_by_form(
     client, operator, nomenclature_factory, manufacture_factory
@@ -109,6 +114,7 @@ def test_change_status_by_form(
     assert manuf_after_update.status == status_work
 
 
+@factory.django.mute_signals(signals.post_save)
 @pytest.mark.django_db
 @pytest.mark.parametrize(
     "statuses, expected_status",
@@ -136,6 +142,7 @@ def test_min_status_by_nomenclature(
     )
 
 
+@factory.django.mute_signals(signals.post_save)
 @pytest.mark.django_db
 @pytest.mark.parametrize(
     "statuses",

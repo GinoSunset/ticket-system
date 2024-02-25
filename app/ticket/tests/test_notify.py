@@ -10,7 +10,9 @@ from django.core import mail
 
 class TestUpdateTicket:
     @pytest.mark.django_db
-    def test_save_comment_update_status(self, ticket_factory, client, operator_factory):
+    def test_save_comment_update_status(
+        self, ticket_factory, client, operator_factory, redis
+    ):
         user = operator_factory(first_name="John", last_name="Smit")
         status = Dictionary.objects.get(code="work")
         new_status = Dictionary.objects.get(code="done")

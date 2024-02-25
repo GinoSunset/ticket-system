@@ -317,3 +317,12 @@ def extract_template_components(comment: str) -> list:
     matches = re.findall(r"{(.*?)}", comment)
     logging.debug(f"matches: {matches}")
     return matches
+
+
+class TaskReservation(models.Model):
+    task_id = models.CharField(max_length=255, unique=True)
+    status = models.CharField(max_length=50)
+    result = models.TextField(blank=True)
+    traceback = models.TextField(blank=True)
+    date_create = models.DateTimeField(auto_now_add=True)
+    date_update = models.DateTimeField(auto_now=True)

@@ -19,7 +19,11 @@ def get_components_rs_type(
 
 
 @pytest.mark.django_db
-def test_has_needs_after_create_manufactory(manufacture_factory, nomenclature_factory):
+def test_has_needs_after_create_manufactory(
+    manufacture_factory,
+    nomenclature_factory,
+    monkeypatch_delay_reserve_component_celery,
+):
     get_components_rs_type()
     manuf = manufacture_factory()
     nomenclatures = nomenclature_factory.create_batch(
@@ -31,7 +35,9 @@ def test_has_needs_after_create_manufactory(manufacture_factory, nomenclature_fa
 
 @pytest.mark.django_db
 def test_create_components_with_type_with_sub_component(
-    nomenclature_factory, component_type_factory
+    nomenclature_factory,
+    component_type_factory,
+    monkeypatch_delay_reserve_component_celery,
 ):
     name_sub_component = "Чип РЧ"
     inner_component_type = component_type_factory(name=name_sub_component)
@@ -44,7 +50,9 @@ def test_create_components_with_type_with_sub_component(
 
 class TestReservation:
     @pytest.mark.django_db
-    def test_reserve_already_exists_component_first(self, nomenclature_factory):
+    def test_reserve_already_exists_component_first(
+        self, nomenclature_factory, monkeypatch_delay_reserve_component_celery
+    ):
         ComponentType.objects.all().delete()
         component = ComponentFactory(
             component_type=get_components_rs_type(), is_reserve=False, is_stock=True
@@ -60,8 +68,7 @@ class TestReservation:
 
     @pytest.mark.django_db
     def test_reserve_only_component_with_date_stock_more_that_manufactory_date_shipment(
-        self,
-        nomenclature_factory,
+        self, nomenclature_factory, monkeypatch_delay_reserve_component_celery
     ):
         ComponentType.objects.all().delete()
 
@@ -82,8 +89,7 @@ class TestReservation:
 
     @pytest.mark.django_db
     def test_reserve_new_component_when_not_in_stock_and_date_delivery_less_that_manufacture_date_shipment(
-        self,
-        nomenclature_factory,
+        self, nomenclature_factory, monkeypatch_delay_reserve_component_celery
     ):
         ComponentType.objects.all().delete()
 
@@ -106,7 +112,12 @@ class TestReservation:
 
 @pytest.mark.django_db
 class TestUnreserveComponents:
-    def test_unreserve_components(self, nomenclature_factory, component_factory):
+    def test_unreserve_components(
+        self,
+        nomenclature_factory,
+        component_factory,
+        monkeypatch_delay_reserve_component_celery,
+    ):
         nomenclature = nomenclature_factory()
         component1 = component_factory(
             nomenclature=nomenclature,
@@ -140,7 +151,9 @@ class TestUnreserveComponents:
 
 @pytest.mark.django_db
 class TestSignalReservation:
-    def test_signal_after_update_component(self, nomenclature_factory):
+    def test_signal_after_update_component(
+        self, nomenclature_factory, monkeypatch_delay_reserve_component_celery
+    ):
         nomenclature = nomenclature_factory()
         component_bp = Component.objects.filter(
             nomenclature=nomenclature, component_type__name__contains="БП АМ"
@@ -156,7 +169,10 @@ class TestSignalReservation:
         assert components.count() == count_before_add * 2
 
     def test_reduce_count_components_after_update_nomenclature(
-        self, nomenclature_factory, component_factory
+        self,
+        nomenclature_factory,
+        component_factory,
+        monkeypatch_delay_reserve_component_celery,
     ):
         """
         Создается 2 компонента БП АМ 1А
@@ -217,7 +233,9 @@ class TestSignalReservation:
 
 @pytest.mark.django_db
 def test_reservation_component_from_comment(
-    nomenclature_factory, component_type_factory
+    nomenclature_factory,
+    component_type_factory,
+    monkeypatch_delay_reserve_component_celery,
 ):
     ct = component_type_factory(name="деатоватор")
     comment = "необходимо {деатоватор  4 шт}"

@@ -5,6 +5,7 @@ import factory
 from manufactures.models import Nomenclature, FrameTypeOption
 
 
+@factory.django.mute_signals(signals.post_save)
 @pytest.mark.django_db
 def test_nomenclature_get_components(nomenclature_factory):
     nomenclature: Nomenclature = nomenclature_factory()
@@ -32,6 +33,7 @@ def test_nomenclature_get_components(nomenclature_factory):
     assert sorted(components) == sorted(expected_components)
 
 
+@factory.django.mute_signals(signals.post_save)
 @pytest.mark.django_db
 def test_nomenclature_get_components_from_rx(nomenclature_factory):
     nomenclature = nomenclature_factory(rx_count=2)
@@ -42,6 +44,7 @@ def test_nomenclature_get_components_from_rx(nomenclature_factory):
     assert components == expected_components
 
 
+@factory.django.mute_signals(signals.post_save)
 @pytest.mark.django_db
 def test_nomenclature_get_components_from_tx(nomenclature_factory):
     nomenclature = nomenclature_factory(tx_count=2)
@@ -52,6 +55,7 @@ def test_nomenclature_get_components_from_tx(nomenclature_factory):
     assert components == expected_components
 
 
+@factory.django.mute_signals(signals.post_save)
 @pytest.mark.django_db
 @pytest.mark.parametrize(
     "rx_count, tx_count, expected_count", ([1, 1, 2], [2, 2, 4], [1, 2, 3], [2, 1, 3])
@@ -68,6 +72,7 @@ def test_nomenclature_get_components_from_body(
     assert components == expected_components
 
 
+@factory.django.mute_signals(signals.post_save)
 @pytest.mark.django_db
 def test_nomenclature_get_components_from_mdg(nomenclature_factory):
     nomenclature = nomenclature_factory(mdg=True, tx_count=2, rx_count=2)
@@ -81,6 +86,7 @@ def test_nomenclature_get_components_from_mdg(nomenclature_factory):
     assert components == expected_components
 
 
+@factory.django.mute_signals(signals.post_save)
 @pytest.mark.django_db
 def test_nomenclature_get_components_from_mdg_rx(nomenclature_factory):
     nomenclature = nomenclature_factory(mdg=True)
@@ -91,6 +97,7 @@ def test_nomenclature_get_components_from_mdg_rx(nomenclature_factory):
     assert components == expected_components
 
 
+@factory.django.mute_signals(signals.post_save)
 @pytest.mark.django_db
 def test_nomenclature_get_components_from_mdg_tx(nomenclature_factory):
     nomenclature = nomenclature_factory(mdg=True)
@@ -101,6 +108,7 @@ def test_nomenclature_get_components_from_mdg_tx(nomenclature_factory):
     assert components == expected_components
 
 
+@factory.django.mute_signals(signals.post_save)
 @pytest.mark.django_db
 def test_nomenclature_get_components_from_bp(nomenclature_factory):
     nomenclature = nomenclature_factory(
@@ -111,6 +119,7 @@ def test_nomenclature_get_components_from_bp(nomenclature_factory):
     assert components == expected_components
 
 
+@factory.django.mute_signals(signals.post_save)
 @pytest.mark.django_db
 def test_nomenclature_get_components_from_bp_rs(nomenclature_factory):
     nomenclature = nomenclature_factory(

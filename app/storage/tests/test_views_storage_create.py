@@ -15,6 +15,7 @@ class TestComponentCreateView:
         component_factory,
         manufacture_factory,
         nomenclature_factory,
+        monkeypatch_delay_reserve_component_celery,
     ):
         manufacture = manufacture_factory(date_shipment=date(2021, 2, 1))
         nomenclature = nomenclature_factory(manufacture=manufacture)
@@ -56,7 +57,10 @@ class TestComponentCreateView:
         assert component.is_stock is True
 
     def test_form_valid_create_new_stock_component(
-        self, operator_client, component_type
+        self,
+        operator_client,
+        component_type,
+        monkeypatch_delay_reserve_component_celery,
     ):
         form_data = {
             "component_type": component_type.pk,
@@ -85,7 +89,12 @@ class TestComponentCreateView:
         assert response.status_code == 302
         assert Component.objects.count() == 3
 
-    def test_form_create_save_serial_number(self, operator_client, component_type):
+    def test_form_create_save_serial_number(
+        self,
+        operator_client,
+        component_type,
+        monkeypatch_delay_reserve_component_celery,
+    ):
         form_data = {
             "component_type": component_type.pk,
             "is_stock": True,
@@ -124,7 +133,11 @@ class TestComponentCreateView:
         assert Component.objects.count() == 1
 
     def test_reserve_and_create_component_in_delivery(
-        self, operator_client, component_factory, nomenclature_factory
+        self,
+        operator_client,
+        component_factory,
+        nomenclature_factory,
+        monkeypatch_delay_reserve_component_celery,
     ):
         ComponentType.objects.all().delete()
         nomenclature = nomenclature_factory(manufacture__date_shipment=date(2021, 1, 2))
