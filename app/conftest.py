@@ -7,6 +7,7 @@ from pytest_factoryboy import register
 from ticket.factory import TicketFactory, CommentFactory
 from additionally.models import Dictionary
 from notifications.tasks import send_email, send_email_task, send_telegram_notify_task
+from django.conf import settings
 
 from notifications.telegram import send_telegram_notify_handler
 from notifications.factory import NotificationFactory
@@ -98,17 +99,44 @@ def status_in_work():
 
 @pytest.fixture(scope="session")
 def redis():
-    with DockerContainer("redis:latest").with_bind_ports(6379, 6379) as redis:
+    with DockerContainer("redis:latest").with_name("redis").with_bind_ports(
+        6379, 6379
+    ) as redis:
         wait_for_logs(redis, "Ready to accept connections")
         yield redis
 
 
 @pytest.fixture(scope="session")
 def rabbitmq():
-    with DockerContainer("rabbitmq:3-management").with_bind_ports(
+    with DockerContainer("rabbitmq:3-management").with_name("rabbit").with_bind_ports(
         5672, 5672
+    ).with_env("RABBITMQ_DEFAULT_USER", settings.RABBIT_LOGIN).with_env(
+        "RABBITMQ_DEFAULT_PASS", settings.RABBIT_PASSWORD
+    ).with_env(
+        "RABBITMQ_DEFAULT_VHOST", settings.RABBIT_VHOST
     ) as rabbitmq:
         yield rabbitmq
+
+
+@pytest.fixture(scope="session")
+def celery(rabbitmq, redis):
+
+    with DockerContainer("helpdesk").with_env(
+        "CELERY_BROKER_URL",
+        f"amqp://{settings.RABBIT_LOGIN}:{settings.RABBIT_PASSWORD}@rabbit:{settings.RABBIT_PORT}/{settings.RABBIT_VHOST}",
+    ).with_env("CELERY_ACCEPT_CONTENT", settings.CELERY_ACCEPT_CONTENT).with_env(
+        "CELERY_RESULT_SERIALIZER", settings.CELERY_RESULT_SERIALIZER
+    ).with_env(
+        "CELERY_TASK_SERIALIZER", settings.CELERY_TASK_SERIALIZER
+    ).with_env(
+        "DATABASE_URL", settings.DATABASE_URL.replace("127.0.0.1", "db")
+    ).with_command(
+        "celery -A ticsys worker -l info"
+    ).with_kwargs(
+        links={"rabbit": "rabbit", "hdp": "db"}
+    ) as celery:
+        wait_for_logs(celery, "ready.")
+        yield celery
 
 
 @pytest.fixture(autouse=True)
