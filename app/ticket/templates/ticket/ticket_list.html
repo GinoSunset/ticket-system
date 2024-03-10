@@ -59,19 +59,33 @@
 {% block script %}
 <script>
     {% if  object_list%}
-    var hidden_values = JSON.parse(localStorage.hidden_value || null) || false;
-    if (hidden_values){
-      let hidden_value_list = hidden_values.split(",");
-      for (var i = 0; i < hidden_value_list.length; i++) {
-        $("#filterBtn").dropdown('set selected', hidden_value_list[i]);
+
+    function loadHideStatus(){
+      var hidden_values = JSON.parse(localStorage.hidden_value || null) || false;
+      if (hidden_values){
+        let hidden_value_list = hidden_values.split(",");
+        for (var i = 0; i < hidden_value_list.length; i++) {
+          $("#filterBtn").dropdown('set selected', hidden_value_list[i]);
+        }
+        
       }
-      
     }
+      
+   
+      $("#filterBtn").dropdown({
+        onChange: function (value, text, $selectedItem) {
+          hideStatus(value);
+        }
+      })
+
     
     var table = $('#tableTickets').DataTable({
       stateSave: true,
       serverSide: true,
       format: "datatables",
+      initComplete: function (settings, json) {
+        loadHideStatus();
+      },
       ajax : "{% url 'api-tickets' %}?format=datatables",
       columnDefs: [
             {
@@ -96,9 +110,8 @@
     });
 
 
-    $("#filterBtn").dropdown({
-      onChange: function (value, text, $selectedItem) {
-        localStorage.setItem('hidden_value', JSON.stringify(value));
+    function hideStatus(value){
+      localStorage.setItem('hidden_value', JSON.stringify(value));
         
         if (!value || value.lenght===0){
           table.columns(-4).search('').draw();
@@ -107,9 +120,7 @@
           to_hide = `^(?!.*${to_hide})`
           table.columns(-4).search(to_hide, true,false,true).draw();
         }
-
-      }
-    })
+    }
 
     {% endif %}
   </script>
