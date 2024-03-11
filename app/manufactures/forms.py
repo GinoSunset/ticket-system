@@ -1,6 +1,7 @@
 from django import forms
 
-from ticket.widgets import CalendarInput, FomanticRadioSelect
+from ticket.widgets import CalendarInput
+from ticsys.widgets import Dropdown
 from additionally.models import DictionaryType, Dictionary
 from .models import Manufacture, Nomenclature
 
@@ -18,7 +19,7 @@ class ManufactureForm(forms.ModelForm):
         widgets = {
             "date_shipment": CalendarInput(),
             "comment": forms.Textarea(attrs={"rows": 1, "placeholder": "Комментарий"}),
-            "client": forms.Select(attrs={"class": "ui selection dropdown search"}),
+            "client": Dropdown(attrs={"class": "ui selection dropdown search"}),
         }
 
     def __init__(self, *args, **kwargs):

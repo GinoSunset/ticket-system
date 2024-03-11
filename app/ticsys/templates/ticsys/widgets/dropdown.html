@@ -1,0 +1,16 @@
+<div id="{{widget.name}}_id" {% include "django/forms/widgets/attrs.html" %}>
+    <input type="hidden" name="{{ widget.name }}" />
+    <i class="dropdown icon"></i>
+    <div class="default text" id="{{widget.name}}_default_text"></div>
+    <div class="menu" id>
+        {% for group_name, group_choices, group_index in widget.optgroups %}{% for option in group_choices %}<div class="item" {%if option.selected%}checked{%endif%} data-value="{{ option.value }}" >{{ option.label }}</div>{% endfor %}{% endfor %}
+    </div>
+</div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        {% for val in widget.value %}
+            $("#{{widget.name}}_id").dropdown('set selected', {{val}})
+        {% endfor %}
+    });
+</script>

@@ -5,6 +5,8 @@ from django.core.exceptions import ValidationError
 from ticket.widgets import CalendarInput
 from .models import ComponentType, Alias, Component, SubComponentTypeRelation, Delivery
 
+from ticsys.widgets import Dropdown
+
 
 class AliasForm(ModelForm):
     class Meta:
