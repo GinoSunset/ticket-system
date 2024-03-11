@@ -108,9 +108,9 @@ class TypeComponentCountForm(Form):
         queryset=ComponentType.objects.all(),
         label="Тип компонента",
         required=True,
-        widget=forms.Select(
+        widget=Dropdown(
             attrs={
-                "class": "ui dropdown search",
+                "class": "ui dropdown search selection",
                 "placeholder": "Выберите тип",
                 "required": True,
             }
