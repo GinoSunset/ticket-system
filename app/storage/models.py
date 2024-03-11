@@ -63,6 +63,10 @@ class Component(models.Model):
             return "purple"
         if self.date_delivery:
             return "blue"
+        
+    @property
+    def is_phantom(self) -> bool:
+        return all([self.is_archive is False, self.is_stock is False, self.delivery is None, self.date_delivery is None])
 
     def __str__(self) -> str:
         sn = f" {self.serial_number}" or ""

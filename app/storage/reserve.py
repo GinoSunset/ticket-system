@@ -20,7 +20,7 @@ def get_components_type_from_nomenclature(
     list_components_type = []
     for component in components:
         try:
-            type_component = ComponentType.objects.get(name__icontains=component)
+            type_component = ComponentType.objects.get(name__iexact=component)
         except ComponentType.DoesNotExist:
             continue
         list_components_type.extend(get_sub_component_from_component(type_component))

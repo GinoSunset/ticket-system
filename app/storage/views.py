@@ -107,7 +107,7 @@ class ComponentCreateView(AccessOperatorMixin, LoginRequiredMixin, CreateView):
     model = Component
     template_name = "storage/component_create.html"
     form_class = ComponentForm
-    success_url = reverse_lazy("component-list")
+    success_url = reverse_lazy("storage")
 
     def get_form_kwargs(self):
         kwargs = super().get_form_kwargs()

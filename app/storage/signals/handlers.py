@@ -1,13 +1,9 @@
+import logging
 from django.dispatch import receiver
-from django.db.models.signals import post_save
+from django.db.models.signals import post_save, pre_delete
 
 from manufactures.models import Nomenclature
-from storage.reserve import (
-    processing_reserved_component,
-    components_from_nomenclature_to_archive,
-    unreserve_components,
-    re_reserved_component_delivery,
-)
+from storage.reserve import re_reserved_component_delivery, unreserve_components
 from storage.models import Delivery
 from manufactures.tasks import reservation_component_from_nomenclature
 
@@ -24,3 +20,13 @@ def change_data_on_component(sender, instance, created, **kwargs):
         components.update(date_delivery=instance.date_delivery)
         for component in components:
             re_reserved_component_delivery(component)
+
+
+@receiver(pre_delete, sender=Nomenclature)
+def unreserve_components_before_delete(sender, instance, using, **kwargs):
+    """
+    Перед удалением номенклатуры, нужно очистить компоненты,
+    фантомные удалить, у реальных снять бронь
+    """
+    logging.info(f"Delete {instance}. Start clean components")
+    unreserve_components(instance)
