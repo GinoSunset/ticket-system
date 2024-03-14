@@ -184,3 +184,47 @@ def test_update_status_to_nomenclature_by_manufacture_ready(
         )
         == expected_status
     )
+
+
+@factory.django.mute_signals(signals.post_save)
+@pytest.mark.django_db
+@pytest.mark.parametrize(
+    "statuses",
+    (
+        ([1]),
+        ([1, 4, 2]),
+        ([1, 4]),
+        ([1, 4, 5]),
+    ),
+)
+def test_update_status_to_nomenclature_by_manufacture_canceled(
+    client, manufacture_factory, nomenclature_factory, operator, statuses
+):
+    manuf = manufacture_factory()
+    for nomenclature_status in statuses:
+        manuf.nomenclatures.add(nomenclature_factory(status=nomenclature_status))
+    manuf.save()
+
+    client.force_login(operator)
+    client.post(
+        reverse("manufacture-update-status", kwargs={"pk": manuf.pk}),
+        data={
+            "status": Dictionary.objects.get(code="canceled").pk,
+        },
+    )
+
+    expected_status = []
+    for nomenclature_status in statuses:
+        if nomenclature_status <= Nomenclature.Status.CANCELED:
+            expected_status.append(Nomenclature.Status.CANCELED.value)
+        else:
+            expected_status.append(nomenclature_status)
+
+    assert (
+        list(
+            manuf.nomenclatures.all()
+            .order_by("date_create")
+            .values_list("status", flat=True)
+        )
+        == expected_status
+    )

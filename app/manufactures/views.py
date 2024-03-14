@@ -175,7 +175,7 @@ class ManufactureStatusUpdateView(LoginRequiredMixin, UpdateView):
 
     def form_valid(self, form):
         self.object = form.save()
-        if self.object.status.code in ["shipped", "ready"]:
+        if self.object.status.code in ["shipped", "ready", "canceled"]:
             # TODO: Переделать на update. Signal не срабатывает при update, нужно передать напрямую
             if self.object.status.code == "shipped":
                 nomenclatures = self.object.nomenclatures.filter(
@@ -184,13 +184,21 @@ class ManufactureStatusUpdateView(LoginRequiredMixin, UpdateView):
                 for nom in nomenclatures:
                     nom.status = Nomenclature.Status.SHIPPED
                     nom.save()
-            else:
+            elif self.object.status.code == "ready":
                 nomenclatures = self.object.nomenclatures.filter(
                     status__lte=Nomenclature.Status.READY
                 )
                 for nom in nomenclatures:
                     nom.status = Nomenclature.Status.READY
                     nom.save()
+            else:
+                nomenclatures = self.object.nomenclatures.filter(
+                    status__lte=Nomenclature.Status.CANCELED
+                )
+                for nom in nomenclatures:
+                    nom.status = Nomenclature.Status.CANCELED
+                    nom.save()
+
         return super().form_valid(form)
 
 
