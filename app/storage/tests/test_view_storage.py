@@ -113,4 +113,7 @@ class TestComponentByNomenclature:
 
         res = admin_client.get(reverse("nomenclature-components", kwargs={"pk": n.pk}))
         assert res.status_code == 200
-        assert set(res.context_data.get("components")) == set(components_n)
+        assert (
+            sum([i["count"] for i in res.context_data.get("components")])
+            == components_n.count()
+        )

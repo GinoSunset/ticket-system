@@ -7,7 +7,7 @@ from django.http import HttpRequest, HttpResponse, HttpResponseRedirect
 from django.shortcuts import get_object_or_404, render
 from django.urls import reverse_lazy
 from django.db import models
-from django.db.models import Count
+from django.db.models import Count, Q
 from django.views.generic import ListView, CreateView, UpdateView
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.db.transaction import atomic
@@ -29,7 +29,7 @@ from .reserve import reserve_component
 
 class ComponentListView(AccessOperatorMixin, LoginRequiredMixin, ListView):
     model = Component
-    template_name = "storage/component_list.html"
+    template_name = "storage/component_list_all.html"
     context_object_name = "components"
     ordering = ["component_type", "-id"]
 
@@ -38,6 +38,11 @@ class StorageListView(AccessOperatorMixin, LoginRequiredMixin, ListView):
     model = Component
     template_name = "storage/storage.html"
     context_object_name = "components"
+
+    def get_context_data(self, **kwargs: Any) -> dict[str, Any]:
+        data = super().get_context_data(**kwargs)
+        data["nomenclature_pk"] = False
+        return data
 
     def get_queryset(self):
         return Component.active_components.values(
@@ -237,6 +242,15 @@ class ComponentTypeReserveView(AccessOperatorMixin, LoginRequiredMixin, ListView
                 client=models.F("nomenclature__manufacture__client__name"),
                 count=Count("id"),
             )
+            .exclude(
+                Q(
+                    nomenclature__manufacture__status__code__in=[
+                        "canceled",
+                        "ready",
+                        "shipped",
+                    ]
+                )
+            )
         )
 
         # get all manufacture from nomenclatures with distinct
@@ -252,14 +266,47 @@ class NomenclatureComponents(AccessOperatorMixin, LoginRequiredMixin, ListView):
     def get_context_data(self, **kwargs: Any) -> dict[str, Any]:
         data = super().get_context_data(**kwargs)
         data["page_name"] = f"Компоненты номенклатуры №{self.kwargs.get('pk')}"
-        return data
-
-    def get_queryset(self) -> QuerySet[Any]:
-        qs = super().get_queryset()
         nomenclature_pk = self.kwargs.get("pk")
         if nomenclature_pk:
+            data["nomenclature_pk"] = nomenclature_pk
+        return data
+
+    def get_queryset(self):
+        nomenclature_pk = self.kwargs.get("pk")
+        qs = Component.active_components.all()
+        if nomenclature_pk:
             qs = qs.filter(nomenclature=nomenclature_pk)
-        return qs
+        return qs.values(
+            "component_type",
+        ).annotate(
+            count=models.Count("component_type"),
+            component_type_name=models.F("component_type__name"),
+            in_stock=models.Sum(
+                models.Case(
+                    models.When(is_stock=True, then=1),
+                    default=0,
+                    output_field=models.IntegerField(),
+                )
+            ),
+            in_reserve=models.Sum(
+                models.Case(
+                    models.When(is_reserve=True, then=1),
+                    default=0,
+                    output_field=models.IntegerField(),
+                )
+            ),
+            in_delivery=models.Sum(
+                models.Case(
+                    models.When(
+                        models.Q(is_stock=False)
+                        & models.Q(date_delivery__isnull=False),
+                        then=1,
+                    ),
+                    default=0,
+                    output_field=models.IntegerField(),
+                )
+            ),
+        )
 
 
 class DeliveryCreateView(AccessOperatorMixin, LoginRequiredMixin, CreateView):

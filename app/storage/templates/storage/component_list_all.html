@@ -1,0 +1,55 @@
+{% extends 'ticsys/index.html' %}
+{% block header_style %}
+  <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
+{% endblock %}
+
+{% block content %}
+    <h1>{% firstof page_name 'Склад' %}</h1>
+    <div class="row">
+      <div class="col-md-6">
+        <a class="ui button basic blue" href="{% url 'component-type-create' %}">Создать тип компонент</a>
+        <a class="ui button basic green" href="{% url 'component-create' %}">Добавить компонент на склад</a>
+        <a class="ui button basic green" href="{% url 'component-type-create' %}">Добавить доставку</a>
+        <div class="ui horizontal right aligned divider header legent">
+          <a class="ui mini red label">отсутвует</a>
+          <a class="ui mini violet label">в резерве на доставе</a>
+          <a class="ui mini blue label">в доставке</a>
+          <a class="ui mini purple label">зарезервирован</a>
+          <a class="ui mini green label">свободны</a>
+        </div>
+        <table class="ui celled table">
+          <thead>
+            <tr>
+              <th>Компонент</th>
+              <th>Резерв</th>
+              <th>Серийный номер</th>
+              <th>Дата ближайшей доставки доставки</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for component in components %}
+              <tr>
+                <td class="right {{ component.get_status_color }} marked">
+                  {{ component.component_type.name }} 
+                </td>
+                <td>
+                  {% if component.is_reserve %}
+                  <div class="content">
+                    <a href={{component.nomenclature.manufacture.get_absolute_url}}> {{component.nomenclature}}</a>
+                    </div>
+                      {{ component.nomenclature.manufacture.date_shipment|date:"d.m.Y" }}
+                  {% comment %} Дата отгрузки: {{ component.nomenclature.manufacture.date_shipment|date:"d.m.Y" }} {% endcomment %}
+                  {% endif %}
+                </td>
+                <td>{% firstof component.serial_number %}</td>
+                <td>{% firstof component.date_delivery %}</td>
+              </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+
+
+{% endblock %}

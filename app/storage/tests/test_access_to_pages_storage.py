@@ -4,6 +4,7 @@ from django.urls import reverse
 PAGES_URLS_PARAMS = [
     ("storage", False),
     ("component-list", False),
+    ("nomenclature-components", True),
     ("component-type-create", False),
     ("component-create", False),
     ("component-type-reserve", True),
@@ -46,7 +47,6 @@ def test_admin_user_has_access(
     kwargs = {"pk": component.pk} if is_has_params else {}
     url = reverse(page, kwargs=kwargs)
 
-    
     response = admin_client.get(url)
 
     assert response.status_code == 200

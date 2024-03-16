@@ -1,5 +1,4 @@
 {% extends 'ticsys/index.html' %}
-{% load progress %}
 {% load static %}
 {% block header_style %}
 <script type="text/javascript" src="{% static 'js/htmx.min.js' %}"></script>
@@ -49,82 +48,14 @@
         </div>
       </div>
         <h1>Склад</h1>
-
-        <table class="ui compact table very padded">
-          <thead>
-            <tr>
-              <th>Тип компонента</th>
-              <th></th>
-              <th>На складе</th>
-              <th>Необходимо</th>
-              <th>На доставке</th>
-              <th class="seven wide">
-                Диаграмма<div class="legent">
-                  <a class="ui mini red label">отсутвует</a>
-                  <a class="ui mini violet label">в резерве на доставе</a>
-                  <a class="ui mini blue label">в доставке</a>
-                  <a class="ui mini purple label">зарезервирован</a>
-                  <a class="ui mini green label">свободны</a>
-                </div>
-              </th>
-            </tr>
-          </thead>
-          <tbody>
-            {% for component in components %}
-              <tr>
-                <td class="selectable">
-                  <span>{{ component.component_type_name }}</span>
-                </td>
-                <td class="collapsing">
-                  <a href="{% url 'component-create' %}?component_type={{ component.component_type }}" class="circular mini green basic alight left ui icon button"><i class="plus icon"></i></a>
-                </td>
-                <td>{{ component.in_stock }}</td>
-                <td class="reserved_popup">
-                  {{ component.in_reserve }}<i class="attention grey icon" onclick="load_reserved({{ component.component_type }})"></i>
-                </td>
-                <td>
-                  {{ component.in_delivery }}<i class="attention grey icon"></i>
-                </td>
-
-                <td>
-                  <div class="ui multiple progress" data-total="{{ component.count }}" data-value="{{ component|get_value_progress }}">
-                    {% comment %};#// в резерве без наличия{% endcomment %}
-                    <div class="red bar">
-                      <div class="progress"></div>
-                    </div>
-                    {% comment %};#// в резерве и с доставкой{% endcomment %}
-                    <div class="violet bar">
-                      <div class="progress"></div>
-                    </div>
-                    {% comment %};#// с доставкой{% endcomment %}
-                    <div class="blue bar">
-                      <div class="progress"></div>
-                    </div>
-                    {% comment %};#// в резерве в наличии{% endcomment %}
-                    <div class="purple bar">
-                      <div class="progress"></div>
-                    </div>
-                    {% comment %};#// в наличии{% endcomment %}
-                    <div class="green bar">
-                      <div class="progress"></div>
-                    </div>
-                  </div>
-                </td>
-              </tr>
-            {% endfor %}
-          </tbody>
-        </table>
+        {% include "storage/table_storage.html" %}
       </div>
     </div>
   </div>
   <div class="ui modal"></div>
   <script>
     $('.ui.accordion').accordion("open",0);
-    $('.ui.multiple.progress').progress({
-      text: {
-        percent: '{value}'
-      }
-    })
+
     
     function load_reserved(id) {
       // show modal and set content id

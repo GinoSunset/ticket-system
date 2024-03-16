@@ -6,45 +6,38 @@ from storage.models import ComponentType, Component
 register = template.Library()
 
 
+def filter_components_by_type(component, nomenclature=None):
+    if nomenclature:
+        return Component.active_components.filter(
+            component_type_id=component["component_type"], nomenclature=nomenclature
+        )
+    return Component.active_components.filter(
+        component_type_id=component["component_type"]
+    )
+
+
 @register.filter
-def get_value_progress(component):
+def get_value_progress(component, nomenclature=False):
     in_reserve_not_in_stock_not_in_delivery = (
-        Component.active_components.filter(
-            component_type_id=component["component_type"]
-        )
-        .filter(
-            is_reserve=True,
-            is_stock=False,
-            date_delivery__isnull=True,
-        )
+        filter_components_by_type(component, nomenclature)
+        .filter(is_reserve=True, is_stock=False, date_delivery__isnull=True)
         .count()
     )
+
     in_reserve_not_in_stock_in_delivery = (
-        Component.active_components.filter(
-            component_type_id=component["component_type"]
-        )
-        .filter(
-            is_reserve=True,
-            is_stock=False,
-            date_delivery__isnull=False,
-        )
+        filter_components_by_type(component, nomenclature)
+        .filter(is_reserve=True, is_stock=False, date_delivery__isnull=False)
         .count()
     )
+
     in_delivery = (
-        Component.active_components.filter(
-            component_type_id=component["component_type"]
-        )
-        .filter(
-            is_reserve=False,
-            is_stock=False,
-            date_delivery__isnull=False,
-        )
+        filter_components_by_type(component, nomenclature)
+        .filter(is_reserve=False, is_stock=False, date_delivery__isnull=False)
         .count()
     )
+
     in_reserve_in_stock_not_in_delivery = (
-        Component.active_components.filter(
-            component_type_id=component["component_type"]
-        )
+        filter_components_by_type(component, nomenclature)
         .filter(
             Q(date_delivery__isnull=True) | Q(date_delivery__isnull=False),
             is_reserve=True,
@@ -52,10 +45,9 @@ def get_value_progress(component):
         )
         .count()
     )
+
     in_stock = (
-        Component.active_components.filter(
-            component_type_id=component["component_type"]
-        )
+        filter_components_by_type(component, nomenclature)
         .filter(
             Q(date_delivery__isnull=True) | Q(date_delivery__isnull=False),
             is_reserve=False,
@@ -63,6 +55,7 @@ def get_value_progress(component):
         )
         .count()
     )
+
     return ",".join(
         [
             str(in_reserve_not_in_stock_not_in_delivery),
