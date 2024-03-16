@@ -25,6 +25,7 @@ from .forms import (
     TypeComponentCountForm,
 )
 from .reserve import reserve_component
+from django.shortcuts import redirect
 
 
 class ComponentListView(AccessOperatorMixin, LoginRequiredMixin, ListView):
@@ -32,6 +33,11 @@ class ComponentListView(AccessOperatorMixin, LoginRequiredMixin, ListView):
     template_name = "storage/component_list_all.html"
     context_object_name = "components"
     ordering = ["component_type", "-id"]
+
+    def get(self, request: HttpRequest, *args: Any, **kwargs: Any) -> HttpResponse:
+        return redirect("manufactures-list")
+
+        # return super().get(request, *args, **kwargs)
 
 
 class StorageListView(AccessOperatorMixin, LoginRequiredMixin, ListView):
