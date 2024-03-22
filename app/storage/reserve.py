@@ -115,3 +115,48 @@ def re_reserved_component_delivery(component: Component):
         component_type=component.component_type,
         nomenclature=nomenclature_from_component,
     )
+
+
+def re_reserver_components_in_stock_to_phantoms():
+    """
+    Изменить резерв с компонентов фантомных на реальные компоненты на складе
+    """
+    component_types = get_component_type_in_stock_and_has_phantoms()
+    for component_type in component_types:
+        re_reserve_stock_component(component_type)
+
+
+def re_reserve_stock_component(component_type: ComponentType):
+    free_components = Component.active_components.filter(
+        is_stock=True, is_reserve=False, component_type=component_type
+    )
+    components_phantom = Component.phantom_components.filter(
+        component_type=component_type, phantom=True, nomenclature__isnull=False
+    ).order_by("nomenclature__manufacture__date_shipment")
+
+    for free_comp, phantom_comp in zip(free_components, components_phantom):
+        with atomic():
+            free_comp.is_reserve = True
+            free_comp.nomenclature = phantom_comp.nomenclature
+            free_comp.save()
+            phantom_comp.delete()
+            logging.info(
+                f"{free_comp} will be reserve to {free_comp.nomenclature} by re_reserve_stock_component"
+            )
+
+
+def get_component_type_in_stock_and_has_phantoms():
+    result = []
+    for ct in ComponentType.objects.all():
+        if (
+            Component.active_components.filter(
+                is_stock=True, is_reserve=False, component_type=ct
+            ).exists()
+            and Component.phantom_components.filter(
+                phantom=True, component_type=ct, nomenclature__isnull=False
+            ).exists()
+        ):
+
+            result.append(ct)
+
+    return result

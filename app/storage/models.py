@@ -1,12 +1,33 @@
 import datetime
 import uuid
 from django.db import models
+from django.db.models import Case, When, Value, BooleanField
 
 
 # create objects manager with filter is_archive=False
 class ComponentManager(models.Manager):
     def get_queryset(self):
         return super().get_queryset().filter(is_archive=False)
+
+
+class ComponentPhantomManager(models.Manager):
+    def get_queryset(self):
+        return (
+            super()
+            .get_queryset()
+            .annotate(
+                phantom=Case(
+                    When(
+                        is_archive=False,
+                        is_stock=False,
+                        date_delivery=None,
+                        then=Value(True),
+                    ),
+                    default=Value(False),
+                    output_field=BooleanField(),
+                )
+            )
+        )
 
 
 class Component(models.Model):
@@ -40,6 +61,7 @@ class Component(models.Model):
         null=True,
     )
     active_components = ComponentManager()
+    phantom_components = ComponentPhantomManager()
     objects = models.Manager()
 
     @classmethod
@@ -63,10 +85,17 @@ class Component(models.Model):
             return "purple"
         if self.date_delivery:
             return "blue"
-        
+
     @property
     def is_phantom(self) -> bool:
-        return all([self.is_archive is False, self.is_stock is False, self.delivery is None, self.date_delivery is None])
+        return all(
+            [
+                self.is_archive is False,
+                self.is_stock is False,
+                self.delivery is None,
+                self.date_delivery is None,
+            ]
+        )
 
     def __str__(self) -> str:
         sn = f" {self.serial_number}" or ""

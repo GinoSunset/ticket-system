@@ -70,7 +70,7 @@ class TestComponentCreateView:
         url = reverse("component-create")
         response = operator_client.post(url, data=form_data)
         assert response.status_code == 302
-        component = Component.objects.get(pk=1)
+        component = Component.objects.filter(component_type=component_type).last()
         assert component.is_stock is True
 
     def test_form_create_component_more_one_count(
@@ -104,9 +104,10 @@ class TestComponentCreateView:
         url = reverse("component-create")
         response = operator_client.post(url, data=form_data)
         assert response.status_code == 302
-        component = Component.objects.get(pk=1)
+        component, component2 = Component.objects.filter(
+            component_type=component_type
+        ).order_by("-id")[:2]
         assert component.serial_number is not None
-        component2 = Component.objects.get(pk=2)
         assert component2.serial_number is not None
         assert component2.serial_number != component.serial_number
 

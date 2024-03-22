@@ -5,7 +5,11 @@ from storage.models import Component
 from manufactures.models import Nomenclature, FrameTypeOption
 from storage.models import ComponentType
 from storage.factories import ComponentFactory, ComponentTypeFactory
-from storage.reserve import unreserve_components
+from storage.reserve import (
+    unreserve_components,
+    re_reserver_components_in_stock_to_phantoms,
+    get_component_type_in_stock_and_has_phantoms,
+)
 
 
 def get_components_rs_type(
@@ -237,9 +241,158 @@ def test_reservation_component_from_comment(
     component_type_factory,
     monkeypatch_delay_reserve_component_celery,
 ):
-    ct = component_type_factory(name="деатоватор")
-    comment = "необходимо {деатоватор  4 шт}"
+    ct = component_type_factory(name="компонент_тест")
+    comment = "необходимо {компонент_тест  4 шт}"
     nomenclature = nomenclature_factory(comment=comment)
 
     assert Component.objects.filter(component_type=ct).count() == 4
     assert Component.objects.filter(component_type=ct, is_reserve=True).count() == 4
+
+
+class TestReReserveStockComponent:
+
+    @pytest.mark.django_db
+    def test_remove_component_phantom_component_if_has_in_reserve(
+        self,
+        nomenclature_factory,
+        component_type_factory,
+        component_factory,
+        monkeypatch_delay_reserve_component_celery,
+    ):
+        def add_component_to_storage(
+            add_component_to_storage: ComponentType, size: int
+        ):
+            component_factory.create_batch(
+                size=5,
+                component_type=ct,
+                is_reserve=False,
+                date_delivery=None,
+                is_stock=True,
+            )
+
+        ct = component_type_factory(name="компонент_тест")
+        phantom_size = 4
+        to_create_size = 5
+
+        comment = "необходимо {компонент_тест  " + str(phantom_size) + " шт}"
+        nomenclature = nomenclature_factory(comment=comment)
+        component_deactivator = Component.objects.filter(
+            component_type=ct, nomenclature=nomenclature
+        )
+        assert all(component.is_phantom for component in component_deactivator)
+        add_component_to_storage(ct, to_create_size)
+        assert (
+            Component.objects.filter(component_type=ct).count()
+            == phantom_size + to_create_size
+        )
+
+        re_reserver_components_in_stock_to_phantoms()
+        assert Component.objects.filter(component_type=ct).count() == to_create_size
+        assert (
+            Component.objects.filter(component_type=ct, is_reserve=True).count()
+            == phantom_size
+        )
+
+    @pytest.mark.django_db
+    def test_get_component_type_in_stock_and_has_phantoms(
+        self, component_type_factory, component_factory
+    ):
+        ct = component_type_factory()
+        component_factory(
+            component_type=ct,
+            is_reserve=False,
+            date_delivery=None,
+            is_stock=True,
+        )
+        component_factory(
+            component_type=ct,
+            is_reserve=True,
+            date_delivery=None,
+            is_stock=False,
+        )
+        assert get_component_type_in_stock_and_has_phantoms() == [ct]
+
+    @pytest.mark.django_db
+    @pytest.mark.parametrize(
+        "reserved, nomenclature_need, countCt",
+        [
+            (True, False, 0),
+            (True, True, 0),
+            (False, False, 0),
+            (False, True, 1),
+        ],
+    )
+    def test_get_component_type_in_stock_and_has_phantoms_and_reserve_or_none(
+        self,
+        component_type_factory,
+        component_factory,
+        reserved,
+        countCt,
+        nomenclature_need,
+        nomenclature_factory,
+    ):
+        nomenclature = nomenclature_factory()
+        ct = component_type_factory()
+        component_factory(
+            component_type=ct,
+            is_reserve=reserved,
+            date_delivery=None,
+            is_stock=True,
+        )
+        component_factory(
+            component_type=ct,
+            is_reserve=True,
+            date_delivery=None,
+            is_stock=False,
+            nomenclature=nomenclature if nomenclature_need else None,
+        )
+        ct_target = get_component_type_in_stock_and_has_phantoms()
+        assert len(ct_target) == countCt
+
+    @pytest.mark.django_db
+    def test_remove_component_phantom_component_if_has_in_reserve_only_for_earlier_manuf(
+        self,
+        nomenclature_factory,
+        component_type_factory,
+        component_factory,
+        monkeypatch_delay_reserve_component_celery,
+        manufacture_factory,
+    ):
+        def add_component_to_storage(
+            add_component_to_storage: ComponentType, size: int
+        ):
+            component_factory.create_batch(
+                size=size,
+                component_type=ct,
+                is_reserve=False,
+                date_delivery=None,
+                is_stock=True,
+            )
+
+        ct = component_type_factory(name="компонент_тест")
+        phantom_size = 1
+        to_create_size = 1
+        for day in range(2):
+            m = manufacture_factory(date_shipment=date(2024, day + 1, 26))
+            comment = "необходимо {компонент_тест  1 шт}"
+            nomenclature = nomenclature_factory(comment=comment, manufacture=m)
+
+        add_component_to_storage(ct, to_create_size)
+        assert (
+            Component.objects.filter(component_type=ct).count()
+            == to_create_size + phantom_size + 1
+        )
+        # start re reserve
+        re_reserver_components_in_stock_to_phantoms()
+        # check
+        assert (
+            Component.objects.filter(component_type=ct).count()
+            == to_create_size + phantom_size
+        ), "only 1 wil be replace"
+        assert Component.objects.filter(
+            component_type=ct,
+            is_reserve=True,
+            is_stock=True,
+        ).first().nomenclature == Nomenclature.objects.get(
+            manufacture__date_shipment=date(2024, 1, 26)
+        )
