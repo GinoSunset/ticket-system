@@ -9,6 +9,33 @@ class GlobalCharFilter(GlobalFilter, filters.CharFilter):
     pass
 
 
+class GlobalFullNameFilter(GlobalFilter, filters.CharFilter):
+
+    def global_q(self):
+        """Return a Q-Object for the global search for this column"""
+        ret = Q()
+        if self.global_search_value:
+            for term in self.global_search_value.split(" "):
+                ret |= (
+                    Q(
+                        **{
+                            f"{self.field_name}__first_name__{self.global_lookup_expr}": term
+                        }
+                    )
+                    | Q(
+                        **{
+                            f"{self.field_name}__last_name__{self.global_lookup_expr}": term
+                        }
+                    )
+                    | Q(
+                        **{
+                            f"{self.field_name}__username__{self.global_lookup_expr}": term
+                        }
+                    )
+                )
+        return ret
+
+
 class TicketGlobalFilter(DatatablesFilterSet):
     city = GlobalCharFilter(lookup_expr="icontains")
     id = GlobalCharFilter(lookup_expr="icontains")
@@ -17,22 +44,13 @@ class TicketGlobalFilter(DatatablesFilterSet):
     type_ticket = GlobalCharFilter(
         field_name="type_ticket__description", lookup_expr="icontains"
     )
-    customer = GlobalCharFilter(field_name="full_name", method="search_by_full_name")
-    responsible = GlobalCharFilter(field_name="full_name", method="search_by_full_name")
-    contractor = GlobalCharFilter(field_name="full_name", method="search_by_full_name")
+    customer = GlobalFullNameFilter(lookup_expr="icontains")
+    responsible = GlobalFullNameFilter(lookup_expr="icontains")
+    contractor = GlobalFullNameFilter(lookup_expr="icontains")
     # planned_execution_date = filters.DateTimeFilter()
     status = GlobalCharFilter(field_name="status__description", lookup_expr="icontains")
     address = GlobalCharFilter(lookup_expr="icontains")
     shop_id = GlobalCharFilter(lookup_expr="icontains")
-
-    def search_by_full_name(self, qs, name, value):
-        for term in value.split():
-            qs = qs.filter(
-                Q(firs_name__icontains=term)
-                | Q(last_name__icontains=term)
-                | Q(username__icontains=term)
-            )
-        return qs
 
     class Meta:
         model = Ticket
