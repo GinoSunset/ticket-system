@@ -4,6 +4,7 @@ import factory
 from django.urls import reverse
 from django.db.models import signals
 from ticket.forms import TicketsForm
+from additionally.models import Dictionary, DictionaryType
 
 from users.models import CustomerProfile
 from notifications.models import Notification
@@ -58,3 +59,30 @@ def test_create_notify_when_set_contractor(
         },
     )
     assert Notification.objects.filter(user=contractor).count() == 1
+
+
+@pytest.mark.django_db
+@factory.django.mute_signals(signals.pre_save, signals.post_save)
+def test_save_ticket_type_before_update_ticket(
+    operator_factory, contractor_factory, customer_factory, ticket_factory, client
+):
+    """Проверка создания уведомления при назначении исполнителя"""
+    user = operator_factory()
+    customer = customer_factory()
+    cp = CustomerProfile.objects.create(user=customer)
+    user.customers.add(cp)
+    contractor = contractor_factory()
+    type_ticket = Dictionary.objects.create(
+        code="test_save_ticket_type_before_update_ticket",
+        type_dict=DictionaryType.objects.get(code="status_ticket"),
+    )
+    ticket = ticket_factory(
+        customer=customer,
+        type_ticket=type_ticket,
+    )
+
+    client.force_login(user=user)
+    res = client.get(
+        reverse("ticket-update", kwargs={"pk": ticket.pk}),
+    )
+    assert res.context_data["form"].fields["type_ticket"].initial == type_ticket

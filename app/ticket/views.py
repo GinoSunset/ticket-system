@@ -132,6 +132,7 @@ class TicketUpdateView(LoginRequiredMixin, AccessTicketMixin, UpdateView):
                 "creator": user,
                 "customer_qs": customer,
                 "status": self.object.status,
+                "type_ticket": self.object.type_ticket,
             }
         )
         return self.initial
