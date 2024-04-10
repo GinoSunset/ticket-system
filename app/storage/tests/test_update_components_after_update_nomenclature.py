@@ -69,31 +69,3 @@ def test_phantom_component_remove_after_delete(
     nomenclature.delete()
 
     assert Component.objects.filter(id__in=components_id).exists() is False
-
-
-@pytest.mark.django_db
-def test_component_move_remove_reservation_after_cancel(
-    nomenclature_factory, monkeypatch_delay_reserve_component_celery
-):
-    assert False
-
-
-@pytest.mark.django_db
-def test_component_remove_reservation_after_delete(
-    nomenclature_factory, monkeypatch_delay_reserve_component_celery
-):
-    assert False
-
-
-@pytest.mark.django_db
-def test_rebalanced_reservation_after_cancel_nomenclature(
-    nomenclature_factory, monkeypatch_delay_reserve_component_celery
-):
-    assert False
-
-
-@pytest.mark.django_db
-def test_rebalanced_reservation_after_remove_nomenclature(
-    nomenclature_factory, monkeypatch_delay_reserve_component_celery
-):
-    assert False

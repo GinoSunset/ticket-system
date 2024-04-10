@@ -1,0 +1,9 @@
+<div class="ui right labeled input">
+  <form hx-post="{% url 'write-off' component_type_id %}" ht-target="#in_stock" hx-swap="outerHTML" hx-remove="true" class="ui mini form">
+    {% csrf_token %}
+    <div class="ui action input">
+      {{ form.count_write_off }}
+      <button class="ui button">Списать</button>
+    </div>
+  </form>
+</div>

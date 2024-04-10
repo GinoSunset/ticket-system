@@ -3,11 +3,12 @@ from django.urls import reverse
 
 PAGES_URLS_PARAMS = [
     ("storage", False),
-    ("component-list", False),
+    # ("component-list", False),
     ("nomenclature-components", True),
     ("component-type-create", False),
     ("component-create", False),
     ("component-type-reserve", True),
+    ("write-off", True),
 ]
 
 

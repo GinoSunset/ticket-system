@@ -38,4 +38,5 @@ urlpatterns = [
         views.DoneDelivery.as_view(),
         name="done_delivery",
     ),
+    path("write-off/<int:pk>/", views.WriteOff.as_view(), name="write-off"),
 ]

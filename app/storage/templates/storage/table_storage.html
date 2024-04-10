@@ -28,11 +28,18 @@
         <td class="collapsing">
           <a href="{% url 'component-create' %}?component_type={{ component.component_type }}" class="circular mini green basic alight left ui icon button"><i class="plus icon"></i></a>
         </td>
-        <td>{{ component.in_stock }}</td>
-        <td class="reserved_popup">
+        
+        <td id="in_stock" hx-target="this" class="right aligned" >
+          {{ component.in_stock }}
+            <a  hx-get="{% url 'write-off' component.component_type%}" 
+            class="circular mini red basic alight left ui icon button">
+              <i class="minus icon"></i>
+            </a>
+        </td>
+        <td class="reserved_popup right aligned">
           {{ component.in_reserve }}<i class="attention grey icon" onclick="load_reserved({{ component.component_type }})"></i>
         </td>
-        <td>
+        <td class="right aligned">
           {{ component.in_delivery }}<i class="attention grey icon"></i>
         </td>
 

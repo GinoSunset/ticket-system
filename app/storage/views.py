@@ -3,12 +3,12 @@ import logging
 from typing import Any
 from django.db.models.query import QuerySet
 from django.forms.models import BaseModelForm
-from django.http import HttpRequest, HttpResponse, HttpResponseRedirect
+from django.http import HttpRequest, HttpResponse, HttpResponseRedirect, JsonResponse
 from django.shortcuts import get_object_or_404, render
 from django.urls import reverse_lazy
 from django.db import models
 from django.db.models import Count, Q
-from django.views.generic import ListView, CreateView, UpdateView
+from django.views.generic import ListView, CreateView, UpdateView, FormView
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.db.transaction import atomic
 from django.forms.formsets import all_valid, formset_factory
@@ -23,6 +23,7 @@ from .forms import (
     DeliveryForm,
     TypeComponentCountFormSet,
     TypeComponentCountForm,
+    WriteOffForm,
 )
 from .reserve import reserve_component
 from django.shortcuts import redirect
@@ -499,3 +500,54 @@ def create_delivery_component(delivery: Delivery, count: int, cmnt_type: Compone
         component.delivery = delivery
         component.save()
         logging.info(f"{component} was added  delivery {delivery}")
+
+
+class WriteOff(AccessOperatorMixin, LoginRequiredMixin, FormView):
+    form_class = WriteOffForm
+    template_name = "storage/write_off_form.html"
+    template_post_name = "storage/in_stock_row.html"
+
+    def get_initial(self):
+        """Return the initial data to use for forms on this view."""
+        self.initial = {
+            "component_type": self.kwargs["pk"]
+        }  # ComponentType.objects.get(self.kwargs["pk"])}
+        return self.initial.copy()
+
+    def get_context_data(self, **kwargs):
+        kwargs = super().get_context_data(**kwargs)
+        kwargs["in_stock"] = Component.active_components.filter(
+            component_type__pk=self.kwargs["pk"], is_stock=True
+        ).count()
+        kwargs["component_type_id"] = self.kwargs["pk"]
+        return kwargs
+
+    def form_valid(self, form):
+        ct = form.cleaned_data["component_type"]
+        count_to_delete = form.cleaned_data["count_write_off"]
+        count_deleted = self.remove_free_components(ct, count_to_delete)
+        in_stock = Component.active_components.filter(
+            component_type=ct, is_stock=True
+        ).count()
+
+        return self.render_to_response(self.get_context_data(form=form))
+
+    def remove_free_components(self, ct: ComponentType, count_to_delete: int):
+        component_for_delete = Component.active_components.filter(
+            component_type=ct, is_reserve=False, is_stock=True
+        )[:count_to_delete]
+
+        count_deleted = component_for_delete.count()
+        [component.delete() for component in component_for_delete]
+
+        logging.info(f"Write off {component_for_delete} {ct} ")
+        return count_deleted
+
+    def form_invalid(self, form):
+        response = super().form_invalid(form)
+        return response
+
+    def get_template_names(self):
+        if self.request.method == "POST":
+            return [self.template_post_name]
+        return super().get_template_names()

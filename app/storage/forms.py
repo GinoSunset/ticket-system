@@ -1,5 +1,5 @@
 from django import forms
-from django.forms import ModelForm, Form
+from django.forms import ModelForm, Form, NumberInput
 from django.forms.formsets import formset_factory
 from django.core.exceptions import ValidationError
 from ticket.widgets import CalendarInput
@@ -122,3 +122,25 @@ class TypeComponentCountForm(Form):
 TypeComponentCountFormSet = formset_factory(
     TypeComponentCountForm, min_num=1, validate_min=True, extra=0
 )
+
+
+class WriteOffForm(Form):
+    component_type = forms.ModelChoiceField(
+        queryset=ComponentType.objects.all(),
+        label="Тип компонента",
+        required=True,
+    )
+    count_write_off = forms.IntegerField(
+        min_value=0,
+        initial=0,
+        label="Количество в доставке",
+        widget=NumberInput(
+            attrs={
+                "class": "ui",
+            }
+        ),
+    )
+
+    def __init__(self, *args, **kwargs):
+        super(WriteOffForm, self).__init__(*args, **kwargs)
+        self.fields["component_type"].disabled = True

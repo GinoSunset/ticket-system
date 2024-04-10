@@ -1,6 +1,8 @@
 import pytest
-from datetime import date, datetime
+import factory
 
+from datetime import date, datetime
+from django.db.models import signals
 from storage.models import Component
 from manufactures.models import Nomenclature, FrameTypeOption
 from storage.models import ComponentType
@@ -293,10 +295,12 @@ class TestReReserveStockComponent:
             == phantom_size
         )
 
+    @factory.django.mute_signals(signals.post_save)
     @pytest.mark.django_db
     def test_get_component_type_in_stock_and_has_phantoms(
-        self, component_type_factory, component_factory
+        self, component_type_factory, component_factory, nomenclature_factory
     ):
+        nomen = nomenclature_factory()
         ct = component_type_factory()
         component_factory(
             component_type=ct,
@@ -309,9 +313,11 @@ class TestReReserveStockComponent:
             is_reserve=True,
             date_delivery=None,
             is_stock=False,
+            nomenclature=nomen,
         )
         assert get_component_type_in_stock_and_has_phantoms() == [ct]
 
+    @factory.django.mute_signals(signals.post_save)
     @pytest.mark.django_db
     @pytest.mark.parametrize(
         "reserved, nomenclature_need, countCt",

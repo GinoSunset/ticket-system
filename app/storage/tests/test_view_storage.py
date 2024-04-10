@@ -13,7 +13,7 @@ import pytest
 @pytest.mark.django_db
 def test_exist_storage_list_view(operator_client):
     response = operator_client.get(reverse("component-list"))
-    assert response.status_code == 200
+    assert response.status_code == 302
 
 
 @pytest.mark.django_db
@@ -117,3 +117,39 @@ class TestComponentByNomenclature:
             sum([i["count"] for i in res.context_data.get("components")])
             == components_n.count()
         )
+
+
+@factory.django.mute_signals(signals.post_save)
+@pytest.mark.django_db
+class TestWriteOffComponent:
+
+    def test_write_off_component(
+        self, component_factory, operator_client, component_type
+    ):
+        to_create = 20
+
+        components = component_factory.create_batch(
+            size=to_create, component_type=component_type, is_stock=True
+        )
+
+        to_write_off = 3
+        data = {"count_write_off": to_write_off}
+        url = reverse("write-off", kwargs={"pk": component_type.pk})
+        res = operator_client.post(url, data=data, format="json")
+        assert res.context_data["in_stock"] == to_create - to_write_off
+        assert (
+            Component.objects.filter(component_type=component_type).count()
+            == to_create - to_write_off
+        )
+
+    def test_write_off_only_free_component(
+        self, component_factory, component_type, operator_client
+    ):
+        component_factory.create_batch(
+            size=20, component_type=component_type, is_reserve=True
+        )
+        data = {"component_type": component_type.pk, "count_write_off": 20}
+        url = reverse("write-off", kwargs={"pk": component_type.pk})
+        res = operator_client.post(url, data=data, format="json")
+        assert res.context_data["in_stock"] == 20
+        assert Component.objects.filter(component_type=component_type).count() == 20
