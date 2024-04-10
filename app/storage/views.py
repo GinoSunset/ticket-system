@@ -85,6 +85,56 @@ class StorageListView(AccessOperatorMixin, LoginRequiredMixin, ListView):
         )
 
 
+class SearchView(AccessOperatorMixin, LoginRequiredMixin, ListView):
+    model = Component
+    template_name = "storage/table_body.html"
+    context_object_name = "components"
+
+    def get_context_data(self, **kwargs: Any) -> dict[str, Any]:
+        data = super().get_context_data(**kwargs)
+        data["nomenclature_pk"] = False
+        return data
+
+    def get_queryset(self):
+        search = self.request.GET.get("search")
+        component = Component.active_components.all()
+        if search:
+            component = Component.active_components.filter(
+                component_type__name__icontains=search
+            )
+        return component.values(
+            "component_type",
+        ).annotate(
+            count=models.Count("component_type"),
+            component_type_name=models.F("component_type__name"),
+            in_stock=models.Sum(
+                models.Case(
+                    models.When(is_stock=True, then=1),
+                    default=0,
+                    output_field=models.IntegerField(),
+                )
+            ),
+            in_reserve=models.Sum(
+                models.Case(
+                    models.When(is_reserve=True, then=1),
+                    default=0,
+                    output_field=models.IntegerField(),
+                )
+            ),
+            in_delivery=models.Sum(
+                models.Case(
+                    models.When(
+                        models.Q(is_stock=False)
+                        & models.Q(date_delivery__isnull=False),
+                        then=1,
+                    ),
+                    default=0,
+                    output_field=models.IntegerField(),
+                )
+            ),
+        )
+
+
 class ComponentTypeCreateView(AccessOperatorMixin, LoginRequiredMixin, CreateView):
     model = ComponentType
     template_name = "storage/component_type_create.html"

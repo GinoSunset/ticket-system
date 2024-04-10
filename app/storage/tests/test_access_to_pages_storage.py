@@ -9,6 +9,7 @@ PAGES_URLS_PARAMS = [
     ("component-create", False),
     ("component-type-reserve", True),
     ("write-off", True),
+    ("search", False),
 ]
 
 

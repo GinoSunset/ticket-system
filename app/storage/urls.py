@@ -3,6 +3,7 @@ from . import views
 
 urlpatterns = [
     path("", views.StorageListView.as_view(), name="storage"),
+    path("search/", views.SearchView.as_view(), name="search"),
     path("component-list/", views.ComponentListView.as_view(), name="component-list"),
     path(
         "create-component-type/",

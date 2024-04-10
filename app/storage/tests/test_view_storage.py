@@ -153,3 +153,15 @@ class TestWriteOffComponent:
         res = operator_client.post(url, data=data, format="json")
         assert res.context_data["in_stock"] == 20
         assert Component.objects.filter(component_type=component_type).count() == 20
+
+
+@factory.django.mute_signals(signals.post_save)
+@pytest.mark.django_db
+def test_search_result(component_type, operator_client, component_factory):
+    url = reverse("search")
+    component_factory(component_type=component_type)
+    res = operator_client.get(url, data={"search": component_type.name})
+    assert res.context_data["components"].count() == 1
+    assert (
+        res.context_data["components"][0]["component_type_name"] == component_type.name
+    )
