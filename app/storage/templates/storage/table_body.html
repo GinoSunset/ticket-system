@@ -9,7 +9,7 @@
       <a href="{% url 'component-create' %}?component_type={{ component.component_type }}" class="circular mini green basic alight left ui icon button"><i class="plus icon"></i></a>
     </td>
 
-    <td id="in_stock" hx-target="this" class="right aligned">
+    <td id="in_stock" hx-target="this" class="right aligned collapsing">
       {{ component.in_stock }}
       <a hx-get="{% url 'write-off' component.component_type %}" class="circular mini red basic alight left ui icon button"><i class="minus icon"></i></a>
     </td>
