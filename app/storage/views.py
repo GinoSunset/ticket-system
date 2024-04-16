@@ -92,16 +92,20 @@ class SearchView(AccessOperatorMixin, LoginRequiredMixin, ListView):
 
     def get_context_data(self, **kwargs: Any) -> dict[str, Any]:
         data = super().get_context_data(**kwargs)
-        data["nomenclature_pk"] = False
+
+        data["nomenclature_pk"] = self.request.GET.get("nomenclature_pk", False)
         return data
 
     def get_queryset(self):
         search = self.request.GET.get("search")
+        nomenclature_pk = self.request.GET.get("nomenclature_pk")
         component = Component.active_components.all()
         if search:
             component = Component.active_components.filter(
                 component_type__name__icontains=search
             )
+        if nomenclature_pk:
+            component = component.filter(nomenclature=nomenclature_pk)
         return component.values(
             "component_type",
         ).annotate(

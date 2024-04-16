@@ -1,21 +1,20 @@
 {% extends 'ticsys/index.html' %}
 {% load static %}
-{% block header_style %}
-  <style>
-    .main {
-      max-width: 85%;
-    }
-    .box.ui.right.rail {
-      padding-right: 2rem;
-    }
-    .p12 {
-      padding-bottom: 2rem;
-    }
-  </style>
-  <script type="text/javascript" src="{% static 'js/htmx.min.js' %}"></script>
-{% endblock %}
 
 {% block content %}
+  {% block header_style %}
+    <style>
+      .main {
+        max-width: 85%;
+      }
+      .box.ui.right.rail {
+        padding-right: 2rem;
+      }
+      .p12 {
+        padding-bottom: 2rem;
+      }
+    </style>
+  {% endblock %}
   <div>
     <a class="ui button basic blue" href="{% url 'component-type-create' %}">Создать тип компонент</a>
     <a class="ui button basic green" href="{% url 'component-create' %}">Добавить компонент на склад</a>
