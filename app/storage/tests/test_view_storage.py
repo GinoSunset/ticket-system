@@ -165,3 +165,40 @@ def test_search_result(component_type, operator_client, component_factory):
     assert (
         res.context_data["components"][0]["component_type_name"] == component_type.name
     )
+
+
+class TestIsInternalFilter:
+
+    @pytest.mark.django_db
+    @factory.django.mute_signals(signals.post_save)
+    @pytest.mark.parametrize("internal", [True, False])
+    def test_view_storage_is_internal(
+        self, internal, component_type_factory, operator_client, component_factory
+    ):
+        ct = component_type_factory(is_internal=True)
+        url = reverse("storage")
+        component = component_factory(component_type=ct)
+        data = {"internal": "yes"} if internal else None
+        res = operator_client.get(url, data=data)
+        component_type_names = [
+            i["component_type_name"] for i in res.context_data["components"]
+        ]
+        assert (ct.name in component_type_names) is internal
+
+    @pytest.mark.django_db
+    @factory.django.mute_signals(signals.post_save)
+    @pytest.mark.parametrize("internal", [True, False])
+    def test_search_storage_is_internal(
+        self, internal, component_type_factory, operator_client, component_factory
+    ):
+        ct = component_type_factory(is_internal=True)
+        url = reverse("search")
+        component = component_factory(component_type=ct)
+        data = {"search": ct.name}
+        if internal:
+            data.update({"internal": "yes"})
+        res = operator_client.get(url, data=data)
+        component_type_names = [
+            i["component_type_name"] for i in res.context_data["components"]
+        ]
+        assert (ct.name in component_type_names) is internal

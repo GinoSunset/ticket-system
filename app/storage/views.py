@@ -52,7 +52,12 @@ class StorageListView(AccessOperatorMixin, LoginRequiredMixin, ListView):
         return data
 
     def get_queryset(self):
-        return Component.active_components.values(
+        components = Component.active_components.all()
+        internal = self.request.GET.get("internal", False)
+        if not internal:
+            components = components.filter(component_type__is_internal=False)
+
+        return components.values(
             "component_type",
         ).annotate(
             count=models.Count("component_type"),
@@ -94,19 +99,27 @@ class SearchView(AccessOperatorMixin, LoginRequiredMixin, ListView):
         data = super().get_context_data(**kwargs)
 
         data["nomenclature_pk"] = self.request.GET.get("nomenclature_pk", False)
+        if self.search:
+            data["search"] = self.search
+        if self.internal:
+            data["internal"] = True
         return data
 
     def get_queryset(self):
-        search = self.request.GET.get("search")
+        self.search = self.request.GET.get("search")
+        self.internal = self.request.GET.get("internal", False)
         nomenclature_pk = self.request.GET.get("nomenclature_pk")
-        component = Component.active_components.all()
-        if search:
-            component = Component.active_components.filter(
-                component_type__name__icontains=search
+
+        components = Component.active_components.all()
+        if self.search:
+            components = Component.active_components.filter(
+                component_type__name__icontains=self.search
             )
         if nomenclature_pk:
-            component = component.filter(nomenclature=nomenclature_pk)
-        return component.values(
+            components = components.filter(nomenclature=nomenclature_pk)
+        if not self.internal:
+            components = components.filter(component_type__is_internal=False)
+        return components.values(
             "component_type",
         ).annotate(
             count=models.Count("component_type"),
