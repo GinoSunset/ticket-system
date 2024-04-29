@@ -27,7 +27,7 @@
         hx-trigger="click" 
         hx-get='{% url "search" %}{% if nomenclature_pk %}?nomenclature_pk={{nomenclature_pk}}{% endif %}'
         hx-target="#search-results" 
-        hx-vals='js:{serach: getSearch()}'
+        hx-vals='js:{search: getSearch()}'
         hx-on:htmx:after-request="run_progress();"
         hx-indicator="#indicator"
         
@@ -70,47 +70,22 @@
         }
       })
     }
-    function addQueryParamInternal(event) {
-      const searchEl = document.getElementById('seach_id')
-      const searchInput = searchEl.value;
-      const checkboxEl = document.getElementById('checkbox_internal')
-      const checkboxInternal = checkboxEl.checked;
-  
-      // Construct query parameters
-      let queryParams = '';
-      if (searchInput) {
-        queryParams += `?search=${searchInput}`;
-      }
-      if (checkboxInternal) {
-        queryParams += `${queryParams ? '&' : '?'}internal=on`;
-      }
-  
-      // Update hx-get attribute with the new URL
-      const searchUrl = `{% url "search" %}${queryParams}{% if nomenclature_pk %}&nomenclature_pk={{nomenclature_pk}}{% endif %}`;
-      event.target.setAttribute('hx-get', searchUrl);
-      searchEl.setAttribute('hx-get', searchUrl);
-      checkboxEl.setAttribute('hx-get', searchUrl);
-      console.log(searchUrl);
-      htmx.process(searchEl);
-      htmx.process(checkboxEl);
 
+  function getSearch(){
+    const searchEl = document.getElementById('seach_id')
+    const searchInput = searchEl.value;
+    if (searchEl){
+      return searchInput
     }
+    return ""
+  }
 
-    function getSearch(){
-      const searchEl = document.getElementById('seach_id')
-      const searchInput = searchEl.value;
-      if (searchEl){
-        return searchInput
-      }
-      return ""
+  function getIternal(){
+    const checkboxEl = document.getElementById('checkbox_internal')
+    const checkboxInternal = checkboxEl.checked;
+    if (checkboxInternal) {
+      return "on"
     }
-
-    function getIternal(){
-      const checkboxEl = document.getElementById('checkbox_internal')
-      const checkboxInternal = checkboxEl.checked;
-      if (checkboxInternal) {
-        return "on"
-      }
-      return ""
-    }
+    return ""
+  }
 </script>
