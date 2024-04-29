@@ -202,3 +202,22 @@ class TestIsInternalFilter:
             i["component_type_name"] for i in res.context_data["components"]
         ]
         assert (ct.name in component_type_names) is internal
+
+    @pytest.mark.django_db
+    @factory.django.mute_signals(signals.post_save)
+    def test_internal_not_in_nomenclature_components_page(
+        self,
+        component_type_factory,
+        operator_client,
+        component_factory,
+        nomenclature_factory,
+    ):
+        nm = nomenclature_factory()
+        url = reverse("nomenclature-components", kwargs={"pk": nm.pk})
+        ct = component_type_factory(is_internal=True)
+        component = component_factory(component_type=ct, nomenclature=nm)
+        res = operator_client.get(url)
+        component_type_names = [
+            i["component_type_name"] for i in res.context_data["components"]
+        ]
+        assert ct.name not in component_type_names

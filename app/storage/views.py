@@ -346,10 +346,13 @@ class NomenclatureComponents(AccessOperatorMixin, LoginRequiredMixin, ListView):
         return data
 
     def get_queryset(self):
+        self.internal = self.request.GET.get("internal", False)
         nomenclature_pk = self.kwargs.get("pk")
         qs = Component.active_components.all()
         if nomenclature_pk:
             qs = qs.filter(nomenclature=nomenclature_pk)
+        if not self.internal:
+            qs = qs.filter(component_type__is_internal=False)
         return qs.values(
             "component_type",
         ).annotate(
