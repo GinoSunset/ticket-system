@@ -10,7 +10,7 @@
       hx-headers='{"X-CSRFToken": "{{ csrf_token }}"}'
       placeholder="Поиск..."
       name="search"
-      hx-get='{% url "search" %}{% if nomenclature_pk %}&nomenclature_pk={{nomenclature_pk}}{% endif %}'
+      hx-get='{% url "search" %}{% if nomenclature_pk %}?nomenclature_pk={{nomenclature_pk}}{% endif %}'
       hx-trigger="input changed delay:500ms, search" 
       hx-target="#search-results" 
       hx-vals='js:{internal: getIternal()}'
