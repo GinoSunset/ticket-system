@@ -304,6 +304,9 @@ class CommentFile(models.Model):
     def file_name(self):
         return self.file.name.split("/")[-1]
 
+    def get_absolute_url(self):
+        return f"{settings.PROTOCOL}://{Site.objects.get_current()}/{self.file.url}"
+
 
 class CommentImage(models.Model):
     class Meta:
@@ -320,3 +323,6 @@ class CommentImage(models.Model):
     @property
     def image_name(self):
         return self.image.name.split("/")[-1]
+
+    def get_absolute_url(self):
+        return f"{settings.PROTOCOL}://{Site.objects.get_current()}/{self.image.url}"

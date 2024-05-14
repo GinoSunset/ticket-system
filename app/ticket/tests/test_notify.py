@@ -149,3 +149,49 @@ class TestUpdateTicket:
         assert notify.user == customer
         assert emails == set(mail.outbox[0].cc)
         assert f"{ticket.shop_id}" in mail.outbox[0].subject
+
+    @pytest.mark.django_db
+    def test_big_file_from_attach_comment_send_as_link(
+        self,
+        file_5_mb,
+        file_1_mb,
+        ticket_factory,
+        operator_factory,
+        customer_factory,
+        client,
+        monkeypatch_delay_send_email_on_celery,
+    ):
+        user = operator_factory(first_name="John", last_name="Smit")
+        status = Dictionary.objects.get(code="new")
+        customer = customer_factory(email="cust1@email.com")
+        ticket: Ticket = ticket_factory(
+            creator=user,
+            status=status,
+            customer=customer,
+        )
+        client.force_login(user=user)
+        with open(file_5_mb) as fd:
+            comment_data = {"text": "Text1", "is_for_report": True, "files": fd}
+            client.post(
+                reverse("comment-create", kwargs={"ticket_pk": ticket.pk}),
+                data=comment_data,
+                format="json",
+            )
+        with open(file_1_mb) as fd:
+            comment_data = {"text": "Text2", "is_for_report": True, "files": fd}
+            client.post(
+                reverse("comment-create", kwargs={"ticket_pk": ticket.pk}),
+                data=comment_data,
+                format="json",
+            )
+
+        res = client.get(reverse("ticket-to-done", kwargs={"pk": ticket.pk}))
+        assert res.status_code == 302
+
+        notify = Notification.objects.first()
+
+        assert len(mail.outbox[0].attach) == 1, "Only small file in attach"
+        assert f"Файл {file_5_mb.name}:" in mail.outbox[0].body
+        assert [i for i in mail.outbox[0].body.splitlines() if i][-2] == comment_data[
+            "text"
+        ]

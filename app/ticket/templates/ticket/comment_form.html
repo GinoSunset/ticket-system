@@ -1,20 +1,29 @@
 {% extends 'ticsys/index.html' %}
+{% load static %}
+{% block header_style %}
+<script type="text/javascript" src={% static "ticket/check_filesize.js" %}></script>
+{% endblock %}
 {% block content %}
-<h1>{% firstof name_page 'Новый комментарий' %}</h1>
-<div class="ui container">
+  <h1>{% firstof name_page 'Новый комментарий' %}</h1>
+  <div class="ui container">
     <form class="ui form" method="post" enctype="multipart/form-data">
-        {{ form.non_field_errors }}
-        {% csrf_token %}
-        {% for field in form %}
+      {{ form.non_field_errors }}
+      {% csrf_token %}
+      {% for field in form %}
         <div class="field">
-            {{ field.errors }}
-            {% if not field.is_hidden%}
-            {{ field.label_tag }} 
-            {% endif %}
-            {{ field }}
+          {{ field.errors }}
+          {% if not field.is_hidden %}
+            {{ field.label_tag }}
+          {% endif %}
+          {{ field }}
         </div>
-        {% endfor %}
+      {% endfor %}
       <button class="ui button" type="submit">{% firstof name_btn 'Создать' %}</button>
     </form>
   </div>
-{% endblock content %}
+{% endblock %}
+{% block script %}
+<script>
+  document.getElementById('id_files').addEventListener('change', checkFileSize);
+</script>
+{% endblock script %}

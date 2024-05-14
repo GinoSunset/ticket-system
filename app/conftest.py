@@ -159,3 +159,29 @@ def setup_test_env(settings):
 def operator_client(operator, client):
     client.force_login(operator)
     return client
+
+
+@pytest.fixture
+def file_5_mb(tmp_path):
+    filename = tmp_path / "big_file.jpg"
+    size_in_mb = 5
+
+    # Generate the big file
+    with open(filename, "wb") as f:
+        f.seek(size_in_mb * 1024 * 1024 - 1)
+        f.write(b"\0")
+
+    return filename
+
+
+@pytest.fixture
+def file_1_mb(tmp_path):
+    filename = tmp_path / "small_file.txt"
+    size_in_mb = 1
+
+    # Generate the big file
+    with open(filename, "wb") as f:
+        f.seek(size_in_mb * 1024 * 1024 - 1)
+        f.write(b"\0")
+
+    return filename
