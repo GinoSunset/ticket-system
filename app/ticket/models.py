@@ -305,7 +305,7 @@ class CommentFile(models.Model):
         return self.file.name.split("/")[-1]
 
     def get_absolute_url(self):
-        return f"{settings.PROTOCOL}://{Site.objects.get_current()}/{self.file.url}"
+        return f"{settings.PROTOCOL}://{Site.objects.get_current()}{self.file.url}"
 
 
 class CommentImage(models.Model):
@@ -325,4 +325,4 @@ class CommentImage(models.Model):
         return self.image.name.split("/")[-1]
 
     def get_absolute_url(self):
-        return f"{settings.PROTOCOL}://{Site.objects.get_current()}/{self.image.url}"
+        return f"{settings.PROTOCOL}://{Site.objects.get_current()}{self.image.url}"
