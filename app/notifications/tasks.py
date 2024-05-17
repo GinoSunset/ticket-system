@@ -3,8 +3,12 @@ from django.core.mail import EmailMessage
 from django.template import loader
 from django.conf import settings
 
+from ticket.models import CommentImage, CommentFile
+
 from notifications.models import Notification
 from notifications.telegram import send_telegram_notify_handler
+
+from .utils import get_attachments
 
 import logging
 
@@ -40,7 +44,12 @@ def send_email(notification_pk: int) -> int:
     )
 
     if notification.is_needed_to_attach_files():
-        set_attachments(email, notification)
+        files_to_attach, files_to_links = get_attachments(notification)
+        if files_to_attach:
+            set_attachments(email, files_to_attach)
+        if files_to_links:
+            added_text = generate_links_to_attach_files_as_link(files_to_links)
+            email.body += added_text
 
     if notification.bcc_email:
         email.bcc = [notification.bcc_email]
@@ -54,14 +63,17 @@ def send_email(notification_pk: int) -> int:
     return status
 
 
-def set_attachments(email: EmailMessage, notification: Notification) -> None:
-    if not notification.ticket:
-        return
-    for comment in notification.ticket.get_comments_for_report(prefetch=True):
-        for file in comment.files.all():
-            email.attach_file(file.file.path)
-        for image in comment.images.all():
-            email.attach_file(image.image.path)
+def generate_links_to_attach_files_as_link(files_to_links: list[str]) -> str:
+    attach_str = [f"\nссылка на прикрепленный файл: {i}" for i in files_to_links]
+    return "".join(attach_str)
+
+
+def set_attachments(
+    email: EmailMessage, files: list[CommentFile | CommentImage]
+) -> None:
+    for file in files:
+        attr = "file" if isinstance(file, CommentFile) else "image"
+        email.attach_file(getattr(file, attr).path)
 
 
 def get_subject(notification: Notification) -> str:

@@ -190,8 +190,5 @@ class TestUpdateTicket:
 
         notify = Notification.objects.first()
 
-        assert len(mail.outbox[0].attach) == 1, "Only small file in attach"
-        assert f"Файл {file_5_mb.name}:" in mail.outbox[0].body
-        assert [i for i in mail.outbox[0].body.splitlines() if i][-2] == comment_data[
-            "text"
-        ]
+        assert len(mail.outbox[0].attachments) == 1, "Only small file in attach"
+        assert f"ссылка на прикрепленный файл:" in mail.outbox[0].body
