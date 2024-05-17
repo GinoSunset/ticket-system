@@ -36,6 +36,18 @@ class GlobalFullNameFilter(GlobalFilter, filters.CharFilter):
         return ret
 
 
+class GlobalFullNameAndCompanyFilter(GlobalFullNameFilter):
+
+    def global_q(self):
+        ret = super().global_q()
+        ret |= Q(
+            **{
+                f"{self.field_name}__profile__company__{self.global_lookup_expr}": self.global_search_value
+            }
+        )
+        return ret
+
+
 class TicketGlobalFilter(DatatablesFilterSet):
     city = GlobalCharFilter(lookup_expr="icontains")
     id = GlobalCharFilter(lookup_expr="icontains")
@@ -44,9 +56,9 @@ class TicketGlobalFilter(DatatablesFilterSet):
     type_ticket = GlobalCharFilter(
         field_name="type_ticket__description", lookup_expr="icontains"
     )
-    customer = GlobalFullNameFilter(lookup_expr="icontains")
+    customer = GlobalFullNameAndCompanyFilter(lookup_expr="icontains")
     responsible = GlobalFullNameFilter(lookup_expr="icontains")
-    contractor = GlobalFullNameFilter(lookup_expr="icontains")
+    contractor = GlobalFullNameAndCompanyFilter(lookup_expr="icontains")
     # planned_execution_date = filters.DateTimeFilter()
     status = GlobalCharFilter(field_name="status__description", lookup_expr="icontains")
     address = GlobalCharFilter(lookup_expr="icontains")
