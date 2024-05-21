@@ -1,7 +1,7 @@
 import datetime
 import uuid
 from django.db import models
-from django.db.models import Case, When, Value, BooleanField
+from django.db.models import Case, When, Value, BooleanField, Count
 
 
 # create objects manager with filter is_archive=False
@@ -206,3 +206,10 @@ class Delivery(models.Model):
     @property
     def is_outdate(self):
         return self.date_delivery < datetime.date.today()
+
+    def get_component_total_aggregate(self):
+        return (
+            self.component_set.all()
+            .values("component_type__name")
+            .annotate(total=Count("id"))
+        )

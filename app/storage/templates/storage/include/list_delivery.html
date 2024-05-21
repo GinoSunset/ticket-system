@@ -4,7 +4,13 @@
     <div class="header">#{{ delivery.id }}</div>
     <div class="meta">
       <span class="right floated time">{{ delivery.date_delivery }}</span>
-      <span class="category">{{ delivery.component_set.count }} шт.</span>
+    <br>
+    {% for deliv_components in delivery.get_component_total_aggregate %}
+      <div class="dot-container">
+        <span class="category dots">{{ deliv_components.component_type__name}}</span>   
+        <span class="right floated time">{{ deliv_components.total }} шт.</span>
+      </div>
+    {% endfor %}
     </div>
     <div class="description">{{ delivery.comment }}</div>
   </div>
@@ -18,4 +24,18 @@
   </div>
 </div>
 {% endfor %}
-<div></div>
+{% block header_style %}
+<style>
+  .dot-container {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.dot-container .dots {
+    flex: 1;
+    border-bottom: 1px dotted;
+    margin: 0 10px;
+}
+</style>
+{% endblock %}
