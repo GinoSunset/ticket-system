@@ -39,6 +39,9 @@ class ComponentAdmin(admin.ModelAdmin):
         "delivery__pk",
     )
 
+    def get_queryset(self, request):
+        return Component.objects.get_queryset()
+
 
 class SubComponentTypeRelationAdmin(admin.ModelAdmin):
     list_display = (

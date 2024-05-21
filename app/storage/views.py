@@ -610,7 +610,9 @@ class WriteOff(AccessOperatorMixin, LoginRequiredMixin, FormView):
         count_deleted = component_for_delete.count()
         [component.delete() for component in component_for_delete]
 
-        logging.info(f"Write off {component_for_delete} {ct} ")
+        logging.info(
+            f"Write off {component_for_delete} {ct} - {component_for_delete.count()} "
+        )
         return count_deleted
 
     def form_invalid(self, form):
