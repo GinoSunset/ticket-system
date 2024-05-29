@@ -103,11 +103,14 @@ class SearchView(AccessOperatorMixin, LoginRequiredMixin, ListView):
             data["search"] = self.search
         if self.internal:
             data["internal"] = True
+        if self.tags:
+            data["tags"] = self.tags
         return data
 
     def get_queryset(self):
         self.search = self.request.GET.get("search")
         self.internal = self.request.GET.get("internal", False)
+        self.tags = self.request.GET.getlist("tags")
         nomenclature_pk = self.request.GET.get("nomenclature_pk")
 
         components = Component.active_components.all()
@@ -119,6 +122,8 @@ class SearchView(AccessOperatorMixin, LoginRequiredMixin, ListView):
             components = components.filter(nomenclature=nomenclature_pk)
         if not self.internal:
             components = components.filter(component_type__is_internal=False)
+        if self.tags:
+            components = components.filter(component_type__tags__name__in=self.tags)
         return components.values(
             "component_type",
         ).annotate(
