@@ -31,6 +31,10 @@ class TestComponentModel:
         assert len(serial_number) == 11
         assert not Component.objects.filter(serial_number=serial_number).exists()
 
+    def test_component_has_tags_component_type(self, component, tag_component):
+        component.component_type.tags.add(tag_component)
+        assert list(component.tags.all()) == [tag_component]
+
 
 @pytest.mark.django_db
 class TestComponentTypeModel:

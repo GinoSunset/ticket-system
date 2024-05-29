@@ -107,6 +107,10 @@ class Component(models.Model):
             ]
         )
 
+    @property
+    def tags(self):
+        return self.component_type.tags
+
     def __str__(self) -> str:
         sn = f" {self.serial_number}" or ""
         return f"[{self.pk}]{self.component_type.name}{sn}"
