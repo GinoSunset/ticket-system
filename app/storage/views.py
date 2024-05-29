@@ -1,6 +1,6 @@
 import datetime
 import logging
-from typing import Any
+from typing import Any, Dict
 from django.db.models.query import QuerySet
 from django.forms.models import BaseModelForm
 from django.http import HttpRequest, HttpResponse, HttpResponseRedirect, JsonResponse
@@ -95,38 +95,36 @@ class SearchView(AccessOperatorMixin, LoginRequiredMixin, ListView):
     template_name = "storage/table_body.html"
     context_object_name = "components"
 
-    def get_context_data(self, **kwargs: Any) -> dict[str, Any]:
+    def get_context_data(self, **kwargs: Any) -> Dict[str, Any]:
         data = super().get_context_data(**kwargs)
-
-        data["nomenclature_pk"] = self.request.GET.get("nomenclature_pk", False)
-        if self.search:
-            data["search"] = self.search
-        if self.internal:
-            data["internal"] = True
-        if self.tags:
-            data["tags"] = self.tags
+        self._populate_context_data(data)
         return data
 
     def get_queryset(self):
+        self._retrieve_request_params()
+        components = self._get_filtered_queryset()
+        return self._annotate_queryset(components)
+
+    def _retrieve_request_params(self):
         self.search = self.request.GET.get("search")
         self.internal = self.request.GET.get("internal", False)
         self.tags = self.request.GET.getlist("tags")
-        nomenclature_pk = self.request.GET.get("nomenclature_pk")
+        self.nomenclature_pk = self.request.GET.get("nomenclature_pk")
 
+    def _get_filtered_queryset(self):
         components = Component.active_components.all()
         if self.search:
-            components = Component.active_components.filter(
-                component_type__name__icontains=self.search
-            )
-        if nomenclature_pk:
-            components = components.filter(nomenclature=nomenclature_pk)
+            components = components.filter(component_type__name__icontains=self.search)
+        if self.nomenclature_pk:
+            components = components.filter(nomenclature=self.nomenclature_pk)
         if not self.internal:
             components = components.filter(component_type__is_internal=False)
         if self.tags:
             components = components.filter(component_type__tags__name__in=self.tags)
-        return components.values(
-            "component_type",
-        ).annotate(
+        return components
+
+    def _annotate_queryset(self, queryset):
+        return queryset.values("component_type").annotate(
             count=models.Count("component_type"),
             component_type_name=models.F("component_type__name"),
             in_stock=models.Sum(
@@ -155,6 +153,15 @@ class SearchView(AccessOperatorMixin, LoginRequiredMixin, ListView):
                 )
             ),
         )
+
+    def _populate_context_data(self, data: Dict[str, Any]):
+        data["nomenclature_pk"] = self.request.GET.get("nomenclature_pk", False)
+        if self.search:
+            data["search"] = self.search
+        if self.internal:
+            data["internal"] = True
+        if self.tags:
+            data["tags"] = self.tags
 
 
 class ComponentTypeCreateView(AccessOperatorMixin, LoginRequiredMixin, CreateView):

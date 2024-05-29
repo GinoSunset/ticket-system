@@ -275,3 +275,32 @@ class TestIsInternalFilter:
             i["component_type_name"] for i in res.context_data["components"]
         ]
         assert [ct.name] == component_type_names
+
+    @pytest.mark.django_db
+    @factory.django.mute_signals(signals.post_save)
+    def test_search_storage_with_one_tag_on_component_with_2_tags(
+        self,
+        component_type_factory,
+        operator_client,
+        component_factory,
+        tag_component_factory,
+    ):
+        name1 = "Деактиватор1"
+        name2 = "Деактиватор2"
+        tag1 = tag_component_factory(name="1")
+        tag2 = tag_component_factory(name="2")
+        ct = component_type_factory(name=name1, is_internal=False)
+        ct_2 = component_type_factory(name=name2, is_internal=False)
+        ct.tags.add(tag1)
+        ct.tags.add(tag2)
+        url = reverse("search")
+        component = component_factory(component_type=ct)
+        component_2 = component_factory(component_type=ct_2)
+
+        data = {"search": "Деактиватор", "tags": [tag1.name]}
+
+        res = operator_client.get(url, data=data)
+        component_type_names = [
+            i["component_type_name"] for i in res.context_data["components"]
+        ]
+        assert [ct.name] == component_type_names
