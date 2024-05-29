@@ -4,7 +4,17 @@ from django.db import models
 from django.db.models import Case, When, Value, BooleanField, Count
 
 
-# create objects manager with filter is_archive=False
+class TagComponent(models.Model):
+    class Meta:
+        verbose_name = "Тег"
+        verbose_name_plural = "Теги"
+
+    name = models.CharField(max_length=255, verbose_name="Тег", unique=True)
+
+    def __str__(self) -> str:
+        return self.name
+
+
 class ComponentManager(models.Manager):
     def get_queryset(self):
         return super().get_queryset().filter(is_archive=False)
@@ -134,8 +144,10 @@ class ComponentType(models.Model):
     is_internal = models.BooleanField(
         default=False,
         verbose_name="Для внутреннего использования",
-        help_text="Если отмечено, то компонент  будет отображаться в списке компонентов только для инженеров",
+        help_text="Если отмечено, то компонент будет отображаться в списке компонентов только для инженеров",
     )
+
+    tags = models.ManyToManyField(TagComponent)
 
     def __str__(self) -> str:
         return f"{self.name}"

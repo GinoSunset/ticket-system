@@ -30,7 +30,12 @@ from manufactures.tasks import (
     reserve_components,
 )
 
-from storage.factories import ComponentTypeFactory, ComponentFactory, DeliveryFactory
+from storage.factories import (
+    ComponentTypeFactory,
+    ComponentFactory,
+    DeliveryFactory,
+    TagComponentFactory,
+)
 
 register(TicketFactory)
 register(UserFactory)
@@ -49,6 +54,7 @@ register(ClientManufFactory, _name="manufacture_client")
 register(ComponentTypeFactory)
 register(ComponentFactory)
 register(DeliveryFactory)
+register(TagComponentFactory)
 
 
 @pytest.fixture

@@ -49,6 +49,17 @@ class TestComponentTypeModel:
             == 2
         )
 
+    def test_component_type_has_tags(
+        self, component_type_factory, tag_component, component_factory
+    ):
+        component_type = component_type_factory()
+        component_type.tags.add(tag_component)
+
+        c = component_factory(component_type=component_type)
+
+        c_tag = Component.objects.filter(component_type__tags=tag_component)
+        assert c_tag.exists(), "Not found component with tag"
+
 
 @pytest.mark.parametrize(
     "is_stock, date_delivery, delivery, is_archive ,expected",
