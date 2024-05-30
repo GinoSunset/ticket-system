@@ -1,5 +1,12 @@
 from django.contrib import admin
-from .models import Component, ComponentType, Alias, SubComponentTypeRelation, Delivery
+from .models import (
+    Component,
+    ComponentType,
+    Alias,
+    SubComponentTypeRelation,
+    Delivery,
+    TagComponent,
+)
 
 
 class AliasInline(admin.TabularInline):
@@ -7,10 +14,16 @@ class AliasInline(admin.TabularInline):
 
 
 class ComponentTypeAdmin(admin.ModelAdmin):
-    list_display = ("name", "is_internal")
-    list_filter = ("parent_component_type", "is_internal")
+    list_display = ("name", "is_internal", "display_tags")
+    list_filter = ("parent_component_type", "is_internal", "tags")
     search_fields = ("name",)
+    filter_horizontal = ("tags",)
     inlines = [AliasInline]
+
+    def display_tags(self, obj):
+        return ", ".join(tag.name for tag in obj.tags.all())
+
+    display_tags.short_description = "Теги"
 
 
 class AliasAdmin(admin.ModelAdmin):
@@ -62,8 +75,14 @@ class DeliveryAdmin(admin.ModelAdmin):
     list_filter = ("status", "date_delivery")
 
 
+class TagComponentAdmin(admin.ModelAdmin):
+    list_display = ("name",)
+    search_fields = ("name",)
+
+
 admin.site.register(Component, ComponentAdmin)
 admin.site.register(ComponentType, ComponentTypeAdmin)
 admin.site.register(Alias, AliasAdmin)
 admin.site.register(SubComponentTypeRelation, SubComponentTypeRelationAdmin)
 admin.site.register(Delivery, DeliveryAdmin)
+admin.site.register(TagComponent, TagComponentAdmin)
