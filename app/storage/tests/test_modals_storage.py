@@ -31,6 +31,10 @@ class TestComponentModel:
         assert len(serial_number) == 11
         assert not Component.objects.filter(serial_number=serial_number).exists()
 
+    def test_component_has_tags_component_type(self, component, tag_component):
+        component.component_type.tags.add(tag_component)
+        assert list(component.tags.all()) == [tag_component]
+
 
 @pytest.mark.django_db
 class TestComponentTypeModel:
@@ -48,6 +52,17 @@ class TestComponentTypeModel:
             ).count_sub_components
             == 2
         )
+
+    def test_component_type_has_tags(
+        self, component_type_factory, tag_component, component_factory
+    ):
+        component_type = component_type_factory()
+        component_type.tags.add(tag_component)
+
+        c = component_factory(component_type=component_type)
+
+        c_tag = Component.objects.filter(component_type__tags=tag_component)
+        assert c_tag.exists(), "Not found component with tag"
 
 
 @pytest.mark.parametrize(

@@ -3,37 +3,58 @@
 {% block header_style %}
   <script type="text/javascript" src="{% static 'js/htmx.min.js' %}"></script>
 {% endblock %}
-<div id="filter_block" >
-  <div class="ui icon input">
-    <input  type="search" 
-      id="seach_id"
-      hx-headers='{"X-CSRFToken": "{{ csrf_token }}"}'
-      placeholder="Поиск..."
-      name="search"
+<div id="filter_block" class="ui middle aligned three column centered grid" >
+    <div class="column">  
+      
+      <div class="ui icon input">
+        <input  type="search" 
+          id="seach_id"
+          hx-headers='{"X-CSRFToken": "{{ csrf_token }}"}'
+          placeholder="Поиск..."
+          name="search"
+          hx-get='{% url "search" %}{% if nomenclature_pk %}?nomenclature_pk={{nomenclature_pk}}{% endif %}'
+          hx-trigger="input changed delay:500ms, search" 
+          hx-target="#search-results" 
+          hx-vals='js:{internal: getIternal(), tags: getTags()}'
+          hx-on:htmx:after-request="run_progress();"
+          hx-indicator="#indicator"
+          >
+        <i class="search icon"></i>  
+      </div>
+    </div>
+    <div class="column">
+      <div class="ui slider checkbox">
+        <input type="checkbox" 
+          id="checkbox_internal"
+          name="internal"
+          hx-trigger="click" 
+          hx-get='{% url "search" %}{% if nomenclature_pk %}?nomenclature_pk={{nomenclature_pk}}{% endif %}'
+          hx-target="#search-results" 
+          hx-vals='js:{search: getSearch(), tags: getTags()}'
+          hx-on:htmx:after-request="run_progress();"
+          hx-indicator="#indicator"
+          
+      >
+      <label for="checkbox_internal">Показать все компоненты</label>
+    </div>
+    </div>
+    <div class="column">
+      <select id="tags_filter" class="ui multiple search selection dropdown" name="tags"
+      id="tags"
+      hx-trigger="change from:body"
       hx-get='{% url "search" %}{% if nomenclature_pk %}?nomenclature_pk={{nomenclature_pk}}{% endif %}'
-      hx-trigger="input changed delay:500ms, search" 
       hx-target="#search-results" 
-      hx-vals='js:{internal: getIternal()}'
+      hx-vals='js:{search: getSearch(), internal: getIternal()}'
       hx-on:htmx:after-request="run_progress();"
       hx-indicator="#indicator"
+      
       >
-    <i class="search icon"></i>  
-  </div>
-
-  <div class="ui checkbox">
-      <input type="checkbox" 
-        id="checkbox_internal"
-        name="internal"
-        hx-trigger="click" 
-        hx-get='{% url "search" %}{% if nomenclature_pk %}?nomenclature_pk={{nomenclature_pk}}{% endif %}'
-        hx-target="#search-results" 
-        hx-vals='js:{search: getSearch()}'
-        hx-on:htmx:after-request="run_progress();"
-        hx-indicator="#indicator"
-        
-    >
-    <label for="checkbox_internal">Показать все компоненты</label>
-  </div>
+        <option value="">Выберети тег</option>
+        {% for tag in tags %}
+        <option value="{{tag.id}}">{{tag.name}}</option>
+        {% endfor %}
+      </select>
+    </div>
 </div>
 
 <table class="ui compact table very padded">
@@ -63,6 +84,11 @@
 
 <script>
   run_progress();
+
+  
+  $('#tags_filter').dropdown();
+  {% comment %} .dropdown('set selected', ['meteor', 'ember']) {% endcomment %}
+
   function run_progress(){
     $('.ui.multiple.progress').progress({
         text: {
@@ -87,5 +113,11 @@
       return "on"
     }
     return ""
+  }
+
+  function getTags(){
+    const tags = $('#tags_filter').dropdown('get values')
+    return tags
+    
   }
 </script>

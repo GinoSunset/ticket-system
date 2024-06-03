@@ -1,5 +1,5 @@
 import factory
-from .models import Component, ComponentType, Delivery
+from .models import Component, ComponentType, Delivery, TagComponent
 
 
 class ComponentTypeFactory(factory.django.DjangoModelFactory):
@@ -8,6 +8,13 @@ class ComponentTypeFactory(factory.django.DjangoModelFactory):
 
     name = factory.Faker("name")
     is_internal = factory.Faker("boolean")
+
+
+class TagComponentFactory(factory.django.DjangoModelFactory):
+    class Meta:
+        model = TagComponent
+
+    name = factory.Faker("name")
 
 
 class ComponentFactory(factory.django.DjangoModelFactory):

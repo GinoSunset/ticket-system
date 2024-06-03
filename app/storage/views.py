@@ -1,6 +1,6 @@
 import datetime
 import logging
-from typing import Any
+from typing import Any, Dict
 from django.db.models.query import QuerySet
 from django.forms.models import BaseModelForm
 from django.http import HttpRequest, HttpResponse, HttpResponseRedirect, JsonResponse
@@ -15,7 +15,7 @@ from django.forms.formsets import all_valid, formset_factory
 
 from ticket.mixin import AccessOperatorMixin
 
-from .models import Component, ComponentType, Alias, Delivery
+from .models import Component, ComponentType, Alias, Delivery, TagComponent
 from .forms import (
     ComponentTypeForm,
     ComponentForm,
@@ -49,6 +49,7 @@ class StorageListView(AccessOperatorMixin, LoginRequiredMixin, ListView):
     def get_context_data(self, **kwargs: Any) -> dict[str, Any]:
         data = super().get_context_data(**kwargs)
         data["nomenclature_pk"] = False
+        data["tags"] = TagComponent.objects.all()
         return data
 
     def get_queryset(self):
@@ -90,38 +91,43 @@ class StorageListView(AccessOperatorMixin, LoginRequiredMixin, ListView):
         )
 
 
-class SearchView(AccessOperatorMixin, LoginRequiredMixin, ListView):
+class SearchView(StorageListView):
     model = Component
     template_name = "storage/table_body.html"
     context_object_name = "components"
 
-    def get_context_data(self, **kwargs: Any) -> dict[str, Any]:
+    def get_context_data(self, **kwargs: Any) -> Dict[str, Any]:
         data = super().get_context_data(**kwargs)
-
-        data["nomenclature_pk"] = self.request.GET.get("nomenclature_pk", False)
-        if self.search:
-            data["search"] = self.search
-        if self.internal:
-            data["internal"] = True
+        self._populate_context_data(data)
         return data
 
     def get_queryset(self):
+        self._retrieve_request_params()
+        components = self._get_filtered_queryset()
+        return self._annotate_queryset(components)
+
+    def _retrieve_request_params(self):
         self.search = self.request.GET.get("search")
         self.internal = self.request.GET.get("internal", False)
-        nomenclature_pk = self.request.GET.get("nomenclature_pk")
+        self.tags = self.request.GET.getlist("tags")
+        self.tags = [tag for tag in self.tags if tag]
+        self.nomenclature_pk = self.request.GET.get("nomenclature_pk")
 
+    def _get_filtered_queryset(self):
         components = Component.active_components.all()
         if self.search:
-            components = Component.active_components.filter(
-                component_type__name__icontains=self.search
-            )
-        if nomenclature_pk:
-            components = components.filter(nomenclature=nomenclature_pk)
+            components = components.filter(component_type__name__icontains=self.search)
+        if self.nomenclature_pk:
+            components = components.filter(nomenclature=self.nomenclature_pk)
         if not self.internal:
             components = components.filter(component_type__is_internal=False)
-        return components.values(
-            "component_type",
-        ).annotate(
+        if self.tags:
+            for tag in self.tags:
+                components = components.filter(component_type__tags__pk=tag)
+        return components
+
+    def _annotate_queryset(self, queryset):
+        return queryset.values("component_type").annotate(
             count=models.Count("component_type"),
             component_type_name=models.F("component_type__name"),
             in_stock=models.Sum(
@@ -150,6 +156,15 @@ class SearchView(AccessOperatorMixin, LoginRequiredMixin, ListView):
                 )
             ),
         )
+
+    def _populate_context_data(self, data: Dict[str, Any]):
+        data["nomenclature_pk"] = self.request.GET.get("nomenclature_pk", False)
+        if self.search:
+            data["search"] = self.search
+        if self.internal:
+            data["internal"] = True
+        if self.tags:
+            data["tags"] = self.tags
 
 
 class ComponentTypeCreateView(AccessOperatorMixin, LoginRequiredMixin, CreateView):
@@ -339,6 +354,7 @@ class NomenclatureComponents(AccessOperatorMixin, LoginRequiredMixin, ListView):
 
     def get_context_data(self, **kwargs: Any) -> dict[str, Any]:
         data = super().get_context_data(**kwargs)
+        data["tags"] = TagComponent.objects.all()
         data["page_name"] = f"Компоненты номенклатуры №{self.kwargs.get('pk')}"
         nomenclature_pk = self.kwargs.get("pk")
         if nomenclature_pk:
