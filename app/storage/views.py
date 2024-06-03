@@ -354,6 +354,7 @@ class NomenclatureComponents(AccessOperatorMixin, LoginRequiredMixin, ListView):
 
     def get_context_data(self, **kwargs: Any) -> dict[str, Any]:
         data = super().get_context_data(**kwargs)
+        data["tags"] = TagComponent.objects.all()
         data["page_name"] = f"Компоненты номенклатуры №{self.kwargs.get('pk')}"
         nomenclature_pk = self.kwargs.get("pk")
         if nomenclature_pk:
