@@ -110,6 +110,7 @@ class SearchView(StorageListView):
         self.search = self.request.GET.get("search")
         self.internal = self.request.GET.get("internal", False)
         self.tags = self.request.GET.getlist("tags")
+        self.tags = [tag for tag in self.tags if tag]
         self.nomenclature_pk = self.request.GET.get("nomenclature_pk")
 
     def _get_filtered_queryset(self):
@@ -121,7 +122,8 @@ class SearchView(StorageListView):
         if not self.internal:
             components = components.filter(component_type__is_internal=False)
         if self.tags:
-            components = components.filter(component_type__tags__name__in=self.tags)
+            for tag in self.tags:
+                components = components.filter(component_type__tags__pk=tag)
         return components
 
     def _annotate_queryset(self, queryset):

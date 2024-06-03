@@ -15,7 +15,7 @@
           hx-get='{% url "search" %}{% if nomenclature_pk %}?nomenclature_pk={{nomenclature_pk}}{% endif %}'
           hx-trigger="input changed delay:500ms, search" 
           hx-target="#search-results" 
-          hx-vals='js:{internal: getIternal()}'
+          hx-vals='js:{internal: getIternal(), tags: getTags()}'
           hx-on:htmx:after-request="run_progress();"
           hx-indicator="#indicator"
           >
@@ -30,7 +30,7 @@
           hx-trigger="click" 
           hx-get='{% url "search" %}{% if nomenclature_pk %}?nomenclature_pk={{nomenclature_pk}}{% endif %}'
           hx-target="#search-results" 
-          hx-vals='js:{search: getSearch()}'
+          hx-vals='js:{search: getSearch(), tags: getTags()}'
           hx-on:htmx:after-request="run_progress();"
           hx-indicator="#indicator"
           
@@ -39,7 +39,16 @@
     </div>
     </div>
     <div class="column">
-      <select id="tags_filter" class="ui multiple search selection dropdown">
+      <select id="tags_filter" class="ui multiple search selection dropdown" name="tags"
+      id="tags"
+      hx-trigger="change from:body"
+      hx-get='{% url "search" %}{% if nomenclature_pk %}?nomenclature_pk={{nomenclature_pk}}{% endif %}'
+      hx-target="#search-results" 
+      hx-vals='js:{search: getSearch(), internal: getIternal()}'
+      hx-on:htmx:after-request="run_progress();"
+      hx-indicator="#indicator"
+      
+      >
         <option value="">Выберети тег</option>
         {% for tag in tags %}
         <option value="{{tag.id}}">{{tag.name}}</option>
@@ -104,5 +113,11 @@
       return "on"
     }
     return ""
+  }
+
+  function getTags(){
+    const tags = $('#tags_filter').dropdown('get values')
+    return tags
+    
   }
 </script>
