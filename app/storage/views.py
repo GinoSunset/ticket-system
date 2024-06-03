@@ -15,7 +15,7 @@ from django.forms.formsets import all_valid, formset_factory
 
 from ticket.mixin import AccessOperatorMixin
 
-from .models import Component, ComponentType, Alias, Delivery
+from .models import Component, ComponentType, Alias, Delivery, TagComponent
 from .forms import (
     ComponentTypeForm,
     ComponentForm,
@@ -49,6 +49,7 @@ class StorageListView(AccessOperatorMixin, LoginRequiredMixin, ListView):
     def get_context_data(self, **kwargs: Any) -> dict[str, Any]:
         data = super().get_context_data(**kwargs)
         data["nomenclature_pk"] = False
+        data["tags"] = TagComponent.objects.all()
         return data
 
     def get_queryset(self):
@@ -90,7 +91,7 @@ class StorageListView(AccessOperatorMixin, LoginRequiredMixin, ListView):
         )
 
 
-class SearchView(AccessOperatorMixin, LoginRequiredMixin, ListView):
+class SearchView(StorageListView):
     model = Component
     template_name = "storage/table_body.html"
     context_object_name = "components"
