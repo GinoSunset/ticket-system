@@ -240,7 +240,7 @@ class TestIsInternalFilter:
         url = reverse("search")
         component = component_factory(component_type=ct)
         component_2 = component_factory(component_type=ct_2)
-        data = {"search": "Деактиватор", "tags": tag_component.name}
+        data = {"search": "Деактиватор", "tags": tag_component.id}
         res = operator_client.get(url, data=data)
         component_type_names = [
             i["component_type_name"] for i in res.context_data["components"]
