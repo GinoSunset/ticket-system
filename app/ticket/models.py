@@ -9,6 +9,7 @@ from django.urls import reverse
 from django.utils import timezone
 from reports.utils import create_act_for_ticket
 from users.models import Operator
+from storage.models import Component
 
 
 User = get_user_model()

@@ -1,5 +1,6 @@
 from django.db.models import Q
 from manufactures.models import Manufacture, Nomenclature
+from ticket.models import Ticket
 from django.db.transaction import atomic
 from .models import Component, ComponentType, SubComponentTypeRelation
 import logging
@@ -44,8 +45,40 @@ def get_sub_component_from_component(
     return components_type
 
 
+def reserve_component(component_type: ComponentType, obj: Nomenclature | Ticket):
+    match obj:
+        case Nomenclature():
+            reserve_component_nomenclature(component_type, obj)
+        case Ticket():
+            reserve_component_ticket(component_type, obj)
+
+
 @atomic
-def reserve_component(component_type: ComponentType, nomenclature: Nomenclature):
+def reserve_component_ticket(component_type: ComponentType, ticket: Ticket):
+    q_conditions = Q(is_stock=True)
+    components = Component.objects.select_for_update().filter(
+        q_conditions, component_type=component_type, is_reserve=False
+    )
+    if components.exists():
+        component = components.first()
+        logging.info(f"{component}  reserved by {ticket}")
+        component.ticket = ticket
+        component.is_reserve = True
+        component.save()
+        return
+
+    component = Component.objects.create(
+        component_type=component_type,
+        ticket=ticket,
+        is_reserve=True,
+    )
+    logging.info(f"Create {component} for {ticket}")
+
+
+@atomic
+def reserve_component_nomenclature(
+    component_type: ComponentType, nomenclature: Nomenclature
+):
     q_conditions = Q(is_stock=True)
     if nomenclature.manufacture and nomenclature.manufacture.date_shipment:
         q_conditions |= Q(date_delivery__isnull=False) & Q(
@@ -58,7 +91,7 @@ def reserve_component(component_type: ComponentType, nomenclature: Nomenclature)
     )
     if components.exists():
         component = components.first()
-        logging.info(f"Update component {component} to reserve")
+        logging.info(f"{component} reserve by {nomenclature}")
         component.nomenclature = nomenclature
         component.is_reserve = True
         component.save()
@@ -69,7 +102,7 @@ def reserve_component(component_type: ComponentType, nomenclature: Nomenclature)
         nomenclature=nomenclature,
         is_reserve=True,
     )
-    logging.info(f"Create component {component} to reserve")
+    logging.info(f"Create component {component} to reserve for {nomenclature}")
 
 
 def components_from_nomenclature_to_archive(nomenclature: Nomenclature):

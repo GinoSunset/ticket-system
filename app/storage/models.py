@@ -70,6 +70,13 @@ class Component(models.Model):
         blank=True,
         null=True,
     )
+    ticket = models.ForeignKey(
+        "ticket.Ticket",
+        verbose_name="Задача",
+        on_delete=models.SET_NULL,
+        blank=True,
+        null=True,
+    )
     active_components = ComponentManager()
     phantom_components = ComponentPhantomManager()
     objects = models.Manager()
