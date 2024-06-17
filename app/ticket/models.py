@@ -9,8 +9,7 @@ from django.urls import reverse
 from django.utils import timezone
 from reports.utils import create_act_for_ticket
 from users.models import Operator
-from storage.models import Component
-
+from .signals_ticket import done_ticket_signal
 
 User = get_user_model()
 
@@ -178,6 +177,8 @@ class Ticket(models.Model):
         self.setup_completion_date()
         if self.status == Dictionary.objects.get(code="work"):
             self.processing_work_status()
+        if self.status == Dictionary.objects.get(code="done"):
+            self.processing_done_status()
 
     def setup_completion_date(self):
         status_done = Dictionary.objects.get(code="done")
@@ -194,6 +195,9 @@ class Ticket(models.Model):
             self.act = create_act_for_ticket(ticket=self)
         if not self.act.file_doc_act:
             self.act.create_act()
+
+    def processing_done_status(self):
+        done_ticket_signal.send(self)
 
 
 class Comment(models.Model):

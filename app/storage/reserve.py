@@ -1,6 +1,7 @@
 from django.db.models import Q
 from manufactures.models import Manufacture, Nomenclature
 from ticket.models import Ticket
+
 from django.db.transaction import atomic
 from .models import Component, ComponentType, SubComponentTypeRelation
 import logging
@@ -105,9 +106,16 @@ def reserve_component_nomenclature(
     logging.info(f"Create component {component} to reserve for {nomenclature}")
 
 
+def components_from_tickets_to_archive(ticket: Ticket):
+    count = Component.objects.filter(ticket=ticket).update(is_archive=True)
+    logging.info(f"All {count} components with ticket {ticket} are archived")
+
+
 def components_from_nomenclature_to_archive(nomenclature: Nomenclature):
-    Component.objects.filter(nomenclature=nomenclature).update(is_archive=True)
-    logging.info(f"All components with nomenclature {nomenclature} are archived")
+    count = Component.objects.filter(nomenclature=nomenclature).update(is_archive=True)
+    logging.info(
+        f"All {count} components with nomenclature {nomenclature} are archived"
+    )
 
 
 def unreserve_components(nomenclature: Nomenclature):

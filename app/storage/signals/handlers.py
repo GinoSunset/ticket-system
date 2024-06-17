@@ -2,8 +2,15 @@ import logging
 from django.dispatch import receiver
 from django.db.models.signals import post_save, pre_delete
 
+from ticket.signals_ticket import done_ticket_signal
+
+
 from manufactures.models import Nomenclature
-from storage.reserve import re_reserved_component_delivery, unreserve_components
+from storage.reserve import (
+    re_reserved_component_delivery,
+    unreserve_components,
+    components_from_tickets_to_archive,
+)
 from storage.models import Delivery
 from manufactures.tasks import reservation_component_from_nomenclature
 
@@ -30,3 +37,8 @@ def unreserve_components_before_delete(sender, instance, using, **kwargs):
     """
     logging.info(f"Delete {instance}. Start clean components")
     unreserve_components(instance)
+
+
+@receiver(done_ticket_signal)
+def archive_components(sender, **kwargs):
+    components_from_tickets_to_archive(sender)
