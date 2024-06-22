@@ -9,7 +9,6 @@ from django.urls import reverse
 from django.utils import timezone
 from reports.utils import create_act_for_ticket
 from users.models import Operator
-from .signals_ticket import done_ticket_signal
 
 User = get_user_model()
 
@@ -197,7 +196,7 @@ class Ticket(models.Model):
             self.act.create_act()
 
     def processing_done_status(self):
-        done_ticket_signal.send(self)
+        pass
 
 
 class Comment(models.Model):
