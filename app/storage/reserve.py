@@ -154,7 +154,7 @@ def re_reserved_component_delivery(component: Component):
     component.save()
     reserve_component(
         component_type=component.component_type,
-        nomenclature=nomenclature_from_component,
+        obj=nomenclature_from_component,
     )
 
 
