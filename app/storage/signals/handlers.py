@@ -2,8 +2,12 @@ import logging
 from django.dispatch import receiver
 from django.db.models.signals import post_save, pre_delete
 
+
 from manufactures.models import Nomenclature
-from storage.reserve import re_reserved_component_delivery, unreserve_components
+from storage.reserve import (
+    re_reserved_component_delivery,
+    unreserve_components,
+)
 from storage.models import Delivery
 from manufactures.tasks import reservation_component_from_nomenclature
 

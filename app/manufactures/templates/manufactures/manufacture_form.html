@@ -1,6 +1,8 @@
 {% extends 'ticsys/index.html' %}
 {% block content %}
-<h1>{% firstof name_page 'Создание задачи на производство' %}</h1>
+<h1>
+  {% if name_page %}{{name_page |safe}}{% else %}Создание задачи на производство{% endif %}
+</h1>
 <a class="ui button blue basic" href="{% url 'client-create' %}">Создать клиента</a>
 <div class="ui container">
 

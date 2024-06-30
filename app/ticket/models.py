@@ -10,7 +10,6 @@ from django.utils import timezone
 from reports.utils import create_act_for_ticket
 from users.models import Operator
 
-
 User = get_user_model()
 
 
@@ -177,6 +176,8 @@ class Ticket(models.Model):
         self.setup_completion_date()
         if self.status == Dictionary.objects.get(code="work"):
             self.processing_work_status()
+        if self.status == Dictionary.objects.get(code="done"):
+            self.processing_done_status()
 
     def setup_completion_date(self):
         status_done = Dictionary.objects.get(code="done")
@@ -193,6 +194,18 @@ class Ticket(models.Model):
             self.act = create_act_for_ticket(ticket=self)
         if not self.act.file_doc_act:
             self.act.create_act()
+
+    def processing_done_status(self):
+        pass
+
+    
+    def create_update_system_comment(self, text, user):
+        Comment.objects.create(
+            ticket=self,
+            author=user,
+            text=text,
+            is_system_message=True,
+        )
 
 
 class Comment(models.Model):

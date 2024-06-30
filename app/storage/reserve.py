@@ -1,5 +1,6 @@
 from django.db.models import Q
 from manufactures.models import Manufacture, Nomenclature
+
 from django.db.transaction import atomic
 from .models import Component, ComponentType, SubComponentTypeRelation
 import logging
@@ -44,8 +45,16 @@ def get_sub_component_from_component(
     return components_type
 
 
+def reserve_component(component_type: ComponentType, obj: Nomenclature):
+    match obj:
+        case Nomenclature():
+            reserve_component_nomenclature(component_type, obj)
+
+
 @atomic
-def reserve_component(component_type: ComponentType, nomenclature: Nomenclature):
+def reserve_component_nomenclature(
+    component_type: ComponentType, nomenclature: Nomenclature
+):
     q_conditions = Q(is_stock=True)
     if nomenclature.manufacture and nomenclature.manufacture.date_shipment:
         q_conditions |= Q(date_delivery__isnull=False) & Q(
@@ -58,7 +67,7 @@ def reserve_component(component_type: ComponentType, nomenclature: Nomenclature)
     )
     if components.exists():
         component = components.first()
-        logging.info(f"Update component {component} to reserve")
+        logging.info(f"{component} reserve by {nomenclature}")
         component.nomenclature = nomenclature
         component.is_reserve = True
         component.save()
@@ -69,12 +78,14 @@ def reserve_component(component_type: ComponentType, nomenclature: Nomenclature)
         nomenclature=nomenclature,
         is_reserve=True,
     )
-    logging.info(f"Create component {component} to reserve")
+    logging.info(f"Create component {component} to reserve for {nomenclature}")
 
 
 def components_from_nomenclature_to_archive(nomenclature: Nomenclature):
-    Component.objects.filter(nomenclature=nomenclature).update(is_archive=True)
-    logging.info(f"All components with nomenclature {nomenclature} are archived")
+    count = Component.objects.filter(nomenclature=nomenclature).update(is_archive=True)
+    logging.info(
+        f"All {count} components with nomenclature {nomenclature} are archived"
+    )
 
 
 def unreserve_components(nomenclature: Nomenclature):
@@ -113,7 +124,7 @@ def re_reserved_component_delivery(component: Component):
     component.save()
     reserve_component(
         component_type=component.component_type,
-        nomenclature=nomenclature_from_component,
+        obj=nomenclature_from_component,
     )
 
 
