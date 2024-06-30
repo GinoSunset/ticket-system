@@ -198,6 +198,15 @@ class Ticket(models.Model):
     def processing_done_status(self):
         pass
 
+    
+    def create_update_system_comment(self, text, user):
+        Comment.objects.create(
+            ticket=self,
+            author=user,
+            text=text,
+            is_system_message=True,
+        )
+
 
 class Comment(models.Model):
     TEMPLATE_DICT = {

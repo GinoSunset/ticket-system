@@ -1,7 +1,9 @@
 from typing import Any, Dict
 from django.contrib.auth.mixins import LoginRequiredMixin
+from django.db.models.base import Model as Model
+from django.db.models.query import QuerySet
 from django.forms.models import BaseModelForm
-from django.http import HttpResponse
+from django.http import HttpRequest, HttpResponse
 from django.views.generic import (
     ListView,
     CreateView,
@@ -13,6 +15,7 @@ from django.urls import reverse_lazy
 from .models import Manufacture, Client, Nomenclature
 from .forms import ManufactureForm, NomenclatureForm, ManufactureChangeStatusForm
 from ticket.mixin import AccessOperatorMixin
+from ticket.models import Ticket
 from additionally.models import Dictionary
 
 
@@ -32,8 +35,27 @@ class ManufactureCreateView(AccessOperatorMixin, LoginRequiredMixin, CreateView)
     form_class = ManufactureForm
     success_url = reverse_lazy("manufactures-list")
 
+    def get(self, request: HttpRequest, *args: str, **kwargs: Any) -> HttpResponse:
+        if ticket_pk := self.request.GET.get("ticket"):
+            self.ticket = Ticket.objects.get(pk=ticket_pk)
+        return super().get(request, *args, **kwargs)
+
+    def post(self, request: HttpRequest, *args: str, **kwargs: Any) -> HttpResponse:
+        if ticket_pk := self.request.GET.get("ticket"):
+            self.ticket = Ticket.objects.get(pk=ticket_pk)
+        return super().post(request, *args, **kwargs)
+
+    def get_success_url(self) -> str:
+        if self.ticket:
+            return reverse_lazy("ticket-update", kwargs={"pk": self.ticket.pk})
+        return super().get_success_url()
+
     def get_context_data(self, form=None, forms_nomenclature=None, **kwargs):
         context = super().get_context_data(**kwargs)
+        if ticket_pk := self.request.GET.get("ticket"):
+            context["name_page"] = (
+                f"Создание задачи на производство для задачи <a href='{reverse_lazy('ticket-update', args=[ticket_pk])}' >#{ticket_pk}</a>"
+            )
         if forms_nomenclature:
             context["forms_nomenclature"] = forms_nomenclature
             context["count_form"] = len(forms_nomenclature) - 1
@@ -42,6 +64,20 @@ class ManufactureCreateView(AccessOperatorMixin, LoginRequiredMixin, CreateView)
         forms_nomenclature = [NomenclatureForm(prefix="0")]
         context["forms_nomenclature"] = forms_nomenclature
         return context
+
+    def get_initial(self):
+        self.initial = super().get_initial()
+        if self.ticket:
+            if self.ticket.planned_execution_date:
+                self.initial.update(
+                    {"date_shipment": self.ticket.planned_execution_date}
+                )
+            self.initial.update(
+                {
+                    "comment": f"Для задачи #{self.ticket.pk} [{self.ticket.get_external_url()}]"
+                }
+            )
+        return self.initial
 
     def form_valid(self, form):
         form.instance.operator = self.request.user
@@ -68,7 +104,11 @@ class ManufactureCreateView(AccessOperatorMixin, LoginRequiredMixin, CreateView)
             ]
         )
         self.object.save()
-
+        if self.ticket:
+            message = f"Создана заявка на производство <a href='{self.object.get_absolute_url()}?ticket={self.ticket.pk}'>№{self.object.pk}</a>"
+            self.ticket.create_update_system_comment(
+                text=message, user=self.request.user
+            )
         return super().form_valid(form)
 
     def form_invalid(self, form):

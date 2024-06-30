@@ -166,10 +166,11 @@
         </div>
       </div>
       <div class="ui grid container">
-        <div class="eight wide column">
-          {% if user.is_operator %}
+        <div class="six wide column ">
+          <div class="ui buttons">
+            {% if user.is_operator %}
             {% if ticket.status.code != "work" %}
-              <a class="ui left floated button basic"  href="{% url 'ticket-to-work' ticket.pk %}">
+              <a class="ui left floated small button basic"  href="{% url 'ticket-to-work' ticket.pk %}">
                 {% if  ticket.status.code == "done" or ticket.status.code == "cancel" %}
                   Переоткрыть
                 {% else %}
@@ -178,18 +179,22 @@
               </a>
             {% endif %}
             {% if ticket.status.code != "done"  and ticket.status.code != "cancel"%}
-              <a class="ui left floated button positive basic" id="to_done" >Выполнить</a>
+              <a class="ui left floated small button positive basic" id="to_done" >Выполнить</a>
             {% endif %}
             {% if ticket.status.code != "cancel" and ticket.status.code != "done"  %}
-              <a class="ui left floated button negative basic" id="to_cancel" >Отменить</a>
+              <a class="ui left floated small button negative basic" id="to_cancel" >Отменить</a>
             {% endif %}
           {% endif %}
+          </div>
         </div>
-        <div class="eight wide column">
-          {% if user.is_operator %}
-          <div id="run_modal" class="ui right floated button ">Изменить</div>
+        <div class="ten wide column">
+          <div class="ui buttons">
+            {% if user.is_operator %}
+            <div id="run_modal" class="ui right floated small icon button">  <i class="pen icon"></i></div>
+            <a href="{% url 'manufactures-create' %}?ticket={{ticket.pk}}" class="ui right floated small button "> <i class="plus icon"></i>Задача на производтво</a>
           {% endif %}
-          <a href="{% url 'comment-create' ticket.pk %}" class="ui right floated info button ">Добавить комментарий</a>
+            <a href="{% url 'comment-create' ticket.pk %}" class="ui right floated info small button "><i class="plus icon"></i> Комментарий</a>
+          <div>
         </div>
 
     </div>
