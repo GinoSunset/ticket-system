@@ -35,9 +35,13 @@ class ManufactureCreateView(AccessOperatorMixin, LoginRequiredMixin, CreateView)
     form_class = ManufactureForm
     success_url = reverse_lazy("manufactures-list")
 
+    def dispatch(self, request, *args, **kwargs):
+        self.ticket = self.request.GET.get("ticket")
+        return super().dispatch(request, *args, **kwargs)
+
     def get(self, request: HttpRequest, *args: str, **kwargs: Any) -> HttpResponse:
-        if ticket_pk := self.request.GET.get("ticket"):
-            self.ticket = Ticket.objects.get(pk=ticket_pk)
+        if self.ticket:
+            self.ticket = Ticket.objects.get(pk=self.ticket)
         return super().get(request, *args, **kwargs)
 
     def post(self, request: HttpRequest, *args: str, **kwargs: Any) -> HttpResponse:
@@ -68,15 +72,17 @@ class ManufactureCreateView(AccessOperatorMixin, LoginRequiredMixin, CreateView)
     def get_initial(self):
         self.initial = super().get_initial()
         if self.ticket:
+            self.initial.update(
+                {
+                    "ticket": self.ticket,
+                    "comment": f"Для задачи #{self.ticket.pk} [{self.ticket.get_external_url()}]",
+                }
+            )
             if self.ticket.planned_execution_date:
                 self.initial.update(
                     {"date_shipment": self.ticket.planned_execution_date}
                 )
-            self.initial.update(
-                {
-                    "comment": f"Для задачи #{self.ticket.pk} [{self.ticket.get_external_url()}]"
-                }
-            )
+            self.initial.update()
         return self.initial
 
     def form_valid(self, form):

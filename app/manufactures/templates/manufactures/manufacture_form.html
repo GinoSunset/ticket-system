@@ -10,13 +10,13 @@
     {{ form.non_field_errors }}
     {% csrf_token %}
     <h4 class="ui dividing header">Общая информация</h4>
-    <div class="ui message">
+    {% comment %} <div class="ui message">
       <div class="header">
         Автоматическое изменение статуса
       </div>
       <p>Статус задачи меняться автоматически на минимальный статус номенклатуры. Можно самому изменить статус, без
         автоматизации. </p>
-    </div>
+    </div> {% endcomment %}
 
 
     <div class="equal width fields">
@@ -35,6 +35,7 @@
         {{form.date_shipment}}
         {{form.date_shipment.errors}}
       </div>
+
       <div class="ui field">
         <div class="ui ui right aligned toggle checkbox">
           {{form.branding}}
@@ -44,6 +45,11 @@
       </div>
     </div>
     <div class="field">
+      <div class="field">
+        <label>{{form.ticket.label}}</label>
+        {{form.ticket}}
+        {{form.ticket.errors}}
+      </div>
       {{form.comment}}
       {{form.comment.errors}}
     </div>

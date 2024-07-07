@@ -15,11 +15,13 @@ class ManufactureForm(forms.ModelForm):
             "date_shipment",
             "branding",
             "comment",
+            "ticket",
         ]
         widgets = {
             "date_shipment": CalendarInput(),
             "comment": forms.Textarea(attrs={"rows": 1, "placeholder": "Комментарий"}),
             "client": Dropdown(attrs={"class": "ui selection dropdown search"}),
+            "ticket": Dropdown(attrs={"class": "ui selection dropdown search"}),
         }
 
     def __init__(self, *args, **kwargs):

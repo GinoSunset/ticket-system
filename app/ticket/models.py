@@ -127,7 +127,7 @@ class Ticket(models.Model):
         return []
 
     def __str__(self):
-        return f"{self.pk} - {self.type_ticket}, {self.customer=}"
+        return f"{self.pk} - {self.type_ticket}, Заказчик:{self.customer.get_role_user().short_str()}"
 
     def get_color_status(self):
         color = {
@@ -198,7 +198,6 @@ class Ticket(models.Model):
     def processing_done_status(self):
         pass
 
-    
     def create_update_system_comment(self, text, user):
         Comment.objects.create(
             ticket=self,
