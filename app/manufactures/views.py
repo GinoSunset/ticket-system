@@ -35,6 +35,11 @@ class ManufactureCreateView(AccessOperatorMixin, LoginRequiredMixin, CreateView)
     form_class = ManufactureForm
     success_url = reverse_lazy("manufactures-list")
 
+    def get_template_names(self) -> list[str]:
+        if self.request.META.get("HTTP_HX_REQUEST"):
+            return ["manufactures/htmx/ticket_field.html"]
+        return super().get_template_names()
+
     def dispatch(self, request, *args, **kwargs):
         self.ticket = self.request.GET.get("ticket")
         return super().dispatch(request, *args, **kwargs)
@@ -45,7 +50,7 @@ class ManufactureCreateView(AccessOperatorMixin, LoginRequiredMixin, CreateView)
         return super().get(request, *args, **kwargs)
 
     def post(self, request: HttpRequest, *args: str, **kwargs: Any) -> HttpResponse:
-        if ticket_pk := self.request.GET.get("ticket"):
+        if ticket_pk := self.request.POST.get("ticket"):
             self.ticket = Ticket.objects.get(pk=ticket_pk)
         return super().post(request, *args, **kwargs)
 
@@ -56,9 +61,9 @@ class ManufactureCreateView(AccessOperatorMixin, LoginRequiredMixin, CreateView)
 
     def get_context_data(self, form=None, forms_nomenclature=None, **kwargs):
         context = super().get_context_data(**kwargs)
-        if ticket_pk := self.request.GET.get("ticket"):
+        if self.ticket:
             context["name_page"] = (
-                f"Создание задачи на производство для задачи <a href='{reverse_lazy('ticket-update', args=[ticket_pk])}' >#{ticket_pk}</a>"
+                f"Создание задачи на производство для задачи <a href='{reverse_lazy('ticket-update', args=[self.ticket.pk])}' >#{self.ticket.pk}</a>"
             )
         if forms_nomenclature:
             context["forms_nomenclature"] = forms_nomenclature
@@ -110,7 +115,7 @@ class ManufactureCreateView(AccessOperatorMixin, LoginRequiredMixin, CreateView)
             ]
         )
         self.object.save()
-        if self.ticket:
+        if self.ticket or form.cleaned_data.get("ticket"):
             message = f"Создана заявка на производство <a href='{self.object.get_absolute_url()}?ticket={self.ticket.pk}'>№{self.object.pk}</a>"
             self.ticket.create_update_system_comment(
                 text=message, user=self.request.user
@@ -125,6 +130,25 @@ class ManufactureUpdateView(UpdateView):
     model = Manufacture
     form_class = ManufactureForm
     success_url = reverse_lazy("manufactures-list")
+
+    def get_template_names(self) -> list[str]:
+        if self.request.META.get("HTTP_HX_REQUEST"):
+            return ["manufactures/htmx/ticket_field.html"]
+        return super().get_template_names()
+
+    def dispatch(self, request, *args, **kwargs):
+        self.ticket = self.request.GET.get("ticket")
+        return super().dispatch(request, *args, **kwargs)
+
+    def get(self, request: HttpRequest, *args: str, **kwargs: Any) -> HttpResponse:
+        if self.ticket:
+            self.ticket = Ticket.objects.get(pk=self.ticket)
+        return super().get(request, *args, **kwargs)
+
+    def post(self, request: HttpRequest, *args: str, **kwargs: Any) -> HttpResponse:
+        if ticket_pk := self.request.POST.get("ticket"):
+            self.ticket = Ticket.objects.get(pk=ticket_pk)
+        return super().post(request, *args, **kwargs)
 
     def get_context_data(self, form=None, forms_nomenclature=None, **kwargs):
         context = super().get_context_data(**kwargs)

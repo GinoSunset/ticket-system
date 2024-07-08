@@ -19,7 +19,7 @@ class ManufactureForm(forms.ModelForm):
         ]
         widgets = {
             "date_shipment": CalendarInput(),
-            "comment": forms.Textarea(attrs={"rows": 1, "placeholder": "Комментарий"}),
+            "comment": forms.Textarea(attrs={"rows": 2, "placeholder": "Комментарий"}),
             "client": Dropdown(attrs={"class": "ui selection dropdown search"}),
             "ticket": Dropdown(attrs={"class": "ui selection dropdown search"}),
         }

@@ -1,4 +1,8 @@
 {% extends 'ticsys/index.html' %}
+{% load static %}
+{% block header_style %}
+  <script type="text/javascript" src="{% static 'js/htmx.min.js' %}"></script>
+{% endblock %}
 {% block content %}
 <h1>
   {% if name_page %}{{name_page |safe}}{% else %}Создание задачи на производство{% endif %}
@@ -44,14 +48,21 @@
         </div>
       </div>
     </div>
-    <div class="field">
+    <div class="equal width fields">
+      <div class="field"  id="ticket" hx-get="." hx-trigger="load">
+          <label>{{ form.ticket.label }}</label>
+          <div class="ui disabled red slow double loading fluid multiple disabled search selection dropdown">
+            <div class="default text">Загрузка заявок...</div>
+            <i class="dropdown icon"></i>
+            <div class="menu">
+            </div>
+          </div>
+          {{ form.ticket.errors }}
+        </div>
       <div class="field">
-        <label>{{form.ticket.label}}</label>
-        {{form.ticket}}
-        {{form.ticket.errors}}
+        {{form.comment}}
+        {{form.comment.errors}}
       </div>
-      {{form.comment}}
-      {{form.comment.errors}}
     </div>
     {% comment %} Form nomeclature {% endcomment %}
     <h4 class="ui dividing header">Номенклатуры в заявке</h4>
@@ -68,6 +79,16 @@
 </div>
 
 <script>
+  document.body.addEventListener('htmx:afterOnLoad', function(event) {
+    if (event.detail.target.id === 'ticket') {
+      {% if form.initial.ticket.pk %}
+      $("#ticket_id").dropdown('set selected', {{form.initial.ticket.pk}})
+      {% else %}
+      $("#ticket_id").dropdown()
+
+      {% endif %}
+    }
+  });
   $('.ui.checkbox').checkbox();
   $('.selection.dropdown').dropdown();
   init_dropdown_frame_type();
