@@ -119,6 +119,16 @@
       {% endif %}
 
     </div>
+    {% if ticket.manufactures.all %}
+    <div class="ui segment">
+      <h4>Производство</h4>
+      <div class="ui list">
+        {% for manufacture in ticket.manufactures.all %}
+          <a href={% url "manufacture-update" manufacture.pk %}?ticket={{ticket.pk}}><span class="ui {{manufacture.get_color_status}} text">{{manufacture.pk}}</span></a>
+        {% endfor %}
+      </div>
+    </div>
+    {% endif %}
   </div>
   <div class="twelve wide column">
     <div class="ui   ">

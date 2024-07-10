@@ -89,7 +89,7 @@ class Manufacture(models.Model):
     ticket = models.ForeignKey(
         Ticket,
         verbose_name="Заявка",
-        related_name="tickets",
+        related_name="manufactures",
         on_delete=models.SET_NULL,
         null=True,
         blank=True,

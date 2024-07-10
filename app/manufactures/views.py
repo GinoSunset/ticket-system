@@ -13,7 +13,11 @@ from django.views.generic import (
 )
 from django.urls import reverse_lazy
 from .models import Manufacture, Client, Nomenclature
-from .forms import ManufactureForm, NomenclatureForm, ManufactureChangeStatusForm
+from .forms import (
+    ManufactureForm,
+    NomenclatureForm,
+    ManufactureChangeStatusForm,
+)
 from ticket.mixin import AccessOperatorMixin
 from ticket.models import Ticket
 from additionally.models import Dictionary
@@ -34,11 +38,6 @@ class ManufactureCreateView(AccessOperatorMixin, LoginRequiredMixin, CreateView)
     model = Manufacture
     form_class = ManufactureForm
     success_url = reverse_lazy("manufactures-list")
-
-    def get_template_names(self) -> list[str]:
-        if self.request.META.get("HTTP_HX_REQUEST"):
-            return ["manufactures/htmx/ticket_field.html"]
-        return super().get_template_names()
 
     def dispatch(self, request, *args, **kwargs):
         self.ticket = self.request.GET.get("ticket")
@@ -72,6 +71,7 @@ class ManufactureCreateView(AccessOperatorMixin, LoginRequiredMixin, CreateView)
         context["count_form"] = 0
         forms_nomenclature = [NomenclatureForm(prefix="0")]
         context["forms_nomenclature"] = forms_nomenclature
+        context["ticket"] = self.ticket
         return context
 
     def get_initial(self):
@@ -126,15 +126,21 @@ class ManufactureCreateView(AccessOperatorMixin, LoginRequiredMixin, CreateView)
         return self.render_to_response(self.get_context_data(form=form))
 
 
+class ManufactureGetTicket(CreateView):
+    model = Manufacture
+    form_class = ManufactureForm
+    template_name = "manufactures/htmx/ticket_field.html"
+
+
 class ManufactureUpdateView(UpdateView):
     model = Manufacture
     form_class = ManufactureForm
     success_url = reverse_lazy("manufactures-list")
 
-    def get_template_names(self) -> list[str]:
-        if self.request.META.get("HTTP_HX_REQUEST"):
-            return ["manufactures/htmx/ticket_field.html"]
-        return super().get_template_names()
+    def get_success_url(self) -> str:
+        if self.ticket:
+            return reverse_lazy("ticket-update", kwargs={"pk": self.ticket.pk})
+        return super().get_success_url()
 
     def dispatch(self, request, *args, **kwargs):
         self.ticket = self.request.GET.get("ticket")
@@ -166,6 +172,7 @@ class ManufactureUpdateView(UpdateView):
             forms_nomenclature.append(form)
         context["forms_nomenclature"] = forms_nomenclature
         context["count_form"] = count - 1  # -1 because first form is empty
+        context["ticket"] = self.ticket
         return context
 
     def form_valid(self, form: BaseModelForm) -> HttpResponse:

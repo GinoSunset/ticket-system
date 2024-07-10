@@ -49,12 +49,12 @@
       </div>
     </div>
     <div class="equal width fields">
-      <div class="field"  id="ticket" hx-get="." hx-trigger="load">
+      <div class="field"  id="ticket" hx-get="{% url 'manufacture-form-get-ticket' %}" hx-trigger="load">
           <label>{{ form.ticket.label }}</label>
-          <div class="ui disabled red slow double loading fluid multiple disabled search selection dropdown">
-            <div class="default text">Загрузка заявок...</div>
-            <i class="dropdown icon"></i>
+          <div class="ui red double loading selection dropdown">
+            {{ticket}}<i class="dropdown icon"></i>
             <div class="menu">
+                <div class="item active">{{ticket}}</div>
             </div>
           </div>
           {{ form.ticket.errors }}
@@ -81,8 +81,8 @@
 <script>
   document.body.addEventListener('htmx:afterOnLoad', function(event) {
     if (event.detail.target.id === 'ticket') {
-      {% if form.initial.ticket.pk %}
-      $("#ticket_id").dropdown('set selected', {{form.initial.ticket.pk}})
+      {% if ticket %}
+      $("#ticket_id").dropdown('set selected', {{ticket.pk}})
       {% else %}
       $("#ticket_id").dropdown()
 
