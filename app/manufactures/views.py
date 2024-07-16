@@ -23,7 +23,7 @@ from ticket.models import Ticket
 from additionally.models import Dictionary
 
 
-class ManufacturesListView(LoginRequiredMixin, ListView):
+class ManufacturesListView(AccessOperatorMixin, LoginRequiredMixin, ListView):
     model = Manufacture
     context_object_name = "manufactures"
 
@@ -49,7 +49,7 @@ class ManufactureCreateView(AccessOperatorMixin, LoginRequiredMixin, CreateView)
         return super().get(request, *args, **kwargs)
 
     def post(self, request: HttpRequest, *args: str, **kwargs: Any) -> HttpResponse:
-        if ticket_pk := self.request.POST.get("ticket"):
+        if ticket_pk := self.request.POST.get("ticket") or self.ticket:
             self.ticket = Ticket.objects.get(pk=ticket_pk)
         return super().post(request, *args, **kwargs)
 
@@ -126,13 +126,13 @@ class ManufactureCreateView(AccessOperatorMixin, LoginRequiredMixin, CreateView)
         return self.render_to_response(self.get_context_data(form=form))
 
 
-class ManufactureGetTicket(CreateView):
+class ManufactureGetTicket(LoginRequiredMixin, CreateView):
     model = Manufacture
     form_class = ManufactureForm
     template_name = "manufactures/htmx/ticket_field.html"
 
 
-class ManufactureUpdateView(UpdateView):
+class ManufactureUpdateView(AccessOperatorMixin, LoginRequiredMixin, UpdateView):
     model = Manufacture
     form_class = ManufactureForm
     success_url = reverse_lazy("manufactures-list")
@@ -152,7 +152,7 @@ class ManufactureUpdateView(UpdateView):
         return super().get(request, *args, **kwargs)
 
     def post(self, request: HttpRequest, *args: str, **kwargs: Any) -> HttpResponse:
-        if ticket_pk := self.request.POST.get("ticket"):
+        if ticket_pk := self.request.POST.get("ticket") or self.ticket:
             self.ticket = Ticket.objects.get(pk=ticket_pk)
         return super().post(request, *args, **kwargs)
 
@@ -173,6 +173,8 @@ class ManufactureUpdateView(UpdateView):
         context["forms_nomenclature"] = forms_nomenclature
         context["count_form"] = count - 1  # -1 because first form is empty
         context["ticket"] = self.ticket
+        if self.ticket is None and self.object.ticket:
+            context["ticket"] = self.object.ticket
         return context
 
     def form_valid(self, form: BaseModelForm) -> HttpResponse:
@@ -225,26 +227,26 @@ class ManufactureUpdateView(UpdateView):
         return status_map.get(min_status_nomenclature, self.object.status)
 
 
-class ClientCreateView(LoginRequiredMixin, CreateView):
+class ClientCreateView(AccessOperatorMixin, LoginRequiredMixin, CreateView):
     model = Client
     fields = ["name", "comment"]
     success_url = reverse_lazy("manufactures-create")
 
 
-class NomenclatureCreateView(LoginRequiredMixin, CreateView):
+class NomenclatureCreateView(AccessOperatorMixin, LoginRequiredMixin, CreateView):
     model = Nomenclature
     form_class = NomenclatureForm
     success_url = reverse_lazy("manufactures-create")
 
 
-class ManufactureNomenclaturesView(LoginRequiredMixin, DetailView):
+class ManufactureNomenclaturesView(AccessOperatorMixin, LoginRequiredMixin, DetailView):
     model = Manufacture
     template_name = "manufactures/manufacture_nomenclatures.html"
     context_object_name = "manufacture"
     queryset = Manufacture.objects.prefetch_related("nomenclatures")
 
 
-class ManufactureStatusUpdateView(LoginRequiredMixin, UpdateView):
+class ManufactureStatusUpdateView(AccessOperatorMixin, LoginRequiredMixin, UpdateView):
     model = Manufacture
     form_class = ManufactureChangeStatusForm
     success_url = reverse_lazy("manufactures-list")
@@ -279,14 +281,16 @@ class ManufactureStatusUpdateView(LoginRequiredMixin, UpdateView):
         return super().form_valid(form)
 
 
-class ManufactureNomenclaturesPrintView(LoginRequiredMixin, DetailView):
+class ManufactureNomenclaturesPrintView(
+    AccessOperatorMixin, LoginRequiredMixin, DetailView
+):
     model = Manufacture
     template_name = "manufactures/manufacture_nomenclatures_print.html"
     context_object_name = "manufacture"
     queryset = Manufacture.objects.prefetch_related("nomenclatures")
 
 
-class DeleteNomenclature(LoginRequiredMixin, DeleteView):
+class DeleteNomenclature(AccessOperatorMixin, LoginRequiredMixin, DeleteView):
     model = Nomenclature
     success_url = reverse_lazy("manufactures-list")
 
