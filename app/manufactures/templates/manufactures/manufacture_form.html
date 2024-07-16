@@ -52,9 +52,10 @@
       <div class="field"  id="ticket" hx-get="{% url 'manufacture-form-get-ticket' %}" hx-trigger="load">
           <label>{{ form.ticket.label }}</label>
           <div class="ui red double loading selection dropdown">
-            {{ticket}}<i class="dropdown icon"></i>
+            <input type="hidden" name={{form.ticket.name}} value="{% firstof ticket.pk form.ticket.value %}">
+            {% firstof ticket "---------" %}<i class="dropdown icon"></i>
             <div class="menu">
-                <div class="item active">{{ticket}}</div>
+                <div class="item active">{% firstof ticket "---------" %}</div>
             </div>
           </div>
           {{ form.ticket.errors }}
