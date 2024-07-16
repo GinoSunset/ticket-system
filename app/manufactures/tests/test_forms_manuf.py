@@ -8,6 +8,7 @@ from additionally.models import Dictionary
 from manufactures.factories import ManufactureFactory, NomenclatureFactory
 from manufactures.forms import NomenclatureForm, ManufactureChangeStatusForm
 from manufactures.views import ManufactureUpdateView, ManufactureStatusUpdateView
+from ticket.signals import post_save as post_save_ticket
 
 # For not process nomenclature in form use this value because in form we have 1 form by default
 DO_NOT_PROCESS_NOMENCLATURE = -1
@@ -47,7 +48,9 @@ def test_save_status_if_change_nomenclature(
     )
 
     nomenc_form = NomenclatureForm(
-        instance=nomenclature, prefix="0", initial={"status": Nomenclature.Status.READY}
+        instance=nomenclature,
+        prefix="0",
+        initial={"status": Nomenclature.Status.READY},
     )
 
     client.force_login(operator)
@@ -228,3 +231,138 @@ def test_update_status_to_nomenclature_by_manufacture_canceled(
         )
         == expected_status
     )
+
+
+@factory.django.mute_signals(post_save_ticket)
+@pytest.mark.django_db
+def test_create_manufacture_with_ticket(
+    ticket_factory,
+    customer_profile_factory,
+    operator_client,
+):
+    ticket = ticket_factory()
+    customer_profile_factory(user=ticket.customer)
+    url = reverse("manufactures-create") + f"?ticket={ticket.pk}"
+    res = operator_client.get(url)
+    title_page = res.context_data.get("name_page")
+    form = res.context_data.get("form")
+    assert (
+        title_page
+        == f"Создание задачи на производство для задачи <a href='{reverse('ticket-update', args=str(ticket.pk))}' >#{ticket.pk}</a>"
+    ), "Имя страницы не правильное "
+
+    # assert form.initial.get("client") == ticket.customer
+
+
+@factory.django.mute_signals(post_save_ticket)
+@pytest.mark.django_db
+def test_create_system_comment_for_ticket_when_create_manufactory(
+    ticket_factory, customer_profile_factory, operator_client, manufacture_client
+):
+    """
+    Проверяет, создается ли системный комментарий после создания задачи
+    на производство из под заявки
+    """
+
+    ticket = ticket_factory()
+    customer_profile_factory(user=ticket.customer)
+    url = reverse("manufactures-create") + f"?ticket={ticket.pk}"
+
+    status_work = Dictionary.objects.get(code="in_progress")
+    res = operator_client.post(
+        url,
+        data={
+            "status": status_work.pk,
+            "client": manufacture_client.pk,
+            "nomenclature-TOTAL_FORMS": DO_NOT_PROCESS_NOMENCLATURE,
+        },
+    )
+    assert ticket.comments.count() == 1, "Comment not created"
+
+
+@factory.django.mute_signals(post_save_ticket)
+@pytest.mark.django_db
+def test_redirect_to_ticket_for_ticket_when_create_manufactory_with_ticket(
+    ticket_factory,
+    customer_profile_factory,
+    operator_client,
+    manufacture_client,
+):
+    """
+    Проверяет, происходиит лии рилдерект на страницу с описанием задачи
+    после создания заявки
+    """
+
+    ticket = ticket_factory()
+    customer_profile_factory(user=ticket.customer)
+    url = reverse("manufactures-create") + f"?ticket={ticket.pk}"
+
+    status_work = Dictionary.objects.get(code="in_progress")
+    res = operator_client.post(
+        url,
+        data={
+            "status": status_work.pk,
+            "client": manufacture_client.pk,
+            "nomenclature-TOTAL_FORMS": DO_NOT_PROCESS_NOMENCLATURE,
+        },
+    )
+    assert res.status_code == 302
+    assert res.url == reverse("ticket-update", kwargs={"pk": ticket.pk})
+
+
+@factory.django.mute_signals(post_save_ticket)
+@pytest.mark.django_db
+def test_redirect_to_ticket_for_ticket_when_update_manufactory_with_ticket(
+    ticket_factory,
+    customer_profile_factory,
+    operator_client,
+    manufacture_client,
+    manufacture_factory,
+):
+    """
+    Проверяет, происходиит лии рилдерект на страницу с описанием задачи
+    после обновления заявки
+    """
+
+    ticket = ticket_factory()
+    customer_profile_factory(user=ticket.customer)
+    manuf = manufacture_factory(ticket=ticket)
+    url = (
+        reverse("manufacture-update", kwargs={"pk": manuf.pk}) + f"?ticket={ticket.pk}"
+    )
+
+    status_work = Dictionary.objects.get(code="in_progress")
+    res = operator_client.post(
+        url,
+        data={
+            "status": status_work.pk,
+            "client": manufacture_client.pk,
+            "nomenclature-TOTAL_FORMS": DO_NOT_PROCESS_NOMENCLATURE,
+        },
+    )
+    assert res.status_code == 302
+    assert res.url == reverse("ticket-update", kwargs={"pk": ticket.pk})
+
+
+@factory.django.mute_signals(post_save_ticket)
+@pytest.mark.django_db
+def test_set_ticket_in_form_for_manufacture_with_ticket(
+    ticket_factory,
+    customer_profile_factory,
+    operator_client,
+    manufacture_client,
+    manufacture_factory,
+):
+    """
+    Проверяет, что на странице обновления производства установлен по умолчанию
+    изначальный тикет
+    """
+
+    ticket = ticket_factory()
+    customer_profile_factory(user=ticket.customer)
+    manuf = manufacture_factory(ticket=ticket)
+    url = reverse("manufacture-update", kwargs={"pk": manuf.pk})
+
+    res = operator_client.get(url)
+    ticket_from_form = res.context_data.get("form")["ticket"].value()
+    assert ticket_from_form == manuf.ticket.pk

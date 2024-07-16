@@ -44,14 +44,6 @@
 
     </tr></thead>
     <tbody>
-      {% for ticket in object_list %}
-      {% comment %} {% include 'ticket/ticket_row.html' %} {% endcomment %}
-        {% empty %}
-        <tr>
-          <td>No tickets yet.</td>
-        <tr>
-        {% endfor %}
-      </tr>
     </tbody>
   </table>
 

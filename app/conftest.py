@@ -16,6 +16,7 @@ from users.factory import (
     CustomerFactory,
     OperatorFactory,
     ContractorFactory,
+    CustomerProfileFactory,
 )
 from reports.factories import ReportFactory, ActFactory
 from share.factories import ShareFactory
@@ -40,6 +41,7 @@ from storage.factories import (
 register(TicketFactory)
 register(UserFactory)
 register(CustomerFactory)
+register(CustomerProfileFactory)
 register(OperatorFactory)
 register(ContractorFactory)
 register(NotificationFactory)
@@ -191,3 +193,15 @@ def file_1_mb(tmp_path):
         f.write(b"\0")
 
     return filename
+
+
+@pytest.fixture
+def free_component(component_factory):
+    return component_factory(
+        is_stock=True,
+        is_reserve=False,
+        date_delivery=None,
+        is_archive=False,
+        delivery=None,
+        nomenclature=None,
+    )

@@ -1,7 +1,9 @@
 from typing import Any, Dict
 from django.contrib.auth.mixins import LoginRequiredMixin
+from django.db.models.base import Model as Model
+from django.db.models.query import QuerySet
 from django.forms.models import BaseModelForm
-from django.http import HttpResponse
+from django.http import HttpRequest, HttpResponse
 from django.views.generic import (
     ListView,
     CreateView,
@@ -11,12 +13,17 @@ from django.views.generic import (
 )
 from django.urls import reverse_lazy
 from .models import Manufacture, Client, Nomenclature
-from .forms import ManufactureForm, NomenclatureForm, ManufactureChangeStatusForm
+from .forms import (
+    ManufactureForm,
+    NomenclatureForm,
+    ManufactureChangeStatusForm,
+)
 from ticket.mixin import AccessOperatorMixin
+from ticket.models import Ticket
 from additionally.models import Dictionary
 
 
-class ManufacturesListView(LoginRequiredMixin, ListView):
+class ManufacturesListView(AccessOperatorMixin, LoginRequiredMixin, ListView):
     model = Manufacture
     context_object_name = "manufactures"
 
@@ -32,8 +39,31 @@ class ManufactureCreateView(AccessOperatorMixin, LoginRequiredMixin, CreateView)
     form_class = ManufactureForm
     success_url = reverse_lazy("manufactures-list")
 
+    def dispatch(self, request, *args, **kwargs):
+        self.ticket = self.request.GET.get("ticket")
+        return super().dispatch(request, *args, **kwargs)
+
+    def get(self, request: HttpRequest, *args: str, **kwargs: Any) -> HttpResponse:
+        if self.ticket:
+            self.ticket = Ticket.objects.get(pk=self.ticket)
+        return super().get(request, *args, **kwargs)
+
+    def post(self, request: HttpRequest, *args: str, **kwargs: Any) -> HttpResponse:
+        if ticket_pk := self.request.POST.get("ticket") or self.ticket:
+            self.ticket = Ticket.objects.get(pk=ticket_pk)
+        return super().post(request, *args, **kwargs)
+
+    def get_success_url(self) -> str:
+        if self.ticket:
+            return reverse_lazy("ticket-update", kwargs={"pk": self.ticket.pk})
+        return super().get_success_url()
+
     def get_context_data(self, form=None, forms_nomenclature=None, **kwargs):
         context = super().get_context_data(**kwargs)
+        if self.ticket:
+            context["name_page"] = (
+                f"Создание задачи на производство для задачи <a href='{reverse_lazy('ticket-update', args=[self.ticket.pk])}' >#{self.ticket.pk}</a>"
+            )
         if forms_nomenclature:
             context["forms_nomenclature"] = forms_nomenclature
             context["count_form"] = len(forms_nomenclature) - 1
@@ -41,7 +71,24 @@ class ManufactureCreateView(AccessOperatorMixin, LoginRequiredMixin, CreateView)
         context["count_form"] = 0
         forms_nomenclature = [NomenclatureForm(prefix="0")]
         context["forms_nomenclature"] = forms_nomenclature
+        context["ticket"] = self.ticket
         return context
+
+    def get_initial(self):
+        self.initial = super().get_initial()
+        if self.ticket:
+            self.initial.update(
+                {
+                    "ticket": self.ticket,
+                    "comment": f"Для задачи #{self.ticket.pk} [{self.ticket.get_external_url()}]",
+                }
+            )
+            if self.ticket.planned_execution_date:
+                self.initial.update(
+                    {"date_shipment": self.ticket.planned_execution_date}
+                )
+            self.initial.update()
+        return self.initial
 
     def form_valid(self, form):
         form.instance.operator = self.request.user
@@ -68,17 +115,46 @@ class ManufactureCreateView(AccessOperatorMixin, LoginRequiredMixin, CreateView)
             ]
         )
         self.object.save()
-
+        if self.ticket or form.cleaned_data.get("ticket"):
+            message = f"Создана заявка на производство <a href='{self.object.get_absolute_url()}?ticket={self.ticket.pk}'>№{self.object.pk}</a>"
+            self.ticket.create_update_system_comment(
+                text=message, user=self.request.user
+            )
         return super().form_valid(form)
 
     def form_invalid(self, form):
         return self.render_to_response(self.get_context_data(form=form))
 
 
-class ManufactureUpdateView(UpdateView):
+class ManufactureGetTicket(LoginRequiredMixin, CreateView):
+    model = Manufacture
+    form_class = ManufactureForm
+    template_name = "manufactures/htmx/ticket_field.html"
+
+
+class ManufactureUpdateView(AccessOperatorMixin, LoginRequiredMixin, UpdateView):
     model = Manufacture
     form_class = ManufactureForm
     success_url = reverse_lazy("manufactures-list")
+
+    def get_success_url(self) -> str:
+        if self.ticket:
+            return reverse_lazy("ticket-update", kwargs={"pk": self.ticket.pk})
+        return super().get_success_url()
+
+    def dispatch(self, request, *args, **kwargs):
+        self.ticket = self.request.GET.get("ticket")
+        return super().dispatch(request, *args, **kwargs)
+
+    def get(self, request: HttpRequest, *args: str, **kwargs: Any) -> HttpResponse:
+        if self.ticket:
+            self.ticket = Ticket.objects.get(pk=self.ticket)
+        return super().get(request, *args, **kwargs)
+
+    def post(self, request: HttpRequest, *args: str, **kwargs: Any) -> HttpResponse:
+        if ticket_pk := self.request.POST.get("ticket") or self.ticket:
+            self.ticket = Ticket.objects.get(pk=ticket_pk)
+        return super().post(request, *args, **kwargs)
 
     def get_context_data(self, form=None, forms_nomenclature=None, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -96,6 +172,9 @@ class ManufactureUpdateView(UpdateView):
             forms_nomenclature.append(form)
         context["forms_nomenclature"] = forms_nomenclature
         context["count_form"] = count - 1  # -1 because first form is empty
+        context["ticket"] = self.ticket
+        if self.ticket is None and self.object.ticket:
+            context["ticket"] = self.object.ticket
         return context
 
     def form_valid(self, form: BaseModelForm) -> HttpResponse:
@@ -148,26 +227,26 @@ class ManufactureUpdateView(UpdateView):
         return status_map.get(min_status_nomenclature, self.object.status)
 
 
-class ClientCreateView(LoginRequiredMixin, CreateView):
+class ClientCreateView(AccessOperatorMixin, LoginRequiredMixin, CreateView):
     model = Client
     fields = ["name", "comment"]
     success_url = reverse_lazy("manufactures-create")
 
 
-class NomenclatureCreateView(LoginRequiredMixin, CreateView):
+class NomenclatureCreateView(AccessOperatorMixin, LoginRequiredMixin, CreateView):
     model = Nomenclature
     form_class = NomenclatureForm
     success_url = reverse_lazy("manufactures-create")
 
 
-class ManufactureNomenclaturesView(LoginRequiredMixin, DetailView):
+class ManufactureNomenclaturesView(AccessOperatorMixin, LoginRequiredMixin, DetailView):
     model = Manufacture
     template_name = "manufactures/manufacture_nomenclatures.html"
     context_object_name = "manufacture"
     queryset = Manufacture.objects.prefetch_related("nomenclatures")
 
 
-class ManufactureStatusUpdateView(LoginRequiredMixin, UpdateView):
+class ManufactureStatusUpdateView(AccessOperatorMixin, LoginRequiredMixin, UpdateView):
     model = Manufacture
     form_class = ManufactureChangeStatusForm
     success_url = reverse_lazy("manufactures-list")
@@ -202,14 +281,16 @@ class ManufactureStatusUpdateView(LoginRequiredMixin, UpdateView):
         return super().form_valid(form)
 
 
-class ManufactureNomenclaturesPrintView(LoginRequiredMixin, DetailView):
+class ManufactureNomenclaturesPrintView(
+    AccessOperatorMixin, LoginRequiredMixin, DetailView
+):
     model = Manufacture
     template_name = "manufactures/manufacture_nomenclatures_print.html"
     context_object_name = "manufacture"
     queryset = Manufacture.objects.prefetch_related("nomenclatures")
 
 
-class DeleteNomenclature(LoginRequiredMixin, DeleteView):
+class DeleteNomenclature(AccessOperatorMixin, LoginRequiredMixin, DeleteView):
     model = Nomenclature
     success_url = reverse_lazy("manufactures-list")
 

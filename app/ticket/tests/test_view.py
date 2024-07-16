@@ -9,6 +9,7 @@ from additionally.models import Dictionary
 from notifications.models import Notification
 from django.core.files.uploadedfile import SimpleUploadedFile
 from ticket.models import CommentImage, CommentFile
+from ticket.signals import post_save as post_save_ticket
 
 
 @pytest.mark.django_db
@@ -211,7 +212,8 @@ def test_update_comment(
     client.force_login(user=user)
     res = client.post(
         reverse(
-            "comment-update", kwargs={"ticket_pk": comment.ticket.pk, "pk": comment.pk}
+            "comment-update",
+            kwargs={"ticket_pk": comment.ticket.pk, "pk": comment.pk},
         ),
         data={"text": "new_text"},
     )
@@ -280,6 +282,41 @@ class TestUpdateTicketPage:
         assert res.status_code == 302
         ticket.refresh_from_db()
         assert ticket.status == Dictionary.objects.get(code="cancel")
+
+    @factory.django.mute_signals(post_save_ticket)
+    @pytest.mark.django_db
+    @pytest.mark.parametrize(
+        "status",
+        ["new_manufacture_task", "in_progress", "ready", "canceled", "shipped"],
+    )
+    def test_update_ticket_page_has_manufactory_ticket(
+        self,
+        status,
+        ticket_factory,
+        operator_factory,
+        client,
+        customer_factory,
+        manufacture_factory,
+        customer_profile_factory,
+    ):
+        operator = operator_factory()
+        customer = customer_factory()
+        customer_profile_factory(user=customer)
+        ticket = ticket_factory(customer=customer)
+        operator.customers.add(ticket.customer.profile)
+        client.force_login(user=operator)
+
+        status = Dictionary.objects.get(code="new_manufacture_task")
+        manuf = manufacture_factory(ticket=ticket, status=status)
+
+        res = client.get(reverse("ticket-update", kwargs={"pk": ticket.pk}))
+
+        assert res.status_code == 200
+        ticket_from_context = res.context_data.get("ticket")
+        assert ticket_from_context
+        manufs = ticket_from_context.manufactures.all()
+
+        assert manuf in manufs
 
 
 class TestCommentViews:

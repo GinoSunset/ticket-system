@@ -1,10 +1,13 @@
 import datetime
 from datetime import timedelta
 import pytest
+import factory
 
 from django.urls import reverse
+from ticket import signals
 from storage.models import Delivery, Component
 from storage.views import DeliveryUpdateView, create_delivery_component
+from storage.reserve import reserve_component
 
 
 @pytest.mark.django_db
@@ -346,3 +349,17 @@ def test_re_reserve_component_if_ahead_delivery_has_more_one_component(
         ).count()
         == 1
     )
+
+
+@factory.django.mute_signals(signals.post_save)
+@pytest.mark.django_db
+def test_ticket_phantom_component_change_to_delivery_when_create_delivery(
+    ticket_factory, customer_profile_factory, component_type
+):
+    """
+    Проверяет что фантомные (недостающие) компоненты из задачи будут при создании доставки будут
+    перерезервированы компонентами из доставки
+    """
+    ticket = ticket_factory()
+    customer_profile_factory(user=ticket.customer)
+    reserve_component(component_type, ticket)

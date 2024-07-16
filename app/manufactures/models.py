@@ -5,6 +5,7 @@ from django.urls import reverse
 
 from additionally.models import Dictionary
 from users.models import Operator
+from ticket.models import Ticket
 
 import logging
 
@@ -85,6 +86,15 @@ class Manufacture(models.Model):
     branding = models.BooleanField(verbose_name="Брендирование", default=False)
     comment = models.TextField(verbose_name="Комментарий", blank=True, null=True)
 
+    ticket = models.ForeignKey(
+        Ticket,
+        verbose_name="Заявка",
+        related_name="manufactures",
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+    )
+
     @property
     def progress_str_as_list_nomenclatures(self) -> str:
         """return list with count nomenclatures in work and in status ready"""
@@ -102,6 +112,8 @@ class Manufacture(models.Model):
             "in_progress": "blue",
             "ready": "green",
             "new_manufacture_task": "violet",
+            "canceled": "grey",
+            "shipped": "green",
         }
         return color.get(self.status.code, "detail")
 
