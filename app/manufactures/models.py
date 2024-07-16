@@ -112,6 +112,8 @@ class Manufacture(models.Model):
             "in_progress": "blue",
             "ready": "green",
             "new_manufacture_task": "violet",
+            "canceled": "grey",
+            "shipped": "green",
         }
         return color.get(self.status.code, "detail")
 
