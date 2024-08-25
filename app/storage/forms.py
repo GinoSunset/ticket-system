@@ -103,6 +103,18 @@ class DeliveryForm(ModelForm):
         }
 
 
+class DeliveryOrderPDFForm(ModelForm):
+    pdf_file = forms.FileField(required=True)
+
+    class Meta:
+        model = Delivery
+        fields = ["date_delivery", "comment"]
+
+        widgets = {
+            "date_delivery": CalendarInput(),
+        }
+
+
 class TypeComponentCountForm(Form):
     component_type = forms.ModelChoiceField(
         queryset=ComponentType.objects.all(),

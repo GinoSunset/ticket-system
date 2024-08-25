@@ -25,9 +25,8 @@ urlpatterns = [
         views.NomenclatureComponents.as_view(),
         name="nomenclature-components",
     ),
-    path(
-        "create-delivery/", views.DeliveryCreateView.as_view(), name="delivery-create"
-    ),
+    path("manual-delivery/", views.DeliveryCreateView.as_view(), name="manual-create"),
+    path("create-delivery/", views.CreateDelivery.as_view(), name="delivery-create"),
     path("get_deliveries/", views.DeliveryListView.as_view(), name="delivery-list"),
     path(
         "update_delivery/<int:pk>/",
@@ -40,4 +39,9 @@ urlpatterns = [
         name="done_delivery",
     ),
     path("write-off/<int:pk>/", views.WriteOff.as_view(), name="write-off"),
+    path(
+        "create-delivery/<str:template>",
+        views.GetDeliveryCreateTemplate.as_view(),
+        name="delivery-template",
+    ),
 ]

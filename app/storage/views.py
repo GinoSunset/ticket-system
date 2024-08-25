@@ -8,7 +8,13 @@ from django.shortcuts import get_object_or_404, render
 from django.urls import reverse_lazy
 from django.db import models
 from django.db.models import Count, Q
-from django.views.generic import ListView, CreateView, UpdateView, FormView
+from django.views.generic import (
+    ListView,
+    CreateView,
+    UpdateView,
+    FormView,
+    TemplateView,
+)
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.db.transaction import atomic
 from django.forms.formsets import all_valid, formset_factory
@@ -404,7 +410,7 @@ class NomenclatureComponents(AccessOperatorMixin, LoginRequiredMixin, ListView):
 
 class DeliveryCreateView(AccessOperatorMixin, LoginRequiredMixin, CreateView):
     model = Delivery
-    template_name = "storage/delivery_create.html"
+    template_name = "storage/htmx/manual_delivery.html"
     form_class = DeliveryForm
     success_url = reverse_lazy("storage")
 
@@ -568,6 +574,8 @@ class DoneDelivery(AccessOperatorMixin, LoginRequiredMixin, UpdateView):
 def create_delivery_component(delivery: Delivery, count: int, cmnt_type: ComponentType):
     date_delivery = delivery.date_delivery
     for _ in range(count):
+        # TODO: don't search always free component, if not set bool flag
+        # TODO: check than component in stock without delivery was add delivery.!
         component = Component.objects.filter(
             component_type=cmnt_type,
             nomenclature__manufacture__date_shipment__gte=date_delivery,
@@ -639,3 +647,11 @@ class WriteOff(AccessOperatorMixin, LoginRequiredMixin, FormView):
         if self.request.method == "POST":
             return [self.template_post_name]
         return super().get_template_names()
+
+
+class GetDeliveryCreateTemplate(FormView):
+    template_name = "storage/htmx/auto_delivery.html"
+
+
+class CreateDelivery(TemplateView):
+    template_name = "storage/delivery_create.html"
