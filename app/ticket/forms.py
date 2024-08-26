@@ -1,5 +1,6 @@
 from django import forms
 from additionally.models import Dictionary, DictionaryType
+from ticsys.fields import MultipleFileField
 from .models import Ticket, Comment
 from .widgets import CalendarInput, ContractorSelect
 from users.models import Contractor
@@ -80,11 +81,10 @@ class TicketsFormCustomer(forms.ModelForm):
 
 
 class CommentForm(forms.ModelForm):
-    files = forms.FileField(
+    files = MultipleFileField(
         required=False,
         help_text="Файлы",
         label="Прикрепить файлы",
-        widget=forms.ClearableFileInput(attrs={"multiple": True}),
     )
 
     class Meta:

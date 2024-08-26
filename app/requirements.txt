@@ -17,6 +17,6 @@ natasha==1.4.0
 openpyxl==3.1.1
 redis==4.5.3
 requests==2.30.0
-sentry-sdk[django]==1.19.1
+sentry-sdk[django]==2.13.0
 psycopg2-binary
 django-viewflow==2.2.7
