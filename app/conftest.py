@@ -165,6 +165,7 @@ def setup_test_env(settings):
 
 @pytest.fixture
 def operator_client(operator, client):
+    """фикстура для отправки запроса от имени оператора"""
     client.force_login(operator)
     return client
 
