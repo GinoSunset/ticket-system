@@ -4,7 +4,7 @@ from django.urls import reverse
 from storage.models import Component, ComponentType
 
 from storage.forms import ComponentForm
-from storage.views import ComponentCreateView
+from storage.views.component import ComponentCreateView
 
 
 @pytest.mark.django_db

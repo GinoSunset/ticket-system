@@ -6,12 +6,12 @@ import factory
 from django.urls import reverse
 from ticket import signals
 from storage.models import Delivery, Component
-from storage.views import DeliveryUpdateView, create_delivery_component
+from storage.views.delivery import DeliveryUpdateView, create_delivery_component
 from storage.reserve import reserve_component
 
 
 @pytest.mark.django_db
-def test_delivery_create(admin_client, client, operator, component_type_factory):
+def test_delivery_create(operator_client, component_type_factory):
     ct = component_type_factory()
     count_component = 10
     delivery_date = datetime.date(2020, 1, 1)
@@ -22,10 +22,8 @@ def test_delivery_create(admin_client, client, operator, component_type_factory)
         "type_count-TOTAL_FORMS": 1,
         "type_count-INITIAL_FORMS": "0",
     }
-    # TODO:change to login
-    # client.force_login(operator)
 
-    res = admin_client.post(reverse("delivery-create"), data=data, format="json")
+    res = operator_client.post(reverse("delivery-create"), data=data, format="json")
     assert res.status_code == 302
     assert Delivery.objects.filter(date_delivery=delivery_date).exists()
     assert (
