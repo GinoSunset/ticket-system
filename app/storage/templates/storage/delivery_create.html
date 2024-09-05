@@ -1,9 +1,9 @@
 {% extends 'ticsys/index.html' %}
 {% block content %}
   <h1>{% firstof name_page 'Создание доставки' %}</h1>
-  <div hx-target="#tab-contents">
-    <a class="ui primary basic button active">Ручное создание</a>
-    <a class="ui primary basic button" href="{% url 'delivery-template' 'auto' %}">Доставка из счета (beta)</a>
+  <div hx-target="#tab-contents" class="ui left buttons">
+    <a class="ui primary button active">Ручное создание</a>
+    <a class="ui primary basic button" href="{% url 'create-delivery-invoice' %}">Доставка из счета (beta)</a>
   </div>
   <br />
   <form class="ui form" id="form-create-delivery" method="post">

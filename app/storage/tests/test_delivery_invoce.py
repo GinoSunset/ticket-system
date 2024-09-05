@@ -10,7 +10,7 @@ def test_upload_file(operator_client, invoice_pfd_file):
         "test-invoice.pdf", invoice_pfd_file, content_type="application/pdf"
     )
     data = {"file": uploaded_file}
-    url = reverse("upload-invoice-pdf")
+    url = reverse("delivery-invoice")
 
     response = operator_client.post(url, data, format="multipart")
 
@@ -18,4 +18,4 @@ def test_upload_file(operator_client, invoice_pfd_file):
     assert Delivery.objects.count() == 1
     delivery = Delivery.objects.first()
     assert delivery
-    assert delivery.order_pdf.name == "test-invoice.pdf"
+    assert delivery.invoice.file_invoice.name == "test-invoice.pdf"

@@ -11,7 +11,7 @@ from django.db import models
 
 from ticket.mixin import AccessOperatorMixin
 from storage.models import Delivery, Component, ComponentType
-from storage.forms import DeliveryForm, TypeComponentCountFormSet
+from storage.forms import DeliveryForm, DeliveryInvoiceForm, TypeComponentCountFormSet
 from django.views.generic import (
     ListView,
     CreateView,
@@ -210,3 +210,38 @@ def create_delivery_component(delivery: Delivery, count: int, cmnt_type: Compone
 
 class GetDeliveryCreateTemplate(FormView):
     template_name = "storage/htmx/auto_delivery.html"
+
+
+class CreateDeliveryThrowInvoice(AccessOperatorMixin, LoginRequiredMixin, CreateView):
+    model = Delivery
+    template_name = "storage/delivery_create.html"
+    form_class = DeliveryInvoiceForm
+    success_url = reverse_lazy("storage")  # change me
+
+    def get_context_data(self, **kwargs: Any) -> dict[str, Any]:
+        kwargs = super().get_context_data(**kwargs)
+        if "type_count_forms" not in kwargs:
+            kwargs["type_count_forms"] = TypeComponentCountFormSet(prefix="type_count")
+        return kwargs
+
+    @atomic()
+    def form_valid(self, form):
+        self.object: Delivery = form.save(commit=False)
+        self.object.status = Delivery.Status.NEW
+        self.object.save()
+        type_count_forms = TypeComponentCountFormSet(
+            self.request.POST, prefix="type_count"
+        )
+        if not all_valid(type_count_forms):
+            self.object.delete()
+            return self.render_to_response(
+                self.get_context_data(form=form, type_count_forms=type_count_forms)
+            )
+
+        for type_count_form in type_count_forms:
+            count = type_count_form.cleaned_data["count"]
+            cmnt_type = type_count_form.cleaned_data["component_type"]
+            create_delivery_component(self.object, count, cmnt_type)
+            # TODO: logging
+
+        return super().form_valid(form)

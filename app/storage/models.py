@@ -229,3 +229,25 @@ class Delivery(models.Model):
             .values("component_type__name")
             .annotate(total=Count("id"))
         )
+
+
+class Invoice(models.Model):
+    class Status(models.IntegerChoices):
+        WORK = 10, "В работе"
+        DONE = 20, "Обработан"
+        ERROR = 100, "Ошибка"
+
+    date_create = models.DateTimeField(auto_now_add=True)
+    date_update = models.DateTimeField(auto_now=True)
+    file_invoice = models.FileField(
+        upload_to="secret/invoice/%Y/%m/", verbose_name="Счет"
+    )
+    delivery = models.ForeignKey(
+        "Delivery", verbose_name="Доставка", on_delete=models.SET_NULL, null=True
+    )
+    alias = models.ManyToManyField(Alias)
+    status = models.IntegerField(
+        verbose_name="Статус",
+        choices=Status.choices,
+        default=Status.WORK,
+    )

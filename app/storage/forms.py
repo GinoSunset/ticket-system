@@ -3,7 +3,14 @@ from django.forms import ModelForm, Form, NumberInput
 from django.forms.formsets import formset_factory
 from django.core.exceptions import ValidationError
 from ticket.widgets import CalendarInput
-from .models import ComponentType, Alias, Component, SubComponentTypeRelation, Delivery
+from .models import (
+    ComponentType,
+    Alias,
+    Component,
+    SubComponentTypeRelation,
+    Delivery,
+    Invoice,
+)
 
 from ticsys.widgets import Dropdown
 
@@ -156,3 +163,23 @@ class WriteOffForm(Form):
     def __init__(self, *args, **kwargs):
         super(WriteOffForm, self).__init__(*args, **kwargs)
         self.fields["component_type"].disabled = True
+
+class DeliveryInvoiceForm(forms.ModelForm):
+    file_invoice = forms.FileField(label="Счет", required=True)
+
+    class Meta:
+        model = Delivery
+        fields = ["date_delivery", "comment"]
+
+        widgets = {
+            "date_delivery": CalendarInput(),
+        }
+
+    def save(self, commit=True):
+        delivery = super().save(commit=commit)
+        invoice = Invoice(
+            delivery=delivery, file_invoice=self.cleaned_data["file_invoice"]
+        )
+        if commit:
+            invoice.save()
+        return delivery
