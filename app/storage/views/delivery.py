@@ -9,6 +9,7 @@ from django.urls import reverse_lazy
 from django.forms.formsets import all_valid
 from django.db import models
 
+from ticsys.utils import is_htmx
 from ticket.mixin import AccessOperatorMixin
 from storage.models import Delivery, Component, ComponentType
 from storage.forms import DeliveryForm, DeliveryInvoiceForm, TypeComponentCountFormSet
@@ -25,6 +26,11 @@ class CreateDelivery(AccessOperatorMixin, LoginRequiredMixin, CreateView):
     template_name = "storage/delivery_create.html"
     form_class = DeliveryForm
     success_url = reverse_lazy("storage")
+
+    def get_template_names(self) -> list[str]:
+        if is_htmx(self.request):
+            return ["storage/htmx/manual_delivery.html"]
+        return super().get_template_names()
 
     def get_context_data(self, **kwargs: Any) -> dict[str, Any]:
         kwargs = super().get_context_data(**kwargs)
@@ -214,7 +220,7 @@ class GetDeliveryCreateTemplate(FormView):
 
 class CreateDeliveryThrowInvoice(AccessOperatorMixin, LoginRequiredMixin, CreateView):
     model = Delivery
-    template_name = "storage/delivery_create.html"
+    template_name = "storage/htmx/auto_delivery.html"
     form_class = DeliveryInvoiceForm
     success_url = reverse_lazy("storage")  # change me
 

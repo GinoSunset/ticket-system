@@ -1,0 +1,17 @@
+{{ type_count_forms.management_form }}
+    {% for type_count_form in type_count_forms %}
+      <div class="containerComponents">
+        <div class="two fields">
+          <div class="{% if type_count_form.component_type.errors %}{% endif %} field">
+            <label>{{ type_count_form.component_type.label }}</label>
+            {{ type_count_form.component_type }}
+            {{ type_count_form.component_type.errors }}
+          </div>
+          <div class="field">
+            <label>{{ type_count_form.count.label }}</label>
+            {{ type_count_form.count }}
+            {{ type_count_form.count.errors }}
+          </div>
+        </div>
+      </div>
+    {% endfor %}
