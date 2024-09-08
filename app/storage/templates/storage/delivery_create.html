@@ -6,58 +6,17 @@
 {% block content %}
   <h1>{% firstof name_page 'Создание доставки' %}</h1>
   <div hx-target="#tab-contents" class="ui left buttons">
-    <a class="ui primary button active"  hx-target="#delivery-type-add" hx-get="{% url 'delivery-create' %}" hx-on::after-request=initialize()> >Ручное создание</a>
-    <a class="ui primary basic button" hx-target="#delivery-type-add" hx-get="{% url 'create-delivery-invoice' %}" hx-on::after-request=initialize()>Доставка из счета (beta)</a>
+    <a class="ui primary button active" id="btn-manual"  hx-target="#form-create-delivery" hx-get="{% url 'delivery-create' %}" > Ручное создание</a>
+    <a class="ui primary basic button" id="btn-invoice" hx-target="#form-create-delivery" hx-get="{% url 'create-delivery-invoice' %}" >Доставка из счета (beta)</a>
   </div>
   <br />
-  <form class="ui form" id="form-create-delivery" method="post">
-    {{ form.non_field_errors }}
-    {% csrf_token %}
-    <div class="field">
-      <label>{{ form.date_delivery.label }}</label>
-      {{ form.date_delivery }}
-      {{ form.date_delivery.errors }}
-    </div>
-    <div class="field">
-      <label>{{ form.comment.label }}</label>
-      {{ form.comment }}
-      {{ form.comment.errors }}
-    </div>
-    <div id="delivery-type-add">
-      {% include "storage/htmx/manual_delivery.html" %}
-    </div>
-    <button class="ui button basic green" id="add_btn">+</button>
-    <button class="ui button basic green" type="submit">{% firstof name_btn 'Создать' %}</button>
-  </form>
+{% include "storage/htmx/manual_delivery.html" %}
 {% endblock %}
 {% block script %}
   <script>
-    function initialize() {
+    function initializeUI(){
       $('.dropdown').dropdown()
       $('.ui.checkbox').checkbox()
-    
-      let parentForm = document.querySelectorAll('.containerComponents')
-      let container = document.querySelector('.containerComponents')
-      let addButton = document.querySelector('#add_btn')
-      let totalForms = document.querySelector('#id_type_count-TOTAL_FORMS')
-    
-      let formNum = parentForm.length - 1
-      addButton.addEventListener('click', addForm)
-    
-      function addForm(e) {
-        e.preventDefault()
-    
-        let newForm = parentForm[0].cloneNode(true)
-        let formRegex = RegExp(`type_count-(\\d){1}-`, 'g')
-    
-        formNum++
-        newForm.innerHTML = newForm.innerHTML.replace(formRegex, `type_count-${formNum}-`)
-        container.insertAdjacentElement('afterend', newForm);
-    
-        totalForms.setAttribute('value', `${formNum + 1}`)
-        $('.dropdown').dropdown()
-      }
-    
       $('#date_calendar_date_delivery').calendar({
         type: 'date',
         firstDayOfWeek: 1,
@@ -72,6 +31,47 @@
         }
       })
     }
-    initialize()
+    function initialize() {
+      initializeUI()
+    
+      let parentForm = document.querySelectorAll('.containerComponents')
+      let container = document.querySelector('#form-create-delivery')
+      let addButton = document.querySelector('#add_btn')
+      let totalForms = document.querySelector('#id_type_count-TOTAL_FORMS')
+    
+      let formNum = parentForm.length - 1
+      addButton.addEventListener('click', addForm)
+    
+      function addForm(e) {
+        e.preventDefault()
+    
+        let newForm = parentForm[0].cloneNode(true)
+        let formRegex = RegExp(`type_count-(\\d){1}-`, 'g')
+    
+        formNum++
+        newForm.innerHTML = newForm.innerHTML.replace(formRegex, `type_count-${formNum}-`)
+        container.insertBefore(newForm, addButton)
+    
+        totalForms.setAttribute('value', `${formNum + 1}`)
+        $('.dropdown').dropdown()
+      }
+    
+
+    }
+    document.body.addEventListener('htmx:afterRequest', (event) => {
+      let btnManual = $("#btn-manual");
+      let btnInvoce = $("#btn-invoice");
+      if (event.detail.elt.id === 'btn-manual') {
+        initialize();
+        btnManual.removeClass("basic")
+        btnInvoce.addClass("basic")
+      }else{
+        initializeUI()
+        btnInvoce.removeClass("basic")
+        btnManual.addClass("basic")
+      }
+  });
+  initialize();
+
   </script>
 {% endblock %}

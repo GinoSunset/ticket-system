@@ -10,7 +10,7 @@ def test_upload_file(operator_client, invoice_pfd_file):
         "test-invoice.pdf", invoice_pfd_file, content_type="application/pdf"
     )
     data = {"file": uploaded_file}
-    url = reverse("delivery-invoice")
+    url = reverse("create-delivery-invoice")
 
     response = operator_client.post(url, data, format="multipart")
 
