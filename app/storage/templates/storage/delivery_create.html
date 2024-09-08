@@ -6,11 +6,15 @@
 {% block content %}
   <h1>{% firstof name_page 'Создание доставки' %}</h1>
   <div hx-target="#tab-contents" class="ui left buttons">
-    <a class="ui primary button active" id="btn-manual"  hx-target="#form-create-delivery" hx-get="{% url 'delivery-create' %}" > Ручное создание</a>
-    <a class="ui primary basic button" id="btn-invoice" hx-target="#form-create-delivery" hx-get="{% url 'create-delivery-invoice' %}" >Доставка из счета (beta)</a>
+    <a class="ui primary {% if is_invoice_delivery %} basic {% endif %} button active" id="btn-manual"  hx-target="#form-create-delivery" hx-get="{% url 'delivery-create' %}" > Ручное создание</a>
+    <a class="ui primary {% if not is_invoice_delivery %}basic{% endif %}  button" id="btn-invoice" hx-target="#form-create-delivery" hx-get="{% url 'create-delivery-invoice' %}" >Доставка из счета (beta)</a>
   </div>
   <br />
+{% if is_invoice_delivery %}
+{% include "storage/htmx/auto_delivery.html" %}
+{% else %}
 {% include "storage/htmx/manual_delivery.html" %}
+{% endif %}
 {% endblock %}
 {% block script %}
   <script>

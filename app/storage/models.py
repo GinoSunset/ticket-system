@@ -189,6 +189,7 @@ class Delivery(models.Model):
         ordering = ["-date_delivery"]
 
     class Status(models.IntegerChoices):
+        DRAFT = 5, "Черновик"
         NEW = 10, "Создана"
         DONE = 30, "Завершена"
         CANCELED = 50, "Отменена"
@@ -232,7 +233,11 @@ class Delivery(models.Model):
 
 
 class Invoice(models.Model):
+    class Meta:
+        verbose_name = "Счет на доставку"
+        verbose_name_plural = "Счета на доставку"
     class Status(models.IntegerChoices):
+        NEW = 5, "Новый"
         WORK = 10, "В работе"
         DONE = 20, "Обработан"
         ERROR = 100, "Ошибка"
@@ -242,12 +247,22 @@ class Invoice(models.Model):
     file_invoice = models.FileField(
         upload_to="secret/invoice/%Y/%m/", verbose_name="Счет"
     )
-    delivery = models.ForeignKey(
+    delivery = models.OneToOneField(
         "Delivery", verbose_name="Доставка", on_delete=models.SET_NULL, null=True
     )
     alias = models.ManyToManyField(Alias)
     status = models.IntegerField(
         verbose_name="Статус",
         choices=Status.choices,
-        default=Status.WORK,
+        default=Status.NEW,
     )
+
+    def to_work(self):
+        if self.status is not self.Status.WORK:
+            # go to process
+            self.status = self.Status.WORK
+            self.save()
+            # loggings
+
+    def __str__(self) -> str:
+        return f"[{self.delivery.pk}] - file: {self.file_invoice.name}"
