@@ -4,7 +4,7 @@ from typing import Any
 
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.db.transaction import atomic
-from django.http import HttpRequest, HttpResponse
+from django.http import HttpRequest, HttpResponse, HttpResponseRedirect
 from django.urls import reverse_lazy
 from django.forms.formsets import all_valid
 from django.db import models
@@ -241,5 +241,6 @@ class CreateDeliveryThrowInvoice(AccessOperatorMixin, LoginRequiredMixin, Create
         self.object: Delivery = form.save(commit=False)
         self.object.status = Delivery.Status.DRAFT
         self.object.save()
+        form.save()
         self.object.invoice.to_work()
-        return super().form_valid(form)
+        return HttpResponseRedirect(self.get_success_url())

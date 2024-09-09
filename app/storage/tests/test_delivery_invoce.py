@@ -9,7 +9,12 @@ from storage.models import Delivery, Invoice
 
 @override_settings(MEDIA_ROOT=tempfile.mkdtemp())
 @pytest.mark.django_db
-def test_upload_file(operator_client, invoice_pfd_file):
+def test_upload_file(
+    operator_client,
+    invoice_pfd_file,
+    monkeypatch_delay_sent_to_parse_invoice,
+    mock_post_to_invoice_api,
+):
     uploaded_file = SimpleUploadedFile(
         "test-invoice.pdf", invoice_pfd_file, content_type="application/pdf"
     )
@@ -24,4 +29,4 @@ def test_upload_file(operator_client, invoice_pfd_file):
     assert delivery
     assert delivery.status == Delivery.Status.DRAFT
     assert "test-invoice.pdf" in delivery.invoice.file_invoice.name
-    assert delivery.invoice.status == Invoice.Status.WORK
+    assert delivery.invoice.status == Invoice.Status.DONE

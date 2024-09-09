@@ -1,5 +1,6 @@
 import datetime
 import uuid
+from celery import current_app
 from django.db import models
 from django.db.models import Case, When, Value, BooleanField, Count
 
@@ -122,9 +123,12 @@ class Alias(models.Model):
         verbose_name_plural = "Алиасы"
         unique_together = ("name", "component_type")
 
-    name = models.CharField(max_length=255, verbose_name="Алиас")
+    name = models.CharField(max_length=255, verbose_name="Алиас", unique=True)
     component_type = models.ForeignKey(
-        "ComponentType", verbose_name="Тип компонента", on_delete=models.CASCADE
+        "ComponentType",
+        verbose_name="Тип компонента",
+        on_delete=models.SET_NULL,
+        null=True,
     )
 
     def __str__(self) -> str:
@@ -230,6 +234,28 @@ class Delivery(models.Model):
             .values("component_type__name")
             .annotate(total=Count("id"))
         )
+class InvoiceAliasRelation(models.Model):
+    class Meta:
+        verbose_name = "Связь счетов и компонентов через алиас"
+        verbose_name_plural = "Связи счетов и компонентов через алиас"
+
+    invoice = models.ForeignKey(
+        "Invoice",
+        verbose_name="Счет",
+        related_name="invoice",
+        on_delete=models.CASCADE,
+    )
+    alias = models.ForeignKey(
+        "Alias",
+        verbose_name="Алиас компонента",
+        related_name="alias",
+        on_delete=models.SET_NULL,
+        null=True,
+    )
+    quantity = models.PositiveIntegerField(verbose_name="Количество", default=1)
+
+    def __str__(self) -> str:
+        return f"{self.invoice} -> {self.alias} [{self.quantity}]"
 
 
 class Invoice(models.Model):
@@ -250,7 +276,7 @@ class Invoice(models.Model):
     delivery = models.OneToOneField(
         "Delivery", verbose_name="Доставка", on_delete=models.SET_NULL, null=True
     )
-    alias = models.ManyToManyField(Alias)
+    alias = models.ManyToManyField(Alias, through=InvoiceAliasRelation)
     status = models.IntegerField(
         verbose_name="Статус",
         choices=Status.choices,
@@ -259,10 +285,7 @@ class Invoice(models.Model):
 
     def to_work(self):
         if self.status is not self.Status.WORK:
-            # go to process
-            self.status = self.Status.WORK
-            self.save()
-            # loggings
+            current_app.send_task("storage.tasks.sent_to_parse_invoice", (self.pk,))
 
     def __str__(self) -> str:
         return f"[{self.delivery.pk}] - file: {self.file_invoice.name}"

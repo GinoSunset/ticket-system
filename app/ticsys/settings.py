@@ -25,6 +25,7 @@ env = environ.Env(
     TG_BOT_URL=(str, ""),
     TG_BOT_NOTIFICATION_URI=(str, ""),
     DATABASE_URL=(str, "sqlite:///db.sqlite3"),
+    URL_INVOICE_API=(str, "http://invoice"),
 )
 BASE_DIR = Path(__file__).resolve().parent.parent
 
@@ -194,3 +195,6 @@ REST_FRAMEWORK = {
     ),
     "DEFAULT_PAGINATION_CLASS": "rest_framework_datatables.pagination.DatatablesPageNumberPagination",
 }
+
+# API
+URL_INVOICE_API = env("URL_INVOICE_API")
