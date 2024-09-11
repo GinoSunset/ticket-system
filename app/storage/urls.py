@@ -43,4 +43,7 @@ urlpatterns = [
         views.CreateDeliveryThrowInvoice.as_view(),
         name="create-delivery-invoice",
     ),
+    path(
+        "update-invoice/<int:pk>", views.UpdateInvoice.as_view(), name="update-invoice"
+    ),
 ]

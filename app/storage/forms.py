@@ -183,3 +183,28 @@ class DeliveryInvoiceForm(forms.ModelForm):
         if commit:
             invoice.save()
         return delivery
+
+
+class AliasInviceForm(ModelForm):
+    class Meta:
+        model = Alias
+        fields = ["name", "component_type"]
+
+    component_type = forms.ModelChoiceField(
+        queryset=ComponentType.objects.all(),
+        label="Тип компонента",
+        required=True,
+        widget=Dropdown(
+            attrs={
+                "class": "ui dropdown search selection",
+                "placeholder": "Выберите тип",
+                "required": True,
+            }
+        ),
+    )
+    quantity = forms.IntegerField(min_value=1, initial=1, label="Количество в доставке")
+
+
+AliasInviceFormSet = formset_factory(
+    AliasInviceForm, min_num=1, validate_min=True, extra=0
+)

@@ -24,11 +24,13 @@ def run_sent_to_parse_invoice(pk):
         invoice.save()
         return
 
-    for alias_from_invoice, count in result.items():
-        alias, _ = Alias.objects.get_or_create(name=alias_from_invoice)
-        InvoiceAliasRelation.objects.create(
-            alias=alias, invoice=invoice, quantity=count
-        )
+    if aliases := result.get("results"):
+        for alias_from_invoice, count in aliases.items():
+            alias, _ = Alias.objects.get_or_create(name=alias_from_invoice)
+            InvoiceAliasRelation.objects.create(
+                alias=alias, invoice=invoice, quantity=count
+            )
+    # TODO: results['errors']
     invoice.status = Invoice.Status.DONE
     invoice.save()
     return result

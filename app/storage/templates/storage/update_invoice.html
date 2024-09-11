@@ -1,0 +1,65 @@
+{% extends 'ticsys/index.html' %}
+
+{% block content %}
+  <h1>Создание доставки из счета (beta)</h1>
+  <form class="ui form" id="form-update-invoce-alias" method="post">
+    {{ form.non_field_errors }}
+    {% csrf_token %}
+    {{ alias_invoice_forms.management_form }}
+    <div class="contanireParentForm">
+      {% for alias_invoice_form in alias_invoice_forms %}
+        <div class="three fields">
+          <div class="field">
+            <label>{{ alias_invoice_form.name.label }}</label>
+            {{ alias_invoice_form.name }}
+            {{ alias_invoice_form.name.errors }}
+          </div>
+          <div class="field">
+            <label>{{ alias_invoice_form.component_type.label }}</label>
+            {{ alias_invoice_form.component_type }}
+            {{ alias_invoice_form.component_type.errors }}
+          </div>
+          <div class="field">
+            <label>{{ alias_invoice_form.quantity.label }}</label>
+            {{ alias_invoice_form.quantity }}
+            {{ alias_invoice_form.quantity.errors }}
+          </div>
+        </div>
+      {% endfor %}
+    </div>
+    <a class="ui button basic green" id="add_alias_btn">+</a>
+
+    <button class="ui button basic green" type="submit">Создать доставку</button>
+  </form>
+
+  <script>
+    $('.ui.checkbox').checkbox()
+    $('select').dropdown()
+  </script>
+{% endblock %}
+
+{% block script %}
+  <script>
+    let parentForm = document.querySelectorAll('.contanireParentForm')
+    let container = document.querySelector('#form-update-invoce-alias')
+    let addButton = document.querySelector('#add_alias_btn')
+    let totalForms = document.querySelector('#id_aliase_invoce-TOTAL_FORMS')
+    
+    let formNum = parentForm.length - 1
+    addButton.addEventListener('click', addForm)
+    
+    function addForm(e) {
+      e.preventDefault()
+    
+      let newForm = parentForm[0].cloneNode(true)
+      let formRegex = RegExp(`parents-(\\d){1}-`, 'g')
+    
+      formNum++
+      newForm.innerHTML = newForm.innerHTML.replace(formRegex, `parents-${formNum}-`)
+      container.insertBefore(newForm, addButton)
+    
+      totalForms.setAttribute('value', `${formNum + 1}`)
+      $('.dropdown').dropdown()
+    }
+  </script>
+{% endblock %}

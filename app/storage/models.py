@@ -3,6 +3,7 @@ import uuid
 from celery import current_app
 from django.db import models
 from django.db.models import Case, When, Value, BooleanField, Count
+from django.urls import reverse
 
 
 class TagComponent(models.Model):
@@ -245,6 +246,7 @@ class InvoiceAliasRelation(models.Model):
         related_name="invoice",
         on_delete=models.CASCADE,
     )
+    # TODO: on_delete(?) may be add comment str from alias and error?
     alias = models.ForeignKey(
         "Alias",
         verbose_name="Алиас компонента",
@@ -274,7 +276,7 @@ class Invoice(models.Model):
         upload_to="secret/invoice/%Y/%m/", verbose_name="Счет"
     )
     delivery = models.OneToOneField(
-        "Delivery", verbose_name="Доставка", on_delete=models.SET_NULL, null=True
+        "Delivery", verbose_name="Доставка", on_delete=models.CASCADE, null=True
     )
     alias = models.ManyToManyField(Alias, through=InvoiceAliasRelation)
     status = models.IntegerField(
@@ -287,5 +289,8 @@ class Invoice(models.Model):
         if self.status is not self.Status.WORK:
             current_app.send_task("storage.tasks.sent_to_parse_invoice", (self.pk,))
 
+    def get_absolute_url(self):
+        return reverse("update-delivery", kwargs={"pk": self.pk})
+
     def __str__(self) -> str:
-        return f"[{self.delivery.pk}] - file: {self.file_invoice.name}"
+        return f"[{'-' if self.delivery is None else self.delivery.pk}] - file: {self.file_invoice.name}"
