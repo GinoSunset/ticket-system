@@ -11,8 +11,13 @@ from django.db import models
 
 from ticsys.utils import is_htmx
 from ticket.mixin import AccessOperatorMixin
-from storage.models import Delivery, Component, ComponentType
-from storage.forms import DeliveryForm, DeliveryInvoiceForm, TypeComponentCountFormSet
+from storage.models import Delivery, Component, ComponentType, Invoice
+from storage.forms import (
+    DeliveryForm,
+    DeliveryInvoiceForm,
+    TypeComponentCountFormSet,
+    AliasInviceFormSet,
+)
 from django.views.generic import (
     ListView,
     CreateView,
@@ -244,3 +249,24 @@ class CreateDeliveryThrowInvoice(AccessOperatorMixin, LoginRequiredMixin, Create
         form.save()
         self.object.invoice.to_work()
         return HttpResponseRedirect(self.get_success_url())
+
+class UpdateInvoice(AccessOperatorMixin, LoginRequiredMixin, UpdateView):
+    model = Invoice
+    fields = ["status", "file_invoice"]
+    template_name = "storage/update_invoice.html"
+
+    def get_context_data(self, **kwargs: Any) -> dict[str, Any]:
+        data = super().get_context_data(**kwargs)
+        formset = self.get_formset()
+        data.update({"alias_invoice_forms": formset})
+        return data
+
+    def get_formset(self):
+        alias_invoices = self.object.invoice.all()
+        initial_forms = []
+        for i in alias_invoices:
+            init_data = {"name": i.alias.name, "quantity": i.quantity}
+            if i.alias.component_type is not None:
+                init_data.update({"component_type": i.alias.component_type})
+            initial_forms.append(init_data)
+        return AliasInviceFormSet(initial=initial_forms)

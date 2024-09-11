@@ -75,6 +75,11 @@ services:
         - postgres
     env_file:
       - ./.env
+
+  microservice:
+    image: dellivery-parser_web
+    command: app
+
 volumes:
   rabbitmq:
   postgres_data:

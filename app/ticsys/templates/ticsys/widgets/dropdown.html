@@ -6,7 +6,7 @@
         {% for group_name, group_choices, group_index in widget.optgroups %}{% for option in group_choices %}<div class="item" {%if option.selected%}checked{%endif%} data-value="{{ option.value }}" >{{ option.label }}</div>{% endfor %}{% endfor %}
     </div>
 </div>
-
+{% if widget.value and widget.value|length > 0 and widget.value.0 != "" %}
 <script>
     document.addEventListener('DOMContentLoaded', function() {
         {% for val in widget.value %}
@@ -14,3 +14,4 @@
         {% endfor %}
     });
 </script>
+{% endif %}

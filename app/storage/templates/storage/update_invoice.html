@@ -1,5 +1,11 @@
 {% extends 'ticsys/index.html' %}
-
+{% block  header_style%}
+<style>
+  .dropdown.selection {
+     min-width: 300px !important
+}
+</style>
+{% endblock  %}
 {% block content %}
   <h1>Создание доставки из счета (beta)</h1>
   <form class="ui form" id="form-update-invoce-alias" method="post">
@@ -8,18 +14,18 @@
     {{ alias_invoice_forms.management_form }}
     <div class="contanireParentForm">
       {% for alias_invoice_form in alias_invoice_forms %}
-        <div class="three fields">
-          <div class="field">
+        <div class="inline fields">
+          <div class="six wide field">
             <label>{{ alias_invoice_form.name.label }}</label>
             {{ alias_invoice_form.name }}
             {{ alias_invoice_form.name.errors }}
           </div>
-          <div class="field">
+          <div class="seven wide field">
             <label>{{ alias_invoice_form.component_type.label }}</label>
             {{ alias_invoice_form.component_type }}
             {{ alias_invoice_form.component_type.errors }}
           </div>
-          <div class="field">
+          <div class="three wide field">
             <label>{{ alias_invoice_form.quantity.label }}</label>
             {{ alias_invoice_form.quantity }}
             {{ alias_invoice_form.quantity.errors }}
@@ -32,14 +38,14 @@
     <button class="ui button basic green" type="submit">Создать доставку</button>
   </form>
 
-  <script>
-    $('.ui.checkbox').checkbox()
-    $('select').dropdown()
-  </script>
+
 {% endblock %}
 
 {% block script %}
   <script>
+    $('.ui.dropdown.search.selection').dropdown()
+    $('select').dropdown()
+
     let parentForm = document.querySelectorAll('.contanireParentForm')
     let container = document.querySelector('#form-update-invoce-alias')
     let addButton = document.querySelector('#add_alias_btn')
