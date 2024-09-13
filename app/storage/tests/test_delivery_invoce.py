@@ -5,7 +5,8 @@ import tempfile
 from django.urls import reverse
 from django.core.files.uploadedfile import SimpleUploadedFile
 from storage.models import Delivery, Invoice
-
+from storage.forms import AliasInviceFormSet
+from storage.views.delivery import UpdateInvoice
 
 @override_settings(MEDIA_ROOT=tempfile.mkdtemp())
 @pytest.mark.django_db
@@ -48,6 +49,23 @@ def test_success_form_invoice_go_to_set_delivery(
 
     assert response.status_code == 302
     assert response.url == reverse("update-invoice")
+
+@pytest.mark.django_db
+def test_form_update_invoice_has_only_need_alias(invoice_factory, invoice_alias_relation_factory):
+    i1 = invoice_factory()
+    i2 = invoice_factory()
+    ir_1 = invoice_alias_relation_factory.create_batch(5, invoice=i1)
+    ir_2 = invoice_alias_relation_factory.create_batch(5, invoice=i2)
+    view = UpdateInvoice()
+    view.object = i1.delivery
+
+    fs = view.get_formset()
+    assert len(fs.forms) == 5
+
+
+@pytest.mark.django_db
+def test_for_invoice_alias_invalid_if_has_empty_field():
+    pass
 
 @pytest.mark.djago_db
 def test_error_invoice_save_error():

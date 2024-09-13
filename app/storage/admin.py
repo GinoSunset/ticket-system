@@ -7,6 +7,7 @@ from .models import (
     Delivery,
     TagComponent,
     Invoice,
+    InvoiceAliasRelation,
 )
 
 
@@ -88,6 +89,9 @@ class TagComponentAdmin(admin.ModelAdmin):
     list_display = ("name",)
     search_fields = ("name",)
 
+class InvoiceAliasRelationAdmin(admin.ModelAdmin):
+    list_filter = ("invoice", "alias")
+
 
 admin.site.register(Component, ComponentAdmin)
 admin.site.register(ComponentType, ComponentTypeAdmin)
@@ -96,3 +100,4 @@ admin.site.register(SubComponentTypeRelation, SubComponentTypeRelationAdmin)
 admin.site.register(Delivery, DeliveryAdmin)
 admin.site.register(TagComponent, TagComponentAdmin)
 admin.site.register(Invoice, InvoiceAdmin)
+admin.site.register(InvoiceAliasRelation, InvoiceAliasRelationAdmin)

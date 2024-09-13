@@ -1,5 +1,5 @@
 from django import forms
-from django.forms import ModelForm, Form, NumberInput
+from django.forms import ModelForm, Form, NumberInput, modelformset_factory
 from django.forms.formsets import formset_factory
 from django.core.exceptions import ValidationError
 from ticket.widgets import CalendarInput
@@ -183,12 +183,17 @@ class DeliveryInvoiceForm(forms.ModelForm):
         if commit:
             invoice.save()
         return delivery
-
+    
 
 class AliasInviceForm(ModelForm):
     class Meta:
         model = Alias
-        fields = ["name", "component_type"]
+        fields = ["name", "component_type", "id" ]
+        widgets = {
+            "id": forms.HiddenInput(),
+        }
+
+
 
     component_type = forms.ModelChoiceField(
         queryset=ComponentType.objects.all(),
@@ -203,8 +208,3 @@ class AliasInviceForm(ModelForm):
         ),
     )
     quantity = forms.IntegerField(min_value=1, initial=1, label="Количество в доставке")
-
-
-AliasInviceFormSet = formset_factory(
-    AliasInviceForm, min_num=1, validate_min=True, extra=0
-)

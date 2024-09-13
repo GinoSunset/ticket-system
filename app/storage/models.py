@@ -1,5 +1,6 @@
 import datetime
 import uuid
+from pathlib import Path
 from celery import current_app
 from django.db import models
 from django.db.models import Case, When, Value, BooleanField, Count
@@ -124,7 +125,7 @@ class Alias(models.Model):
         verbose_name_plural = "Алиасы"
         unique_together = ("name", "component_type")
 
-    name = models.CharField(max_length=255, verbose_name="Алиас", unique=True)
+    name = models.CharField(max_length=255, verbose_name="Название", unique=True)
     component_type = models.ForeignKey(
         "ComponentType",
         verbose_name="Тип компонента",
@@ -246,7 +247,7 @@ class InvoiceAliasRelation(models.Model):
         related_name="invoice",
         on_delete=models.CASCADE,
     )
-    # TODO: on_delete(?) may be add comment str from alias and error?
+    #TODO: on_delete(?) may be add comment str from alias and error?
     alias = models.ForeignKey(
         "Alias",
         verbose_name="Алиас компонента",
@@ -291,6 +292,10 @@ class Invoice(models.Model):
 
     def get_absolute_url(self):
         return reverse("update-delivery", kwargs={"pk": self.pk})
+    
+    @property
+    def file_invoice_name(self):
+        return Path(self.file_invoice.name).name
 
     def __str__(self) -> str:
         return f"[{'-' if self.delivery is None else self.delivery.pk}] - file: {self.file_invoice.name}"

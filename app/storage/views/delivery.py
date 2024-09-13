@@ -3,20 +3,24 @@ import logging
 from typing import Any
 
 from django.contrib.auth.mixins import LoginRequiredMixin
+from django.db.models.base import Model as Model
+from django.db.models.query import QuerySet
 from django.db.transaction import atomic
 from django.http import HttpRequest, HttpResponse, HttpResponseRedirect
 from django.urls import reverse_lazy
 from django.forms.formsets import all_valid
+from django.forms import modelformset_factory
 from django.db import models
+from django.db.models import Q
 
 from ticsys.utils import is_htmx
 from ticket.mixin import AccessOperatorMixin
-from storage.models import Delivery, Component, ComponentType, Invoice
+from storage.models import Delivery, Component, ComponentType, Invoice, Alias
 from storage.forms import (
     DeliveryForm,
     DeliveryInvoiceForm,
     TypeComponentCountFormSet,
-    AliasInviceFormSet,
+    AliasInviceForm,
 )
 from django.views.generic import (
     ListView,
@@ -71,7 +75,7 @@ class DeliveryListView(AccessOperatorMixin, LoginRequiredMixin, ListView):
     template_name = "storage/include/list_delivery.html"
     context_object_name = "delivers"
     ordering = ["date_delivery"]
-    queryset = Delivery.objects.filter(status=Delivery.Status.NEW)
+    queryset = Delivery.objects.filter(Q(status=Delivery.Status.NEW)|Q(status=Delivery.Status.DRAFT))
 
 
 class DeliveryUpdateView(AccessOperatorMixin, LoginRequiredMixin, UpdateView):
@@ -83,6 +87,7 @@ class DeliveryUpdateView(AccessOperatorMixin, LoginRequiredMixin, UpdateView):
     def get_context_data(self, **kwargs: Any) -> dict[str, Any]:
         kwargs = super().get_context_data(**kwargs)
         kwargs["name_page"] = "Редактирование доставки"
+        kwargs["is_update_delivery"] = True
         kwargs["name_btn"] = "Обновить"
         if "type_count_forms" not in kwargs:
             cts = (
@@ -251,22 +256,63 @@ class CreateDeliveryThrowInvoice(AccessOperatorMixin, LoginRequiredMixin, Create
         return HttpResponseRedirect(self.get_success_url())
 
 class UpdateInvoice(AccessOperatorMixin, LoginRequiredMixin, UpdateView):
-    model = Invoice
-    fields = ["status", "file_invoice"]
+    model = Delivery
     template_name = "storage/update_invoice.html"
+    form_class = DeliveryForm
+    success_url = reverse_lazy("storage")
+
 
     def get_context_data(self, **kwargs: Any) -> dict[str, Any]:
         data = super().get_context_data(**kwargs)
         formset = self.get_formset()
-        data.update({"alias_invoice_forms": formset})
+        if data.get("alias_invoice_forms") is None:
+            data.update({"alias_invoice_forms": formset})
         return data
 
     def get_formset(self):
-        alias_invoices = self.object.invoice.all()
+        initial_forms = self.get_initial_for_alias_invoice()
+        ids_alias = set([i.get("id") for i in initial_forms])
+        AliasInviceFormSet = self.create_formset()
+        return AliasInviceFormSet(initial=initial_forms, queryset=Alias.objects.filter(id__in=ids_alias))
+    
+
+    def create_formset(self, min_num=1):
+        return modelformset_factory(Alias, form=AliasInviceForm, min_num=min_num, validate_min=True, extra=0)
+
+
+    def get_initial_for_alias_invoice(self):
         initial_forms = []
+        alias_invoices = self.object.invoice.invoice.all()
         for i in alias_invoices:
-            init_data = {"name": i.alias.name, "quantity": i.quantity}
-            if i.alias.component_type is not None:
+            name = 'Unknow' if i.alias is None else i.alias.name
+            id_ = None if i.alias is None else i.alias.pk
+            init_data = {"name": name, "quantity": i.quantity, "id":id_}
+            if i.alias and i.alias.component_type is not None:
                 init_data.update({"component_type": i.alias.component_type})
             initial_forms.append(init_data)
-        return AliasInviceFormSet(initial=initial_forms)
+        return initial_forms
+
+    @atomic()
+    def form_valid(self, form):
+        self.object: Delivery = form.save(commit=False)
+        # TODO: to_new
+
+        AliasInviceFormSet = self.create_formset()
+        alias_invoice_forms = AliasInviceFormSet(
+            self.request.POST,
+            initial=self.get_initial_for_alias_invoice()
+        )
+        if not all_valid(alias_invoice_forms):
+            return self.render_to_response(
+                self.get_context_data(form=form, alias_invoice_forms=alias_invoice_forms)
+            )
+        
+        self.object.status = Delivery.Status.NEW
+        self.object.save()
+        for type_quantity_form in alias_invoice_forms:
+            quantity = type_quantity_form.cleaned_data["quantity"]
+            cmnt_type = type_quantity_form.cleaned_data["component_type"]
+            create_delivery_component(self.object, quantity, cmnt_type)
+            # TODO: logging
+
+        return super().form_valid(form)

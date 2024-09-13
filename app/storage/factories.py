@@ -1,5 +1,5 @@
 import factory
-from .models import Component, ComponentType, Delivery, TagComponent
+from .models import Component, ComponentType, Delivery, TagComponent, Invoice, InvoiceAliasRelation, Alias
 
 
 class ComponentTypeFactory(factory.django.DjangoModelFactory):
@@ -41,3 +41,28 @@ class DeliveryFactory(factory.django.DjangoModelFactory):
         model = Delivery
 
     date_delivery = factory.Faker("date")
+
+class AliasFactory(factory.django.DjangoModelFactory):
+    class Meta:
+        model = Alias
+    
+    name = factory.Faker("text")
+    component_type = factory.SubFactory(ComponentTypeFactory)
+
+    
+
+class InvoiceFactory(factory.django.DjangoModelFactory):
+    class Meta:
+        model = Invoice
+
+    delivery = factory.SubFactory(DeliveryFactory)
+    file_invoice = factory.django.FileField()
+
+
+class InvoiceAliasRelationFactory(factory.django.DjangoModelFactory):
+    class Meta:
+        model = InvoiceAliasRelation
+
+    invoice = factory.SubFactory(InvoiceFactory)
+    alias = factory.SubFactory(AliasFactory)
+    
