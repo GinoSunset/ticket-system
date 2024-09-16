@@ -8,7 +8,7 @@
 {% endblock  %}
 {% block content %}
   <h1>Редактирование черновой доставки №{{delivery.pk}} (beta)</h1>
-  <p>Достаква создавалась из pdf счета <a href={{delivery.invoice.file_invoice.url}}>{{delivery.invoice.file_invoice_name}}</a></p>
+  <p>Достаква создавалась из pdf счета <a target="_blank" href={{delivery.invoice.file_invoice.url}}>{{delivery.invoice.file_invoice_name}}</a></p>
   <form class="ui form" id="form-update-invoce-alias" method="post">
     {% include "storage/htmx/base_form.html" %}
     <h3>Компоненты из счета</h3>
@@ -18,15 +18,16 @@
     <div class="contanireParentForm">
       {% for alias_invoice_form in alias_invoice_forms %}
         <div class="inline fields">
+          <span class="ui circular label">{{ forloop.counter }}</span>
           {{alias_invoice_form.id}}
           <div class="six wide field {% if alias_invoice_form.name.errors %}error{% endif %}">
             <label>{{ alias_invoice_form.name.label }}</label>
             {{ alias_invoice_form.name }}
-                {% if alias_invoice_form.name.errors %}
-                <div class="ui error message">
+              {% if alias_invoice_form.name.errors %}
+                <div class="ui left pointing red basic label">
                   {{alias_invoice_form.name.errors}}
                 </div>
-            {% endif %}
+              {% endif %}
           </div>
           <div class="seven wide field {% if alias_invoice_form.component_type.errors %}error{% endif %}">
             <label>{{ alias_invoice_form.component_type.label }}</label>

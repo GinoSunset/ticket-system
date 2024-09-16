@@ -5,7 +5,6 @@ import tempfile
 from django.urls import reverse
 from django.core.files.uploadedfile import SimpleUploadedFile
 from storage.models import Delivery, Invoice
-from storage.forms import AliasInviceFormSet
 from storage.views.delivery import UpdateInvoice
 
 @override_settings(MEDIA_ROOT=tempfile.mkdtemp())
@@ -64,10 +63,37 @@ def test_form_update_invoice_has_only_need_alias(invoice_factory, invoice_alias_
 
 
 @pytest.mark.django_db
+def test_get_formset_initialization(invoice_factory, invoice_alias_relation_factory):
+    i1 = invoice_factory()
+    i2 = invoice_factory()
+    ir_1 = invoice_alias_relation_factory(invoice=i1, quantity=16)
+    ir_2 = invoice_alias_relation_factory(invoice=i1, quantity=120)
+    ir_3 = invoice_alias_relation_factory(invoice=i1, quantity=7)
+
+    invoice_alias_relation_factory.create_batch(5, invoice=i2)
+    view = UpdateInvoice()
+    view.object = i1.delivery
+
+    fs = view.get_formset()
+    # Проверяем, что formset был инициализирован с правильными данными
+    assert fs.forms[0].initial["quantity"] == 16
+    assert fs.forms[1].initial["quantity"] == 120
+    assert fs.forms[2].initial["quantity"] == 7
+    assert fs.forms[0].initial["id"] == ir_1.alias.id
+    assert fs.forms[1].initial["id"] == ir_2.alias.id
+    assert fs.forms[2].initial["id"] == ir_3.alias.id
+
+    # Проверяем, что правильный компонент был выбран
+    assert fs.forms[0].initial["name"] == ir_1.alias.name
+    assert fs.forms[0].initial["name"] == ir_2.alias.name
+    assert fs.forms[2].initial["name"] == ir_3.alias.name
+
+
+@pytest.mark.django_db
 def test_for_invoice_alias_invalid_if_has_empty_field():
     pass
 
-@pytest.mark.djago_db
+@pytest.mark.django_db
 def test_error_invoice_save_error():
     assert False
 

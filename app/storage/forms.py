@@ -185,7 +185,14 @@ class DeliveryInvoiceForm(forms.ModelForm):
         return delivery
     
 
-class AliasInviceForm(ModelForm):
+class AliasInvoiceForm(ModelForm):
+    def __init__(self, *args, **kwargs):
+        initial = kwargs.get("initial", {})
+        super().__init__(*args, **kwargs)
+
+        if "quantity" in initial:
+            self.fields["quantity"].initial = initial["quantity"]
+
     class Meta:
         model = Alias
         fields = ["name", "component_type", "id" ]

@@ -125,7 +125,7 @@ class Alias(models.Model):
         verbose_name_plural = "Алиасы"
         unique_together = ("name", "component_type")
 
-    name = models.CharField(max_length=255, verbose_name="Название", unique=True)
+    name = models.CharField(max_length=255, verbose_name="Имя", unique=True)
     component_type = models.ForeignKey(
         "ComponentType",
         verbose_name="Тип компонента",
@@ -298,4 +298,4 @@ class Invoice(models.Model):
         return Path(self.file_invoice.name).name
 
     def __str__(self) -> str:
-        return f"[{'-' if self.delivery is None else self.delivery.pk}] - file: {self.file_invoice.name}"
+        return f"[{'-' if self.delivery is None else self.delivery.pk}] - file: {self.file_invoice_name}"

@@ -20,7 +20,7 @@ from storage.forms import (
     DeliveryForm,
     DeliveryInvoiceForm,
     TypeComponentCountFormSet,
-    AliasInviceForm,
+    AliasInvoiceForm,
 )
 from django.views.generic import (
     ListView,
@@ -272,12 +272,18 @@ class UpdateInvoice(AccessOperatorMixin, LoginRequiredMixin, UpdateView):
     def get_formset(self):
         initial_forms = self.get_initial_for_alias_invoice()
         ids_alias = set([i.get("id") for i in initial_forms])
-        AliasInviceFormSet = self.create_formset()
-        return AliasInviceFormSet(initial=initial_forms, queryset=Alias.objects.filter(id__in=ids_alias))
+        AliasInvoiceFormSet = self.create_formset()
+        formset = AliasInvoiceFormSet(queryset=Alias.objects.filter(id__in=ids_alias))
+
+        for form, initial_data in zip(formset.forms, initial_forms):
+            form.initial.update(initial_data)
+        return formset
     
 
     def create_formset(self, min_num=1):
-        return modelformset_factory(Alias, form=AliasInviceForm, min_num=min_num, validate_min=True, extra=0)
+        return modelformset_factory(
+            Alias, form=AliasInvoiceForm, min_num=min_num, validate_min=True, extra=0
+        )
 
 
     def get_initial_for_alias_invoice(self):
