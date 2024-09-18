@@ -46,4 +46,9 @@ urlpatterns = [
     path(
         "update-invoice/<int:pk>", views.UpdateInvoice.as_view(), name="update-invoice"
     ),
+    path(
+        "invoice-alias-delete/<int:pk>",
+        views.InvoiceAliasDeleteView.as_view(),
+        name="invoice-alias-delete",
+    ),
 ]

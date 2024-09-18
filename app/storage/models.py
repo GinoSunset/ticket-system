@@ -236,6 +236,11 @@ class Delivery(models.Model):
             .values("component_type__name")
             .annotate(total=Count("id"))
         )
+
+    def get_absolute_url(self):
+        return reverse("update_delivery", kwargs={"pk": self.pk})
+
+
 class InvoiceAliasRelation(models.Model):
     class Meta:
         verbose_name = "Связь счетов и компонентов через алиас"
@@ -259,6 +264,9 @@ class InvoiceAliasRelation(models.Model):
 
     def __str__(self) -> str:
         return f"{self.invoice} -> {self.alias} [{self.quantity}]"
+
+    def get_absolute_url(self):
+        return self.invoice.delivery.get_absolute_url()
 
 
 class Invoice(models.Model):

@@ -4,7 +4,7 @@ import tempfile
 
 from django.urls import reverse
 from django.core.files.uploadedfile import SimpleUploadedFile
-from storage.models import Delivery, Invoice
+from storage.models import Delivery, Invoice, Alias, InvoiceAliasRelation
 from storage.views.delivery import UpdateInvoice
 
 @override_settings(MEDIA_ROOT=tempfile.mkdtemp())
@@ -99,3 +99,36 @@ def test_error_invoice_save_error():
 
 def test_remove_aliases_set_comment_to_rel_alias_invoice():
     assert False
+
+
+@override_settings(MEDIA_ROOT=tempfile.mkdtemp())
+@pytest.mark.django_db
+def test_remove_alias_from_invoices(
+    operator_client, invoice_alias_relation_factory, invoice_factory
+):
+    invoice = invoice_factory()
+    invoice_alias_relation_factory.create_batch(15, invoice=invoice)
+
+    alias_for_delete = Alias.objects.first()
+    inv_alias_relation = InvoiceAliasRelation.objects.get(
+        invoice=invoice, alias=alias_for_delete
+    )
+    url = reverse("invoice-alias-delete", kwargs={"pk": inv_alias_relation.pk})
+
+    assert (
+        InvoiceAliasRelation.objects.filter(
+            invoice=invoice, alias=alias_for_delete
+        ).exists()
+        is True
+    )
+
+    res = operator_client.delete(url)
+
+    assert res.status_code == 200
+
+    assert (
+        InvoiceAliasRelation.objects.filter(
+            invoice=invoice, alias=alias_for_delete
+        ).exists()
+        is False
+    )

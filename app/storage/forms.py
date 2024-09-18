@@ -192,6 +192,8 @@ class AliasInvoiceForm(ModelForm):
 
         if "quantity" in initial:
             self.fields["quantity"].initial = initial["quantity"]
+        if "id_relation" in initial:
+            self.fields["id_relation"].initial = initial["id_relation"]
 
     class Meta:
         model = Alias
@@ -215,3 +217,4 @@ class AliasInvoiceForm(ModelForm):
         ),
     )
     quantity = forms.IntegerField(min_value=1, initial=1, label="Количество в доставке")
+    id_relation = forms.IntegerField(widget=forms.HiddenInput())

@@ -15,7 +15,14 @@ from django.db.models import Q
 
 from ticsys.utils import is_htmx
 from ticket.mixin import AccessOperatorMixin
-from storage.models import Delivery, Component, ComponentType, Invoice, Alias
+from storage.models import (
+    Delivery,
+    Component,
+    ComponentType,
+    Invoice,
+    Alias,
+    InvoiceAliasRelation,
+)
 from storage.forms import (
     DeliveryForm,
     DeliveryInvoiceForm,
@@ -27,6 +34,7 @@ from django.views.generic import (
     CreateView,
     UpdateView,
     FormView,
+    DeleteView,
 )
 
 
@@ -292,7 +300,12 @@ class UpdateInvoice(AccessOperatorMixin, LoginRequiredMixin, UpdateView):
         for i in alias_invoices:
             name = 'Unknow' if i.alias is None else i.alias.name
             id_ = None if i.alias is None else i.alias.pk
-            init_data = {"name": name, "quantity": i.quantity, "id":id_}
+            init_data = {
+                "name": name,
+                "quantity": i.quantity,
+                "id": id_,
+                "id_relation": i.pk,
+            }
             if i.alias and i.alias.component_type is not None:
                 init_data.update({"component_type": i.alias.component_type})
             initial_forms.append(init_data)
@@ -322,3 +335,12 @@ class UpdateInvoice(AccessOperatorMixin, LoginRequiredMixin, UpdateView):
             # TODO: logging
 
         return super().form_valid(form)
+
+
+class InvoiceAliasDeleteView(AccessOperatorMixin, LoginRequiredMixin, DeleteView):
+    model = InvoiceAliasRelation
+
+    def delete(self, request, *args, **kwargs):
+        self.object = self.get_object()
+        self.object.delete()
+        return HttpResponse(status=200)

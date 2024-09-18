@@ -1,15 +1,22 @@
 {% extends 'ticsys/index.html' %}
+{% load static %}
+
 {% block  header_style%}
+<script type="text/javascript" src="{% static 'js/htmx.min.js' %}"></script>
 <style>
   .dropdown.selection {
      min-width: 300px !important
 }
+  .htmx-swapping {
+    opacity: 0;
+    transition: opacity 1s ease-out;
+  }
 </style>
 {% endblock  %}
 {% block content %}
   <h1>Редактирование черновой доставки №{{delivery.pk}} (beta)</h1>
   <p>Достаква создавалась из pdf счета <a target="_blank" href={{delivery.invoice.file_invoice.url}}>{{delivery.invoice.file_invoice_name}}</a></p>
-  <form class="ui form" id="form-update-invoce-alias" method="post">
+  <form class="ui form" id="form-update-invoce-alias" method="post" hx-headers='{"X-CSRFToken": "{{ csrf_token }}"}'>
     {% include "storage/htmx/base_form.html" %}
     <h3>Компоненты из счета</h3>
     {{ form.non_field_errors }}
@@ -17,7 +24,11 @@
     {{ alias_invoice_forms.management_form }}
     <div class="contanireParentForm">
       {% for alias_invoice_form in alias_invoice_forms %}
-        <div class="inline fields">
+        <div class="inline fields" 
+        id="invoice_alias_{{alias_invoice_form.id_relation.initial}}"
+        hx-confirm="Удалить объект из доставки?"
+        hx-target="#invoice_alias_{{alias_invoice_form.id_relation.initial}}"
+        hx-swap="outerHTML swap:1s">
           <span class="ui circular label">{{ forloop.counter }}</span>
           {{alias_invoice_form.id}}
           <div class="six wide field {% if alias_invoice_form.name.errors %}error{% endif %}">
@@ -39,10 +50,13 @@
             {{ alias_invoice_form.quantity }}
             {% comment %} {{ alias_invoice_form.quantity.errors }} {% endcomment %}
           </div>
+          <button class="btn danger" hx-delete={% url "invoice-alias-delete" alias_invoice_form.id_relation.initial %}>
+            Delete
+          </button>
         </div>
       {% endfor %}
     </div>
-    <a class="ui button basic green" id="add_alias_btn">+</a>
+    {% comment %} <a class="ui button basic green" id="add_alias_btn">+</a> {% endcomment %}
 
     <button class="ui button basic green" type="submit">Создать доставку</button>
   </form>
