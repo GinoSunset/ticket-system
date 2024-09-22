@@ -16,6 +16,7 @@
 {% block content %}
   <h1>Редактирование черновой доставки №{{delivery.pk}} (beta)</h1>
   <p>Достаква создавалась из pdf счета <a target="_blank" href={{delivery.invoice.file_invoice.url}}>{{delivery.invoice.file_invoice_name}}</a></p>
+  {% if object.invoice.status == object.invoice.Status.DONE %}
   <form class="ui form" id="form-update-invoce-alias" method="post" hx-headers='{"X-CSRFToken": "{{ csrf_token }}"}'>
     {% include "storage/htmx/base_form.html" %}
     <h3>Компоненты из счета</h3>
@@ -50,9 +51,15 @@
             {{ alias_invoice_form.quantity }}
             {% comment %} {{ alias_invoice_form.quantity.errors }} {% endcomment %}
           </div>
-          <button class="btn danger" hx-delete={% url "invoice-alias-delete" alias_invoice_form.id_relation.initial %}>
-            Delete
-          </button>
+          {% if alias_invoice_form.id_relation.initial %}
+            {% with id_for_delete=alias_invoice_form.id_relation.initial %}
+
+            <a class="ui icon red label" hx-delete= {% url "invoice-alias-delete" id_for_delete %}>
+              <i class="trash icon"></i>
+            </a>
+            {% endwith %}
+
+          {% endif %}
         </div>
       {% endfor %}
     </div>
@@ -60,6 +67,9 @@
 
     <button class="ui button basic green" type="submit">Создать доставку</button>
   </form>
+  {% else %}
+  <h3>Статус обработки заявки: {{object.invoice.get_status_display}}.<h3>
+  {% endif %}
 
 
 {% endblock %}
