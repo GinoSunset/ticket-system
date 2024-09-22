@@ -1,5 +1,5 @@
 from django.urls import path
-from . import views
+from storage import views
 
 urlpatterns = [
     path("", views.StorageListView.as_view(), name="storage"),
@@ -25,9 +25,7 @@ urlpatterns = [
         views.NomenclatureComponents.as_view(),
         name="nomenclature-components",
     ),
-    path(
-        "create-delivery/", views.DeliveryCreateView.as_view(), name="delivery-create"
-    ),
+    path("create-delivery/", views.CreateDelivery.as_view(), name="delivery-create"),
     path("get_deliveries/", views.DeliveryListView.as_view(), name="delivery-list"),
     path(
         "update_delivery/<int:pk>/",
@@ -40,4 +38,17 @@ urlpatterns = [
         name="done_delivery",
     ),
     path("write-off/<int:pk>/", views.WriteOff.as_view(), name="write-off"),
+    path(
+        "create-delivery-invoice",
+        views.CreateDeliveryThrowInvoice.as_view(),
+        name="create-delivery-invoice",
+    ),
+    path(
+        "update-invoice/<int:pk>", views.UpdateInvoice.as_view(), name="update-invoice"
+    ),
+    path(
+        "invoice-alias-delete/<int:pk>",
+        views.InvoiceAliasDeleteView.as_view(),
+        name="invoice-alias-delete",
+    ),
 ]

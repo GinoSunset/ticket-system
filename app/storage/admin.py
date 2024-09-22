@@ -6,11 +6,20 @@ from .models import (
     SubComponentTypeRelation,
     Delivery,
     TagComponent,
+    Invoice,
+    InvoiceAliasRelation,
 )
 
 
 class AliasInline(admin.TabularInline):
     model = Alias
+
+class InvoiceAdmin(admin.ModelAdmin):
+    pass
+
+
+class InvoiceInLine(admin.TabularInline):
+    model = Invoice
 
 
 class ComponentTypeAdmin(admin.ModelAdmin):
@@ -73,11 +82,15 @@ class DeliveryAdmin(admin.ModelAdmin):
     list_display = ("id", "date_create", "date_delivery", "status")
     list_editable = ("status", "date_delivery")
     list_filter = ("status", "date_delivery")
+    inlines = [InvoiceInLine]
 
 
 class TagComponentAdmin(admin.ModelAdmin):
     list_display = ("name",)
     search_fields = ("name",)
+
+class InvoiceAliasRelationAdmin(admin.ModelAdmin):
+    list_filter = ("invoice", "alias")
 
 
 admin.site.register(Component, ComponentAdmin)
@@ -86,3 +99,5 @@ admin.site.register(Alias, AliasAdmin)
 admin.site.register(SubComponentTypeRelation, SubComponentTypeRelationAdmin)
 admin.site.register(Delivery, DeliveryAdmin)
 admin.site.register(TagComponent, TagComponentAdmin)
+admin.site.register(Invoice, InvoiceAdmin)
+admin.site.register(InvoiceAliasRelation, InvoiceAliasRelationAdmin)

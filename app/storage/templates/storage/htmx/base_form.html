@@ -1,0 +1,12 @@
+{{ form.non_field_errors }}
+  {% csrf_token %}
+  <div class="field">
+    <label>{{ form.date_delivery.label }}</label>
+    {{ form.date_delivery }}
+    {{ form.date_delivery.errors }}
+  </div>
+  <div class="field">
+    <label>{{ form.comment.label }}</label>
+    {{ form.comment }}
+    {{ form.comment.errors }}
+    </div>

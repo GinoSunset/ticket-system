@@ -3,7 +3,7 @@ from datetime import datetime, timedelta
 from django.db.models import signals
 
 
-from storage.views import ComponentCreateView
+from storage.views.component import ComponentCreateView
 from storage.reserve import processing_reserved_component
 from storage.models import Component
 import factory

@@ -1,5 +1,7 @@
 from django import forms
 
+from ticsys.fields import MultipleFileField
+
 from .models import Share
 from ticket.models import Comment
 
@@ -13,11 +15,10 @@ class ShareForm(forms.ModelForm):
 
 
 class CommentShareForm(forms.ModelForm):
-    files = forms.FileField(
+    files = MultipleFileField(
         required=False,
         help_text="Файлы",
         label="Прикрепить файлы",
-        widget=forms.ClearableFileInput(attrs={"multiple": True}),
     )
 
     user_fingerprint = forms.CharField(

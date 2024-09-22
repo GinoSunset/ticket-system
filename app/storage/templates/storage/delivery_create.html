@@ -1,80 +1,84 @@
 {% extends 'ticsys/index.html' %}
-
+{% load static %}
+{% block header_style %}
+  <script type="text/javascript" src="{% static 'js/htmx.min.js' %}"></script>
+{% endblock %}
 {% block content %}
   <h1>{% firstof name_page 'Создание доставки' %}</h1>
-  <form class="ui form" id="form-create-delivery" method="post">
-    {{ form.non_field_errors }}
-    {% csrf_token %}
-    <div class="field">
-      <label>{{ form.date_delivery.label }}</label>
-      {{ form.date_delivery }}
-      {{ form.date_delivery.errors }}
-    </div>
-    <div class="field">
-      <label>{{ form.comment.label }}</label>
-      {{ form.comment }}
-      {{ form.comment.errors }}
-    </div>
-
-    {{ type_count_forms.management_form }}
-    {% for type_count_form in type_count_forms %}
-      <div class="containerComponents">
-        <div class="two fields">
-          <div class="{% if type_count_form.component_type.errors %}{% endif %} field">
-            <label>{{ type_count_form.component_type.label }}</label>
-            {{ type_count_form.component_type }}
-            {{ type_count_form.component_type.errors }}
-          </div>
-          <div class="field">
-            <label>{{ type_count_form.count.label }}</label>
-            {{ type_count_form.count }}
-            {{ type_count_form.count.errors }}
-          </div>
-        </div>
-      </div>
-    {% endfor %}
-    <button class="ui button basic green" id="add_btn">+</button>
-    <button class="ui button basic green" type="submit">{% firstof name_btn 'Создать' %}</button>
-  </form>
-
+  {% if not is_update_delivery %}
+  <div hx-target="#tab-contents" class="ui left buttons">
+    <a class="ui primary {% if is_invoice_delivery %} basic {% endif %} button active" id="btn-manual"  hx-target="#form-create-delivery" hx-get="{% url 'delivery-create' %}" > Ручное создание</a>
+    <a class="ui primary {% if not is_invoice_delivery %}basic{% endif %}  button" id="btn-invoice" hx-target="#form-create-delivery" hx-get="{% url 'create-delivery-invoice' %}" >Доставка из счета (beta)</a>
+  </div>
+  
+  <br />
+  {% endif %}
+{% if is_invoice_delivery %}
+{% include "storage/htmx/auto_delivery.html" %}
+{% else %}
+{% include "storage/htmx/manual_delivery.html" %}
+{% endif %}
+{% endblock %}
+{% block script %}
   <script>
-    $('.dropdown').dropdown()
-    $('.ui.checkbox').checkbox()
-    
-    let parentForm = document.querySelectorAll('.containerComponents')
-    let container = document.querySelector('#form-create-delivery')
-    let addButton = document.querySelector('#add_btn')
-    let totalForms = document.querySelector('#id_type_count-TOTAL_FORMS')
-    
-    let formNum = parentForm.length - 1
-    addButton.addEventListener('click', addForm)
-    
-    function addForm(e) {
-      e.preventDefault()
-    
-      let newForm = parentForm[0].cloneNode(true)
-      let formRegex = RegExp(`type_count-(\\d){1}-`, 'g')
-    
-      formNum++
-      newForm.innerHTML = newForm.innerHTML.replace(formRegex, `type_count-${formNum}-`)
-      container.insertBefore(newForm, addButton)
-    
-      totalForms.setAttribute('value', `${formNum + 1}`)
+    function initializeUI(){
       $('.dropdown').dropdown()
+      $('.ui.checkbox').checkbox()
+      $('#date_calendar_date_delivery').calendar({
+        type: 'date',
+        firstDayOfWeek: 1,
+        text: {
+          days: ['В', 'П', 'В', 'С', 'Ч', 'П', 'С'],
+          today: 'Сегодня',
+          months: ['Январь', 'Февраль', 'Март', 'Апрель', 'Май', 'Июнь', 'Июль', 'Август', 'Сентябрь', 'Октябрь', 'Ноябрь', 'Декабрь'],
+          monthsShort: ['Янв', 'Фев', 'Мар', 'Апр', 'Май', 'Июн', 'Июл', 'Авг', 'Сен', 'Окт', 'Ноя', 'Дек']
+        },
+        formatter: {
+          date: 'DD.MM.YYYY'
+        }
+      })
     }
+    function initialize() {
+      initializeUI()
     
-    $('#date_calendar_date_delivery').calendar({
-      type: 'date',
-      firstDayOfWeek: 1,
-      text: {
-        days: ['В', 'П', 'В', 'С', 'Ч', 'П', 'С'],
-        today: 'Сегодня',
-        months: ['Январь', 'Февраль', 'Март', 'Апрель', 'Май', 'Июнь', 'Июль', 'Август', 'Сентябрь', 'Октябрь', 'Ноябрь', 'Декабрь'],
-        monthsShort: ['Янв', 'Фев', 'Мар', 'Апр', 'Май', 'Июн', 'Июл', 'Авг', 'Сен', 'Окт', 'Ноя', 'Дек']
-      },
-      formatter: {
-        date: 'DD.MM.YYYY'
+      let parentForm = document.querySelectorAll('.containerComponents')
+      let container = document.querySelector('#form-create-delivery')
+      let addButton = document.querySelector('#add_btn')
+      let totalForms = document.querySelector('#id_type_count-TOTAL_FORMS')
+    
+      let formNum = parentForm.length - 1
+      addButton.addEventListener('click', addForm)
+    
+      function addForm(e) {
+        e.preventDefault()
+    
+        let newForm = parentForm[0].cloneNode(true)
+        let formRegex = RegExp(`type_count-(\\d){1}-`, 'g')
+    
+        formNum++
+        newForm.innerHTML = newForm.innerHTML.replace(formRegex, `type_count-${formNum}-`)
+        container.insertBefore(newForm, addButton)
+    
+        totalForms.setAttribute('value', `${formNum + 1}`)
+        $('.dropdown').dropdown()
       }
-    })
+    
+
+    }
+    document.body.addEventListener('htmx:afterRequest', (event) => {
+      let btnManual = $("#btn-manual");
+      let btnInvoce = $("#btn-invoice");
+      if (event.detail.elt.id === 'btn-manual') {
+        initialize();
+        btnManual.removeClass("basic")
+        btnInvoce.addClass("basic")
+      }else{
+        initializeUI()
+        btnInvoce.removeClass("basic")
+        btnManual.addClass("basic")
+      }
+  });
+  initialize();
+
   </script>
 {% endblock %}

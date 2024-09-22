@@ -1,0 +1,8 @@
+<form class="ui form" id="form-create-delivery" enctype="multipart/form-data" action="{% url "create-delivery-invoice" %}" method="post">
+  {% include "storage/htmx/base_form.html" %}
+  <div class="field">
+    <label>{{ form.file_invoice.label }}</label>
+    {{ form.file_invoice }}
+    {{ form.file_invoice.errors }}
+  </div>
+  <button class="ui button basic green" type="submit">{% firstof name_btn 'Создать' %}</button>

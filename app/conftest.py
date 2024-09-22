@@ -36,6 +36,8 @@ from storage.factories import (
     ComponentFactory,
     DeliveryFactory,
     TagComponentFactory,
+    InvoiceFactory,
+    InvoiceAliasRelationFactory,
 )
 
 register(TicketFactory)
@@ -57,7 +59,8 @@ register(ComponentTypeFactory)
 register(ComponentFactory)
 register(DeliveryFactory)
 register(TagComponentFactory)
-
+register(InvoiceFactory)
+register(InvoiceAliasRelationFactory)
 
 @pytest.fixture
 def monkeypatch_delay_send_email_on_celery(monkeypatch, redis):
@@ -65,7 +68,6 @@ def monkeypatch_delay_send_email_on_celery(monkeypatch, redis):
         return send_email(*args, **kwargs)
 
     monkeypatch.setattr(send_email_task, "delay", mock_delay)
-
 
 @pytest.fixture
 def monkeypatch_delay_send_telegram_on_celery(monkeypatch):
@@ -132,9 +134,7 @@ def rabbitmq():
         5672, 5672
     ).with_env("RABBITMQ_DEFAULT_USER", settings.RABBIT_LOGIN).with_env(
         "RABBITMQ_DEFAULT_PASS", settings.RABBIT_PASSWORD
-    ).with_env(
-        "RABBITMQ_DEFAULT_VHOST", settings.RABBIT_VHOST
-    ) as rabbitmq:
+    ).with_env("RABBITMQ_DEFAULT_VHOST", settings.RABBIT_VHOST) as rabbitmq:
         yield rabbitmq
 
 
@@ -145,13 +145,9 @@ def celery(rabbitmq, redis):
         f"amqp://{settings.RABBIT_LOGIN}:{settings.RABBIT_PASSWORD}@rabbit:{settings.RABBIT_PORT}/{settings.RABBIT_VHOST}",
     ).with_env("CELERY_ACCEPT_CONTENT", settings.CELERY_ACCEPT_CONTENT).with_env(
         "CELERY_RESULT_SERIALIZER", settings.CELERY_RESULT_SERIALIZER
-    ).with_env(
-        "CELERY_TASK_SERIALIZER", settings.CELERY_TASK_SERIALIZER
-    ).with_env(
+    ).with_env("CELERY_TASK_SERIALIZER", settings.CELERY_TASK_SERIALIZER).with_env(
         "DATABASE_URL", settings.DATABASE_URL.replace("127.0.0.1", "db")
-    ).with_command(
-        "celery -A ticsys worker -l info"
-    ).with_kwargs(
+    ).with_command("celery -A ticsys worker -l info").with_kwargs(
         links={"rabbit": "rabbit", "hdp": "db"}
     ) as celery:
         wait_for_logs(celery, "ready.")
@@ -165,6 +161,7 @@ def setup_test_env(settings):
 
 @pytest.fixture
 def operator_client(operator, client):
+    """фикстура для отправки запроса от имени оператора"""
     client.force_login(operator)
     return client
 

@@ -1,9 +1,16 @@
 from django import forms
-from django.forms import ModelForm, Form, NumberInput
+from django.forms import ModelForm, Form, NumberInput, modelformset_factory
 from django.forms.formsets import formset_factory
 from django.core.exceptions import ValidationError
 from ticket.widgets import CalendarInput
-from .models import ComponentType, Alias, Component, SubComponentTypeRelation, Delivery
+from .models import (
+    ComponentType,
+    Alias,
+    Component,
+    SubComponentTypeRelation,
+    Delivery,
+    Invoice,
+)
 
 from ticsys.widgets import Dropdown
 
@@ -103,6 +110,18 @@ class DeliveryForm(ModelForm):
         }
 
 
+class DeliveryOrderPDFForm(ModelForm):
+    pdf_file = forms.FileField(required=True)
+
+    class Meta:
+        model = Delivery
+        fields = ["date_delivery", "comment"]
+
+        widgets = {
+            "date_delivery": CalendarInput(),
+        }
+
+
 class TypeComponentCountForm(Form):
     component_type = forms.ModelChoiceField(
         queryset=ComponentType.objects.all(),
@@ -144,3 +163,58 @@ class WriteOffForm(Form):
     def __init__(self, *args, **kwargs):
         super(WriteOffForm, self).__init__(*args, **kwargs)
         self.fields["component_type"].disabled = True
+
+class DeliveryInvoiceForm(forms.ModelForm):
+    file_invoice = forms.FileField(label="Счет", required=True)
+
+    class Meta:
+        model = Delivery
+        fields = ["date_delivery", "comment"]
+
+        widgets = {
+            "date_delivery": CalendarInput(),
+        }
+
+    def save(self, commit=True):
+        delivery = super().save(commit=commit)
+        invoice = Invoice(
+            delivery=delivery, file_invoice=self.cleaned_data["file_invoice"]
+        )
+        if commit:
+            invoice.save()
+        return delivery
+    
+
+class AliasInvoiceForm(ModelForm):
+    def __init__(self, *args, **kwargs):
+        initial = kwargs.get("initial", {})
+        super().__init__(*args, **kwargs)
+
+        if "quantity" in initial:
+            self.fields["quantity"].initial = initial["quantity"]
+        if "id_relation" in initial:
+            self.fields["id_relation"].initial = initial["id_relation"]
+
+    class Meta:
+        model = Alias
+        fields = ["name", "component_type", "id" ]
+        widgets = {
+            "id": forms.HiddenInput(),
+        }
+
+
+
+    component_type = forms.ModelChoiceField(
+        queryset=ComponentType.objects.all(),
+        label="Тип компонента",
+        required=True,
+        widget=Dropdown(
+            attrs={
+                "class": "ui dropdown search selection",
+                "placeholder": "Выберите тип",
+                "required": True,
+            }
+        ),
+    )
+    quantity = forms.IntegerField(min_value=1, initial=1, label="Количество в доставке")
+    id_relation = forms.IntegerField(widget=forms.HiddenInput(), required=False)

@@ -97,6 +97,16 @@ services:
     env_file:
       - ./.env
 
+  microservice:
+    image: dellivery-parser_web
+    ports:
+      - "8081:8000"
+    command: ["python", "app.py"]
+    env_file:
+      - ./.env
+
+  
+
 volumes:
   rabbitmq:
   postgres_data:

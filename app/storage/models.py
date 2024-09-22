@@ -1,7 +1,10 @@
 import datetime
 import uuid
+from pathlib import Path
+from celery import current_app
 from django.db import models
 from django.db.models import Case, When, Value, BooleanField, Count
+from django.urls import reverse
 
 
 class TagComponent(models.Model):
@@ -122,9 +125,12 @@ class Alias(models.Model):
         verbose_name_plural = "Алиасы"
         unique_together = ("name", "component_type")
 
-    name = models.CharField(max_length=255, verbose_name="Алиас")
+    name = models.CharField(max_length=255, verbose_name="Имя", unique=True)
     component_type = models.ForeignKey(
-        "ComponentType", verbose_name="Тип компонента", on_delete=models.CASCADE
+        "ComponentType",
+        verbose_name="Тип компонента",
+        on_delete=models.SET_NULL,
+        null=True,
     )
 
     def __str__(self) -> str:
@@ -189,6 +195,7 @@ class Delivery(models.Model):
         ordering = ["-date_delivery"]
 
     class Status(models.IntegerChoices):
+        DRAFT = 5, "Черновик"
         NEW = 10, "Создана"
         DONE = 30, "Завершена"
         CANCELED = 50, "Отменена"
@@ -229,3 +236,74 @@ class Delivery(models.Model):
             .values("component_type__name")
             .annotate(total=Count("id"))
         )
+
+    def get_absolute_url(self):
+        return reverse("update_delivery", kwargs={"pk": self.pk})
+
+
+class InvoiceAliasRelation(models.Model):
+    class Meta:
+        verbose_name = "Связь счетов и компонентов через алиас"
+        verbose_name_plural = "Связи счетов и компонентов через алиас"
+
+    invoice = models.ForeignKey(
+        "Invoice",
+        verbose_name="Счет",
+        related_name="invoice",
+        on_delete=models.CASCADE,
+    )
+    #TODO: on_delete(?) may be add comment str from alias and error?
+    alias = models.ForeignKey(
+        "Alias",
+        verbose_name="Алиас компонента",
+        related_name="alias",
+        on_delete=models.SET_NULL,
+        null=True,
+    )
+    quantity = models.PositiveIntegerField(verbose_name="Количество", default=1)
+
+    def __str__(self) -> str:
+        return f"{self.invoice} -> {self.alias} [{self.quantity}]"
+
+    def get_absolute_url(self):
+        return self.invoice.delivery.get_absolute_url()
+
+
+class Invoice(models.Model):
+    class Meta:
+        verbose_name = "Счет на доставку"
+        verbose_name_plural = "Счета на доставку"
+    class Status(models.IntegerChoices):
+        NEW = 5, "Новый"
+        WORK = 10, "В работе"
+        DONE = 20, "Обработан"
+        ERROR = 100, "Ошибка"
+
+    date_create = models.DateTimeField(auto_now_add=True)
+    date_update = models.DateTimeField(auto_now=True)
+    file_invoice = models.FileField(
+        upload_to="secret/invoice/%Y/%m/", verbose_name="Счет"
+    )
+    delivery = models.OneToOneField(
+        "Delivery", verbose_name="Доставка", on_delete=models.CASCADE, null=True
+    )
+    alias = models.ManyToManyField(Alias, through=InvoiceAliasRelation)
+    status = models.IntegerField(
+        verbose_name="Статус",
+        choices=Status.choices,
+        default=Status.NEW,
+    )
+
+    def to_work(self):
+        if self.status is not self.Status.WORK:
+            current_app.send_task("storage.tasks.sent_to_parse_invoice", (self.pk,))
+
+    def get_absolute_url(self):
+        return reverse("update-delivery", kwargs={"pk": self.pk})
+    
+    @property
+    def file_invoice_name(self):
+        return Path(self.file_invoice.name).name
+
+    def __str__(self) -> str:
+        return f"[{'-' if self.delivery is None else self.delivery.pk}] - file: {self.file_invoice_name}"
