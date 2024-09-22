@@ -63,7 +63,7 @@
         </div>
       {% endfor %}
     </div>
-    {% comment %} <a class="ui button basic green" id="add_alias_btn">+</a> {% endcomment %}
+    <a class="ui button basic green" style="display: none;" id="add_alias_btn">+</a>
 
     <button class="ui button basic green" type="submit">Создать доставку</button>
   </form>
@@ -101,5 +101,15 @@
       totalForms.setAttribute('value', `${formNum + 1}`)
       $('.dropdown').dropdown()
     }
+
+    document.body.addEventListener('htmx:afterRequest', function(evt) {
+      if (evt.detail.elt.getAttribute("hx-delete")) {
+          const totalFormsInput = document.querySelector('#id_form-TOTAL_FORMS');
+          
+          if (totalFormsInput) {
+              totalFormsInput.value = parseInt(totalFormsInput.value) - 1;
+          }
+      }
+  });
   </script>
 {% endblock %}
