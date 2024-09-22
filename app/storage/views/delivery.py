@@ -316,11 +316,11 @@ class UpdateInvoice(AccessOperatorMixin, LoginRequiredMixin, UpdateView):
         self.object: Delivery = form.save(commit=False)
         # TODO: to_new
 
-        AliasInviceFormSet = self.create_formset()
-        alias_invoice_forms = AliasInviceFormSet(
-            self.request.POST,
-            initial=self.get_initial_for_alias_invoice()
-        )
+        AliasInvoiceFormSet = self.create_formset()
+        alias_invoice_forms = AliasInvoiceFormSet(self.request.POST)
+        initial_forms = self.get_initial_for_alias_invoice()
+        for alias_form, initial_data in zip(alias_invoice_forms.forms, initial_forms):
+            alias_form.initial.update(initial_data)
         if not all_valid(alias_invoice_forms):
             return self.render_to_response(
                 self.get_context_data(form=form, alias_invoice_forms=alias_invoice_forms)
@@ -329,6 +329,7 @@ class UpdateInvoice(AccessOperatorMixin, LoginRequiredMixin, UpdateView):
         self.object.status = Delivery.Status.NEW
         self.object.save()
         for type_quantity_form in alias_invoice_forms:
+            type_quantity_form.save()
             quantity = type_quantity_form.cleaned_data["quantity"]
             cmnt_type = type_quantity_form.cleaned_data["component_type"]
             create_delivery_component(self.object, quantity, cmnt_type)
