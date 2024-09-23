@@ -192,10 +192,16 @@ class DoneDelivery(AccessOperatorMixin, LoginRequiredMixin, UpdateView):
                 component.date_delivery = self.today
                 component.is_stock = True
                 component.save()
+                logging.info(
+                    f"{free_component.pk=} change to {component} from delivery and was reserve when delivery #{self.object.pk} done"
+                )
                 free_component.delete()
                 continue
             free_component.date_delivery = self.today
             free_component.is_stock = True
+            logging.info(
+                f"{free_component.pk=} added to stock when delivery #{self.object.pk} done"
+            )
             free_component.save()
 
     @atomic
