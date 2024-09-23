@@ -25,7 +25,7 @@ env = environ.Env(
     TG_BOT_URL=(str, ""),
     TG_BOT_NOTIFICATION_URI=(str, ""),
     DATABASE_URL=(str, "sqlite:///db.sqlite3"),
-    URL_INVOICE_API=(str, "http://invoice"),
+    URL_INVOICE_API=(str, "http://microservice:8000"),
 )
 BASE_DIR = Path(__file__).resolve().parent.parent
 
