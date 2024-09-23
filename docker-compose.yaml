@@ -77,7 +77,7 @@ services:
       - ./.env
 
   microservice:
-    image: dellivery-parser_web
+    image: ghcr.io/ginosunset/delivery-parser:latest
     command: app
 
 volumes:

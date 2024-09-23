@@ -98,7 +98,7 @@ services:
       - ./.env
 
   microservice:
-    image: dellivery-parser_web
+    image: ghcr.io/ginosunset/delivery-parser:latest
     ports:
       - "8081:8000"
     command: ["python", "app.py"]
