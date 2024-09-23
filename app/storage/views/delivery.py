@@ -173,6 +173,7 @@ class DoneDelivery(AccessOperatorMixin, LoginRequiredMixin, UpdateView):
         return HttpResponse(status=201)
 
     def add_to_stock_component_delivery(self):
+        logging.info(f"delivery {self.object.pk} changed to done")
         Component.objects.filter(delivery=self.object, is_reserve=True).update(
             date_delivery=self.today, is_stock=True
         )
@@ -209,7 +210,7 @@ class DoneDelivery(AccessOperatorMixin, LoginRequiredMixin, UpdateView):
         self.object.status = Delivery.Status.DONE
         if self.object.date_delivery != self.today:
             self.object.date_delivery = self.today
-            self.add_to_stock_component_delivery()
+        self.add_to_stock_component_delivery()
         self.object.save()
 
 
