@@ -32,7 +32,7 @@ def test_create_share_ticket(
 
 
 @pytest.mark.django_db
-def test_non_auth_user_can_not_create_share_ticket(ticket_factory, client):
+def test_non_auth_user_can_not_create_share_ticket(ticket_factory, client, redis):
     ticket = ticket_factory()
     url = reverse("create-share")
     response = client.post(url, data={"ticket": ticket.id}, format="json")
@@ -42,7 +42,9 @@ def test_non_auth_user_can_not_create_share_ticket(ticket_factory, client):
 
 
 @pytest.mark.django_db
-def test_customer_can_not_create_share_ticket(ticket_factory, client, customer_factory):
+def test_customer_can_not_create_share_ticket(
+    ticket_factory, client, customer_factory, redis
+):
     customer = customer_factory()
     ticket = ticket_factory(creator=customer)
     url = reverse("create-share")
@@ -53,7 +55,7 @@ def test_customer_can_not_create_share_ticket(ticket_factory, client, customer_f
 
 @pytest.mark.django_db
 def test_operator_can_not_create_share_ticket_for_not_linked_customer(
-    ticket_factory, client, operator_factory, customer_factory
+    ticket_factory, client, operator_factory, customer_factory, redis
 ):
     customer = customer_factory()
     operator = operator_factory()
@@ -76,7 +78,7 @@ def test_admin_can_create_share(ticket_factory, client, user_factory):
 
 
 @pytest.mark.django_db
-def test_delete_share(client, share_factory):
+def test_delete_share(client, share_factory, redis):
     share: Share = share_factory()
     ticket_id = share.ticket.pk
     operator = share.creator
@@ -91,7 +93,7 @@ def test_delete_share(client, share_factory):
 
 
 @pytest.mark.django_db
-def test_detail_share(client, share_factory):
+def test_detail_share(client, share_factory, redis):
     share = share_factory()
     res = client.get(reverse("detail-share", kwargs={"pk": share.pk}))
     assert res.status_code == 200

@@ -6,7 +6,9 @@ from additionally.models import Dictionary
 
 
 @pytest.mark.django_db
-def test_take_needed_tickets_without_compiled_date(ticket_factory, report_factory):
+def test_take_needed_tickets_without_compiled_date(
+    ticket_factory, report_factory, redis
+):
     status = Dictionary.get_status_ticket("done")
     ticket = ticket_factory(
         status=status,

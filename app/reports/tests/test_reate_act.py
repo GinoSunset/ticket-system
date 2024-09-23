@@ -9,7 +9,7 @@ from reports.models import Act
 @pytest.mark.django_db
 @override_settings(MEDIA_ROOT=tempfile.mkdtemp())
 def test_generate_success_act(
-    ticket_factory, customer_factory, act_factory, status_done
+    ticket_factory, customer_factory, act_factory, status_done, redis
 ):
     customer = customer_factory(phone="+7 (999) 999-99-99")
     customer.profile.company = "ООО Тестовая компания"

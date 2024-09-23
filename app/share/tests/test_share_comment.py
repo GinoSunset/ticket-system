@@ -7,7 +7,7 @@ from users.models import User
 
 
 @pytest.mark.django_db
-def test_create_share_comment(client, share_factory, ticket_factory):
+def test_create_share_comment(client, share_factory, ticket_factory, redis):
     ticket = ticket_factory()
     share = share_factory(ticket=ticket)
 

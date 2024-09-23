@@ -239,6 +239,7 @@ def test_create_manufacture_with_ticket(
     ticket_factory,
     customer_profile_factory,
     operator_client,
+    redis,
 ):
     ticket = ticket_factory()
     customer_profile_factory(user=ticket.customer)

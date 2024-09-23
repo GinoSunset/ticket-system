@@ -7,7 +7,7 @@ from additionally.models import Dictionary
 
 
 @pytest.mark.django_db
-def test_create_report_form(ticket_factory):
+def test_create_report_form(ticket_factory, redis):
     status = Dictionary.get_status_ticket("done")
     ticket = ticket_factory(status=status)
     form = ReportForm(

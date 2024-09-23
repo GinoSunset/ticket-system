@@ -10,7 +10,7 @@ from django.urls import reverse
 
 
 @pytest.mark.django_db
-def test_create_share_after_ticket_to_work(ticket_factory, user_factory):
+def test_create_share_after_ticket_to_work(ticket_factory, user_factory, redis):
     status = Dictionary.get_status_ticket("new")
     status_work = Dictionary.get_status_ticket("work")
     ticket = ticket_factory(status=status)
@@ -22,7 +22,9 @@ def test_create_share_after_ticket_to_work(ticket_factory, user_factory):
 
 @pytest.mark.django_db
 @pytest.mark.parametrize("status_code", ["done", "cancel"])
-def test_remove_share_after_completed_ticket(ticket_factory, user_factory, status_code):
+def test_remove_share_after_completed_ticket(
+    ticket_factory, user_factory, status_code, redis
+):
     ticket = ticket_factory(status=Dictionary.get_status_ticket(status_code))
     user = user_factory()
     Share.objects.create(ticket=ticket, creator=user)

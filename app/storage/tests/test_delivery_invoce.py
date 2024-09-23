@@ -47,7 +47,7 @@ def test_success_form_invoice_go_to_set_delivery(
     response = operator_client.post(url, data, format="multipart")
 
     assert response.status_code == 302
-    assert response.url == reverse("update-invoice")
+    assert response.url == reverse("storage")
 
 @pytest.mark.django_db
 def test_form_update_invoice_has_only_need_alias(invoice_factory, invoice_alias_relation_factory):
@@ -85,7 +85,7 @@ def test_get_formset_initialization(invoice_factory, invoice_alias_relation_fact
 
     # Проверяем, что правильный компонент был выбран
     assert fs.forms[0].initial["name"] == ir_1.alias.name
-    assert fs.forms[0].initial["name"] == ir_2.alias.name
+    assert fs.forms[1].initial["name"] == ir_2.alias.name
     assert fs.forms[2].initial["name"] == ir_3.alias.name
 
 
