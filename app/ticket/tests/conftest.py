@@ -1,4 +1,6 @@
 import pytest
+import json
+from unittest import mock
 from imap_tools.message import MailMessage
 from django.conf import settings
 
@@ -259,3 +261,23 @@ def text_dm_with_dup_new_line():
 Телефон: +7(111)111-11-11, доб. 007
 E-mail: su@email.com
     """
+def get_json_fixture():
+    with open(settings.BASE_DIR / "ticket/tests/res_s1.json") as f:
+        return json.load(f)
+
+def personal_info_fixture():
+    return {"fullname":"Full Name Named", "phone":"+19992221112", "position":"Driver"}
+
+@pytest.fixture
+def mock_itsm_get_tasks(monkeypatch):
+    def mocked_get(url, *args, **kwargs):
+        response_data = {"task": get_json_fixture(), "personal": personal_info_fixture()}
+        type_return_json = "task" if "itsm_task" in url else "personal"
+
+        response = mock.Mock()
+        response.status_code = 200
+        response.json.return_value = response_data.get(type_return_json, response_data["task"])
+
+        return response
+
+    monkeypatch.setattr('requests.get', mocked_get)
