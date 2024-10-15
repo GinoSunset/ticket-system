@@ -12,7 +12,7 @@ from users.models import Customer, User
 
 
 CustomerPersonInfo = namedtuple('Person', ['position','fullname', 'phone'])
-ShopInfo = namedtuple('Shop', ['shop_id','adress','city'])
+ShopInfo = namedtuple("Shop", ["shop_id", "address", "city"])
 
 def get_url():
     return settings.ITSM_BASE_URL + settings.ITSM_TASK_URL
@@ -67,14 +67,26 @@ def get_info_about_personal_customer(opened_by) ->CustomerPersonInfo:
     phone = personal_info.get("mobile_phone")
     return CustomerPersonInfo(position,fullname,phone)
 
-def get_info_about_shop(c_store_number) ->ShopInfo:
-    return ShopInfo(c_store_number,None,None)
+def get_info_about_shop(org_unit: dict) -> ShopInfo:
+    link_info = org_unit["link"]
+    res_store_info = get_with_auth_header(url=link_info).json()
+    shop_infos = res_store_info.get("data")
+    if shop_infos is None:
+        logging.error(f"Can not get info about shop {link_info}")
+        return ShopInfo(None, None, None)
+    shop_info = shop_infos[0]
+
+    return ShopInfo(
+        shop_id=shop_info.get("name"),
+        address=shop_info.get("address"),
+        city=shop_info.get("city"),
+    )
 
 
-def update_shop_info(task, ticket):
-    info_shop = get_info_about_shop(task["c_store_number"])
-    ticket.shop_id=info_shop.shop_id
-    ticket.address=info_shop.adress
+def add_shop_info(task: dict, ticket):
+    info_shop = get_info_about_shop(task["org_unit"])
+    ticket.shop_id = info_shop.shop_id
+    ticket.address = info_shop.address
     ticket.city=info_shop.city
 
 def add_customer(task, ticket):
@@ -94,7 +106,7 @@ def create_itsm_task(task:dict) -> bool:
     ticket.description = task.get("description", "Не удалось скачать описание")
     ticket.customer=get_customer()
     add_customer(task, ticket)
-    update_shop_info(task, ticket)
+    add_shop_info(task, ticket)
     ticket.creator = User.objects.get(username=settings.TICKET_CREATOR_USERNAME)
     ticket.status = Dictionary.get_status_ticket("new")
     ticket.type_ticket = Dictionary.get_type_ticket(Ticket.default_type_code)

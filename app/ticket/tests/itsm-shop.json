@@ -1,0 +1,55 @@
+{
+    "status": "OK",
+    "data": [
+        {
+            "unit_head": {
+                "value": "1231233432",
+                "link": ""
+            },
+            "section": null,
+            "department": null,
+            "c_source": "http://234234142:86/Division",
+            "c_region_code": "333-b222-47b3-b54d-10e10783e23a",
+            "c_region": {
+                "value": "33333",
+                "link": "http://r2.test.com/c_regions/234923840234"
+            },
+            "c_parent_dept_code": "234234-cb02-42ce-bf3b-b60f072e7957",
+            "c_parent": {
+                "value": "169514542007389890",
+                "link": "http://r2.test.com/org_unit/234923840234"
+            },
+            "company": {
+                "value": "169514504802019680",
+                "link": "http://r2.test.com/org_company/234923840234"
+            },
+            "c_dept_code": "4331681c-a077-458f-b874-62fd174ae06f",
+            "c_company_code": "d595381d-5f9b-4dd6-a158-c6c1f2c2b278",
+            "branch": null,
+            "zip_postal_code": null,
+            "type": "unit",
+            "sys_updated_by": {
+                "value": "100000000000000000",
+                "link": "http://r2.test.com/user/234923840234"
+            },
+            "sys_updated_at": "2023-11-30 23:05:44",
+            "sys_id": "169514542007390043",
+            "sys_db_table_id": "156873095902223660",
+            "sys_created_by": {
+                "value": "100000000000000000",
+                "link": "http://r2.test.com/user/234923840234"
+            },
+            "sys_created_at": "2023-09-19 17:43:40",
+            "street": null,
+            "state_province": null,
+            "phone": null,
+            "notes": null,
+            "name": "ДМ Москва Петровский 1853 - АУП",
+            "location": {
+                "value": "168596012507548950",
+                "link": "http://r2.test.com/org_location/234923840234"
+            },
+            "city": null
+        }
+    ]
+}

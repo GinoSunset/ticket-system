@@ -272,14 +272,31 @@ def personal_info_fixture():
         return json.load(f)
 
 @pytest.fixture
-def mock_itsm_request(monkeypatch, get_json_fixture, personal_info_fixture):
+def shop_info_fixture():
+    with open(settings.BASE_DIR / "ticket/tests/itsm-shop.json") as f:
+        return json.load(f)
+
+
+@pytest.fixture
+def mock_itsm_request(
+    monkeypatch, get_json_fixture, personal_info_fixture, shop_info_fixture
+):
     def mocked_get(url, *args, **kwargs):
-        response_data = {"task": get_json_fixture, "personal": personal_info_fixture}
-        type_return_json = "task" if "itsm_task" in url else "personal"
+        response_data = {
+            "task": get_json_fixture,
+            "personal": personal_info_fixture,
+            "org_unit": shop_info_fixture,
+        }
+        if "personal" in url:
+            type_return_json = response_data.get("personal")
+        elif "org_unit" in url:
+            type_return_json = response_data.get("org_unit")
+        else:
+            type_return_json = response_data.get("task")
 
         response = mock.Mock()
         response.status_code = 200
-        response.json.return_value = response_data.get(type_return_json, response_data["task"])
+        response.json.return_value = type_return_json
 
         return response
 

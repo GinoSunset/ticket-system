@@ -1,6 +1,10 @@
 from ticket.signals import post_save
 from ticket.models import Ticket
-from ticket.handlers_itsm import create_task_from_itsm, get_info_about_personal_customer
+from ticket.handlers_itsm import (
+    create_task_from_itsm,
+    get_info_about_personal_customer,
+    get_info_about_shop,
+)
 
 import pytest
 import factory
@@ -21,3 +25,10 @@ def test_get_info_about_personal_customer(mock_itsm_request):
     assert personal_info.fullname is not None
     assert personal_info.position is not None
     assert personal_info.phone is not None
+
+
+def test_get_info_about_shop(mock_itsm_request):
+    shop_info = get_info_about_shop({"link": "***************/org_unit/test-id"})
+    assert shop_info.city is None
+    assert shop_info.shop_id is not None
+    assert shop_info.address is None
