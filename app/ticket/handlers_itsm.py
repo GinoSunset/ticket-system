@@ -57,10 +57,14 @@ def get_customer():
 def get_info_about_personal_customer(opened_by) ->CustomerPersonInfo:
     link_info = opened_by["link"]
     res_link_info = get_with_auth_header(url=link_info).json()
-    
-    fullname = res_link_info.get("fullname", opened_by["value"])
-    position = res_link_info.get("position")
-    phone = res_link_info.get("phone")
+    personal_infos = res_link_info.get("data")
+    if personal_infos is None:
+        logging.error(f"Can not get info about user {link_info}")
+        return CustomerPersonInfo(None, None, None)
+    personal_info = personal_infos[0]
+    fullname = personal_info.get("display_name")
+    position = personal_info.get("c_ldap_position")
+    phone = personal_info.get("mobile_phone")
     return CustomerPersonInfo(position,fullname,phone)
 
 def get_info_about_shop(c_store_number) ->ShopInfo:
@@ -73,7 +77,7 @@ def update_shop_info(task, ticket):
     ticket.address=info_shop.adress
     ticket.city=info_shop.city
 
-def update_customer(task, ticket):
+def add_customer(task, ticket):
     info_customer =get_info_about_personal_customer(task["opened_by"])
     ticket.position = info_customer.position
     ticket.phone = info_customer.phone
@@ -87,9 +91,9 @@ def create_task_from_itsm():
 def create_itsm_task(task:dict) -> bool:
     ticket = Ticket()
     ticket.sap_id= task.get("number", "Undefined")
-    ticket.description= task.get("description")
+    ticket.description = task.get("description", "Не удалось скачать описание")
     ticket.customer=get_customer()
-    update_customer(task, ticket)
+    add_customer(task, ticket)
     update_shop_info(task, ticket)
     ticket.creator = User.objects.get(username=settings.TICKET_CREATOR_USERNAME)
     ticket.status = Dictionary.get_status_ticket("new")

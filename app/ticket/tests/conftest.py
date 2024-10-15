@@ -261,17 +261,20 @@ def text_dm_with_dup_new_line():
 Телефон: +7(111)111-11-11, доб. 007
 E-mail: su@email.com
     """
+@pytest.fixture
 def get_json_fixture():
-    with open(settings.BASE_DIR / "ticket/tests/res_s1.json") as f:
+    with open(settings.BASE_DIR / "ticket/tests/itsm-tasks.json") as f:
         return json.load(f)
 
+@pytest.fixture
 def personal_info_fixture():
-    return {"fullname":"Full Name Named", "phone":"+19992221112", "position":"Driver"}
+    with open(settings.BASE_DIR / "ticket/tests/itsm-personal.json") as f:
+        return json.load(f)
 
 @pytest.fixture
-def mock_itsm_get_tasks(monkeypatch):
+def mock_itsm_request(monkeypatch, get_json_fixture, personal_info_fixture):
     def mocked_get(url, *args, **kwargs):
-        response_data = {"task": get_json_fixture(), "personal": personal_info_fixture()}
+        response_data = {"task": get_json_fixture, "personal": personal_info_fixture}
         type_return_json = "task" if "itsm_task" in url else "personal"
 
         response = mock.Mock()
