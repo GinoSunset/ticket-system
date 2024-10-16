@@ -31,11 +31,12 @@ def add_new_tickets_in_email():
 def add_new_tickets_in_itsm():
     logging.debug("Start check itms")
     tasks = get_tasks_from_itsm()
+    logging.info(f"Success check itsm. Count new tickets: {len(tasks)}")
     for task in tasks:
-        create_one_itsm_ticket.s(task)
+        create_one_itsm_ticket.delay(task)
 
 
 @celery_app.task
 def create_one_itsm_ticket(ticket: dict):
     logging.debug(f"Start create itsm [{ticket.get('sys_id')}]")
-    create_itsm_task()
+    create_itsm_task(ticket)

@@ -14,12 +14,14 @@ from users.models import Customer, User
 CustomerPersonInfo = namedtuple('Person', ['position','fullname', 'phone'])
 ShopInfo = namedtuple("Shop", ["shop_id", "address", "city"])
 
+OPERATOR_OR = "^"
+STATE_DONE = 10
 def get_url():
     return settings.ITSM_BASE_URL + settings.ITSM_TASK_URL
 
 
 def get_url_with_assign_filter(url: str) -> str:
-    return f"{url}?sysparm_query=assigned_user={settings.ITSM_USER_ID}"
+    return f"{url}?sysparm_query=assigned_user={settings.ITSM_USER_ID}{OPERATOR_OR}state!={STATE_DONE}"
 
 
 def get_headers():
@@ -28,10 +30,12 @@ def get_headers():
     return {"Authorization": f"Basic {b64encode(basic.encode('utf-8')).decode()}"}
 
 
-def get_with_auth_header(url, headers=None):
+def get_with_auth_header(url, headers=None, change_to_https=False):
     headers_ = headers or {}
     headers_.update(get_headers())
-    res =  requests.get(url, headers=headers_)
+    if change_to_https:
+        url = url.replace("http://", "https://")
+    res = requests.get(url, headers=headers_, allow_redirects=True)
     if res.status_code != 200:
         res.raise_for_status()
     return res
@@ -56,7 +60,7 @@ def get_customer():
    
 def get_info_about_personal_customer(opened_by) ->CustomerPersonInfo:
     link_info = opened_by["link"]
-    res_link_info = get_with_auth_header(url=link_info).json()
+    res_link_info = get_with_auth_header(url=link_info, change_to_https=True).json()
     personal_infos = res_link_info.get("data")
     if personal_infos is None:
         logging.error(f"Can not get info about user {link_info}")
@@ -69,7 +73,7 @@ def get_info_about_personal_customer(opened_by) ->CustomerPersonInfo:
 
 def get_info_about_shop(org_unit: dict) -> ShopInfo:
     link_info = org_unit["link"]
-    res_store_info = get_with_auth_header(url=link_info).json()
+    res_store_info = get_with_auth_header(url=link_info, change_to_https=True).json()
     shop_infos = res_store_info.get("data")
     if shop_infos is None:
         logging.error(f"Can not get info about shop {link_info}")
@@ -101,8 +105,11 @@ def create_task_from_itsm():
         create_itsm_task(task)
 
 def create_itsm_task(task:dict) -> bool:
+    sap_id = task.get("number", "Undefined")
+    if Ticket.objects.filter(sap_id=sap_id).exists():
+        return False
     ticket = Ticket()
-    ticket.sap_id= task.get("number", "Undefined")
+    ticket.sap_id = sap_id
     ticket.description = task.get("description", "Не удалось скачать описание")
     ticket.customer=get_customer()
     add_customer(task, ticket)
