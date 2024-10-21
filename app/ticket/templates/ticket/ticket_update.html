@@ -69,6 +69,16 @@
         </div>
       </div>
       {%endif%}
+      {% comment %} {% if ticket.source_ticket == Ticket.SourceTicket.ITSM %} {% endcomment %}
+      <div class="item">
+        <i class="icon">
+          <img width="16" height="16" src="{% static 'ticket/itsm.ico' %}"></img>
+        </i>
+        <div class="content">
+          <a href="{{ticket.link_to_source}}">{{ticket.link_to_source}}</a>
+        </div>
+      </div>
+      {% comment %} {% endif %} {% endcomment %}
       {% if user.is_operator or user.is_contractor %}
       {% if ticket.act.file_doc_act %}
         <div class="item">
@@ -210,6 +220,17 @@
     </div>
   </div>
 <div class="ui comments">
+  {% if ticket.source_ticket == ticket.SourceTicket.ITSM %}
+  
+  <div class="ui info message">
+    <div class="header">
+      Внимание!
+    </div>
+      <p> Обновленеие на сайте не отправляется на сайт ITSM </p>
+  </div>
+  <div class="segment info">
+  </div>
+  {% endif %}
 {% for comment in ticket.comments.all %}
   {% include "ticket/ticket_comment_list.html" %}
 {% endfor %}

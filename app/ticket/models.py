@@ -129,7 +129,8 @@ class Ticket(models.Model):
     link_to_source = models.URLField(
         verbose_name="Ссылка на источник",
         null=True,
-        help_text="Если задача созджана через itsm, ссылка добавиться автоматически"
+        blank=True,
+        help_text="Если задача создана через itsm, ссылка добавиться автоматически",
     )
 
     source_ticket = models.IntegerField(
