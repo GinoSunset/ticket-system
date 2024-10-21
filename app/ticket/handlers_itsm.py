@@ -122,3 +122,13 @@ def create_itsm_task(task:dict) -> bool:
     ticket.save()
     logging.info(f"Add new task {ticket} from itsm")
     return True
+
+
+
+
+def get_tickets_for_update():
+    tickets = Ticket.objects.filter(source_ticket=Ticket.SourceTicket.ITSM)
+    return tickets
+
+def updates_itsm_tickets():
+    tickets_for_update = get_tickets_for_update()
