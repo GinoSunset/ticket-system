@@ -284,11 +284,11 @@ def mock_itsm_request(
     def mocked_get(url, *args, **kwargs):
         response_data = {
             "task": get_json_fixture,
-            "personal": personal_info_fixture,
+            "employee": personal_info_fixture,
             "org_unit": shop_info_fixture,
         }
-        if "personal" in url:
-            type_return_json = response_data.get("personal")
+        if "employee" in url:
+            type_return_json = response_data.get("employee")
         elif "org_unit" in url:
             type_return_json = response_data.get("org_unit")
         else:

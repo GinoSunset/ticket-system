@@ -58,25 +58,26 @@ def get_customer():
     customer = Customer.objects.get(username="ДетскийМир")
     return customer
    
-def get_info_about_personal_customer(opened_by) ->CustomerPersonInfo:
+def get_info_about_personal_customer(employee) -> dict:
+    link_info = employee["link"]
+    res_link_info = get_with_auth_header(url=link_info, change_to_https=True).json()
+    personal_infos = res_link_info.get("data")
+    return personal_infos
+
+
+def get_personal_info(opened_by):
     link_info = opened_by["link"]
     res_link_info = get_with_auth_header(url=link_info, change_to_https=True).json()
     personal_infos = res_link_info.get("data")
-    if personal_infos is None:
-        logging.error(f"Can not get info about user {link_info}")
-        return CustomerPersonInfo(None, None, None)
-    personal_info = personal_infos[0]
-    fullname = personal_info.get("display_name")
-    position = personal_info.get("c_ldap_position")
-    phone = personal_info.get("mobile_phone")
-    return CustomerPersonInfo(position,fullname,phone)
+    return personal_infos
+
 
 def get_info_about_shop(org_unit: dict) -> ShopInfo:
     link_info = org_unit["link"]
     res_store_info = get_with_auth_header(url=link_info, change_to_https=True).json()
     shop_infos = res_store_info.get("data")
     if shop_infos is None:
-        logging.error(f"Can not get info about shop {link_info}")
+        logging.error(f"Not return info about shop {link_info}")
         return ShopInfo(None, None, None)
     shop_info = shop_infos[0]
 
@@ -86,18 +87,31 @@ def get_info_about_shop(org_unit: dict) -> ShopInfo:
         city=shop_info.get("city"),
     )
 
-
-def add_shop_info(task: dict, ticket):
-    info_shop = get_info_about_shop(task["org_unit"])
+def add_shop_info(org_unit: dict, ticket):
+    if org_unit is None:
+        logging.error(f"Can not get info about shop {org_unit}")
+        return
+    info_shop = get_info_about_shop(org_unit)
     ticket.shop_id = info_shop.shop_id
     ticket.address = info_shop.address
     ticket.city=info_shop.city
 
-def add_customer(task, ticket):
-    info_customer =get_info_about_personal_customer(task["opened_by"])
-    ticket.position = info_customer.position
-    ticket.phone = info_customer.phone
-    ticket.full_name = info_customer.fullname
+def get_shop_info_from_user(task: dict):
+    get_personal_info(task["opened_by"])
+
+
+def add_customer_and_shop_info(task, ticket):
+    info_customer = get_info_about_personal_customer(task["c_employee"])
+    if info_customer is None:
+        logging.error(f"Can not get info about user {task['c_employee']}")
+        return
+    personal_info = info_customer[0]
+
+    ticket.position = personal_info.get("display_name")
+    ticket.phone = personal_info.get("c_ldap_position")
+    ticket.full_name = personal_info.get("mobile_phone")
+
+    add_shop_info(personal_info.get("org_unit"), ticket)
 
 def create_task_from_itsm():
     tasks = get_tasks_from_itsm()
@@ -112,19 +126,15 @@ def create_itsm_task(task:dict) -> bool:
     ticket.sap_id = sap_id
     ticket.description = task.get("description", "Не удалось скачать описание")
     ticket.customer=get_customer()
-    add_customer(task, ticket)
-    add_shop_info(task, ticket)
+    add_customer_and_shop_info(task, ticket)
     ticket.creator = User.objects.get(username=settings.TICKET_CREATOR_USERNAME)
     ticket.status = Dictionary.get_status_ticket("new")
     ticket.type_ticket = Dictionary.get_type_ticket(Ticket.default_type_code)
-    ticket.link_to_source=f"{get_url}/{task['sys_id']}"
+    ticket.link_to_source = f"{get_url()}/{task['sys_id']}"
     ticket.source_ticket = Ticket.SourceTicket.ITSM
     ticket.save()
     logging.info(f"Add new task {ticket} from itsm")
     return True
-
-
-
 
 def get_tickets_for_update():
     tickets = Ticket.objects.filter(source_ticket=Ticket.SourceTicket.ITSM)

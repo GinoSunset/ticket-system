@@ -21,12 +21,13 @@ def test_create_task_from_itsm(mock_itsm_request, dm_customer):
     assert Ticket.objects.count() == count_task_in_json
 
 def test_get_info_about_personal_customer(mock_itsm_request):
-    personal_info = get_info_about_personal_customer(
-        {"link": "http://test.com/personal/test-id"}
+    personals_info = get_info_about_personal_customer(
+        {"link": "http://test.com/employee/test-id"}
     )
-    assert personal_info.fullname is not None
-    assert personal_info.position is not None
-    assert personal_info.phone is not None
+    personal_info = personals_info[0]
+    assert personal_info.get("display_name") is not None
+    assert personal_info.get("c_ldap_position") is not None
+    assert personal_info.get("mobile_phone") is not None
 
 
 def test_get_info_about_shop(mock_itsm_request):
@@ -47,7 +48,7 @@ def test_update_itsm_ticket_comment(mock_itsm_request, ticket: Ticket, status_in
     updates_itsm_tickets()
     
     ticket.refresh_from_db()
-    assert ticket.comment.count() > 0
+    assert ticket.comments.count() > 0
 
 @factory.django.mute_signals(post_save)
 @pytest.mark.django_db
