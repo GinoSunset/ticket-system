@@ -43,6 +43,7 @@ from storage.factories import (
 register(TicketFactory)
 register(UserFactory)
 register(CustomerFactory)
+register(CustomerFactory, "dm_customer", username="ДетскийМир")
 register(CustomerProfileFactory)
 register(OperatorFactory)
 register(ContractorFactory)

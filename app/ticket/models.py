@@ -23,6 +23,12 @@ class Ticket(models.Model):
         verbose_name_plural = "Заявки"
         ordering = ["-date_create"]
 
+
+    class SourceTicket(models.IntegerChoices):
+        EMAIL = 1, "Email"
+        ITSM = 2, "ITSM"
+        MANUAL = 3, "Ручное создание"
+        
     default_type_code = "hardware_setup"
 
     date_create = models.DateTimeField(auto_now_add=True)
@@ -118,6 +124,19 @@ class Ticket(models.Model):
 
     _reply_to_emails = models.CharField(
         "Адреса для ответов", max_length=1000, null=True, blank=True
+    )
+    
+    link_to_source = models.URLField(
+        verbose_name="Ссылка на источник",
+        null=True,
+        blank=True,
+        help_text="Если задача создана через itsm, ссылка добавиться автоматически",
+    )
+
+    source_ticket = models.IntegerField(
+        verbose_name="Источник задачи",
+        choices=SourceTicket.choices,
+        default=SourceTicket.EMAIL,
     )
 
     @property

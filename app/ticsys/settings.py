@@ -26,6 +26,11 @@ env = environ.Env(
     TG_BOT_NOTIFICATION_URI=(str, ""),
     DATABASE_URL=(str, "sqlite:///db.sqlite3"),
     URL_INVOICE_API=(str, "http://microservice:8000"),
+    ITSM_BASE_URL=(str, "https://s1.itsm.net"),
+    ITSM_TASK_URL=(str, "rest/v1/table/itsm_task"),
+    ITSM_USER_ID=(int, 111111111111117111),
+    ITSM_USER=(str, "222"),
+    ITSM_PASSWORD=(str, "1111"),
 )
 BASE_DIR = Path(__file__).resolve().parent.parent
 
@@ -130,6 +135,7 @@ LOGIN_REDIRECT_URL = "/"
 LOGOUT_REDIRECT_URL = "/"
 
 TICKET_CREATOR_USERNAME = "email_robot"
+
 # Ticket email
 DEFAULT_FROM_EMAIL = env("EMAIL_HOST_USER")
 EMAIL_HOST_PASSWORD = env("EMAIL_HOST_PASSWORD")
@@ -198,3 +204,10 @@ REST_FRAMEWORK = {
 
 # API
 URL_INVOICE_API = env("URL_INVOICE_API")
+
+#ITSM
+ITSM_BASE_URL = env("ITSM_BASE_URL")
+ITSM_TASK_URL = env("ITSM_TASK_URL")
+ITSM_USER_ID = env("ITSM_USER_ID")
+ITSM_USER = env("ITSM_USER")
+ITSM_PASSWORD = env("ITSM_PASSWORD")

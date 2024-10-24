@@ -1,0 +1,44 @@
+{
+    "status": "OK",
+    "data": [
+        {
+            "username": "guest",
+
+            "source": "CN=Гостинов Гость Гостовнич,OU=Москва Московский ЛСС (1111),OU=Users,OU=РО Москва и МО,OU=Domain,DC=trade,DC=test-test,DC=ru",
+            "last_name": "Гостинов",
+            "first_name": "Гость",
+            "email": "guest@test.ru",
+            "display_name": "Гостинов Гость Гостовнич",
+            "company": {
+                "value": "169514504802019680",
+                "link": "http://test1.test.ru/r/table/org_company/169514504802019680"
+            },
+            "c_number_sap_ref": {
+                "value": "169582689402441772",
+                "link": "http://test1.test.ru/r/table/c_nomer_zavoda_sap/169582689402441772"
+            },
+            "unit": {
+                "value": "169514542007390043",
+                "link": "http://test1.test.ru/r/table/org_unit/169514542007390043"
+            },
+            "mobile_phone": "71234567890",
+            "middle_name": "Гостовнич",
+            "date_of_birth": "1900-06-05",
+            "c_sap_position_ref": {
+                "value": "169527615301118079",
+                "link": "http://test1.test.ru/r/table/c_positions_sap/169527615301118079"
+            },
+            "c_sap_dept_ref": {
+                "value": "169528037201661769",
+                "link": "http://test1.test.ru/r/table/c_units_sap/169528037201661769"
+            },
+            "c_position": {
+                "value": "169514506103313844",
+                "link": "http://test1.test.ru/r/table/c_position/169514506103313844"
+            },
+            "c_ldap_position": "Заместитель директора речных подводных стульев",
+            "c_ldap_dept": "РСДМ Москва Московский 1111",
+            "c_ldap_company": "РО - ПОВОЛЖЬЕ РС"
+        }
+    ]
+}

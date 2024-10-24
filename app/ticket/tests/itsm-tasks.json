@@ -1,0 +1,516 @@
+{
+    "status": "OK",
+    "data": [
+        {
+            "work_notes": null,
+            "wf_executing_activity": null,
+            "urgency": "2",
+            "sys_updated_by": {
+                "value": "111115077702440297",
+                "link": "http://test.itsm.net/rest/v1/table/employee/111115077702440297"
+            },
+            "sys_updated_at": "2024-10-09 14:58:30",
+            "sys_id": "1111483237045211111",
+            "sys_db_table_id": "1569506166177722222",
+            "sys_created_by": {
+                "value": "111115004506104936",
+                "link": "http://test.itsm.net/rest/v1/table/employee/111115004506104936"
+            },
+            "sys_created_at": "2024-10-09 14:13:57",
+            "subject": "Subject door",
+            "state_changed_at": "2024-10-09 14:13:55",
+            "state": "-2",
+            "sla_due": null,
+            "short_description": "test test test",
+            "service": {
+                "value": "172228156901776968",
+                "link": "http://test.itsm.net/rest/v1/table/sys_cmdb_ci_service/172228156901776968"
+            },
+            "screenshot": null,
+            "priority": "2",
+            "parent_id": null,
+            "opened_by": {
+                "value": "111115004506104936",
+                "link": "http://test.itsm.net/rest/v1/table/employee/111115004506104936"
+            },
+            "opened_at": "2024-10-09 14:13:55",
+            "number": "8-222222",
+            "impact": "1",
+            "followers_list": null,
+            "due_date": null,
+            "display_name": "blas 8-222222",
+            "description": "test test test",
+            "c_store_number": "4984",
+            "contact": null,
+            "company": {
+                "value": "169514504802019680",
+                "link": "http://test.itsm.net/rest/v1/table/org_company/169514504802019680"
+            },
+            "comments": null,
+            "closed_by": null,
+            "closed_at": null,
+            "c_job_title": null,
+            "c_employee": {
+                "value": "111115004506104936",
+                "link": "http://test.itsm.net/rest/v1/table/employee/111115004506104936"
+            },
+            "caller": {
+                "value": "111115004506104936",
+                "link": "http://test.itsm.net/rest/v1/table/employee/111115004506104936"
+            },
+            "attention_required": false,
+            "assignment_group": {
+                "value": "1723495711111099309",
+                "link": "http://test.itsm.net/rest/v1/table/sys_group/1723495711111099309"
+            },
+            "assigned_user": {
+                "value": "172349757000627111",
+                "link": "http://test.itsm.net/rest/v1/table/user/172349757000627111"
+            },
+            "approval_state": "not_requested",
+            "additional_comments": null,
+            "active": true,
+            "work_type": {
+                "value": "172228161202466880",
+                "link": "http://test.itsm.net/rest/v1/table/sys_rmc_model/172228161202466880"
+            },
+            "url_of_object": null,
+            "solved_by_changes": null,
+            "service_satisfaction": null,
+            "resolved_by": null,
+            "resolved_at": null,
+            "remedy_id": null,
+            "related_requests": null,
+            "related_problems": null,
+            "related_inquiry": {
+                "value": "111148321601035240",
+                "link": "http://test.itsm.net/rest/v1/table/itsm_inquiry/111148321601035240"
+            },
+            "related_incidents": null,
+            "related_cis": null,
+            "related_articles": null,
+            "reassign_reason": "2",
+            "reassign_count": 2,
+            "reaction_time": "2024-10-10 10:13:27",
+            "previous_state": null,
+            "planned_start_datetime": null,
+            "planned_end_datetime": null,
+            "pause_work_reason": null,
+            "out_of_sla": false,
+            "org_unit": {
+                "value": "169514553104991441",
+                "link": "http://test.itsm.net/rest/v1/table/org_unit/169514553104991441"
+            },
+            "org_location": null,
+            "level_of_dependency": null,
+            "known_error": null,
+            "job_title": null,
+            "is_sla_reaction_breached": false,
+            "is_sla_due_breached": false,
+            "hde_id": "",
+            "has_breached": false,
+            "first_call_resolution": false,
+            "external_task": null,
+            "external_system": null,
+            "external_company": null,
+            "decision_category": null,
+            "c_remedy_state": null,
+            "copy_cis_to_originators": false,
+            "contact_type": "30",
+            "complete_originators": false,
+            "closure_notes": null,
+            "closure_code": null,
+            "c_group_initiator_remedy": null,
+            "caused_by_changes": null,
+            "category_closure_code": null,
+            "aggregate_number": null,
+            "agent_satisfaction": null,
+            "actual_start_datetime": null,
+            "actual_end_datetime": null
+        },
+        {
+            "work_notes": null,
+            "wf_executing_activity": null,
+            "urgency": "2",
+            "sys_updated_by": {
+                "value": "172349757000627111",
+                "link": "http://test.itsm.net/rest/v1/table/user/172349757000627111"
+            },
+            "sys_updated_at": "2024-10-08 11:41:37",
+            "sys_id": "111129834001287714",
+            "sys_db_table_id": "156950616617772294",
+            "sys_created_by": {
+                "value": "111115014805270629",
+                "link": "http://test.itsm.net/rest/v1/table/employee/111115014805270629"
+            },
+            "sys_created_at": "2024-10-07 10:52:20",
+            "subject": "Subject door",
+            "state_changed_at": "2024-10-08 11:41:35",
+            "state": "2",
+            "sla_due": null,
+            "short_description": "test test test",
+            "service": {
+                "value": "172228156901776968",
+                "link": "http://test.itsm.net/rest/v1/table/sys_cmdb_ci_service/172228156901776968"
+            },
+            "screenshot": null,
+            "priority": "2",
+            "parent_id": null,
+            "opened_by": {
+                "value": "111115014805270629",
+                "link": "http://test.itsm.net/rest/v1/table/employee/111115014805270629"
+            },
+            "opened_at": "2024-10-07 10:52:18",
+            "number": "8-0135896",
+            "impact": "1",
+            "followers_list": null,
+            "due_date": "2024-10-14 12:41:35",
+            "display_name": "blas 8-222222",
+            "description": "test test test",
+            "c_store_number": "4557",
+            "contact": null,
+            "company": {
+                "value": "169514504802019680",
+                "link": "http://test.itsm.net/rest/v1/table/org_company/169514504802019680"
+            },
+            "comments": null,
+            "closed_by": null,
+            "closed_at": null,
+            "c_job_title": null,
+            "c_employee": {
+                "value": "111115014805270629",
+                "link": "http://test.itsm.net/rest/v1/table/employee/111115014805270629"
+            },
+            "caller": {
+                "value": "111115014805270629",
+                "link": "http://test.itsm.net/rest/v1/table/employee/111115014805270629"
+            },
+            "attention_required": false,
+            "assignment_group": {
+                "value": "1723495711111099309",
+                "link": "http://test.itsm.net/rest/v1/table/sys_group/1723495711111099309"
+            },
+            "assigned_user": {
+                "value": "172349757000627111",
+                "link": "http://test.itsm.net/rest/v1/table/user/172349757000627111"
+            },
+            "approval_state": "not_requested",
+            "additional_comments": null,
+            "active": true,
+            "work_type": {
+                "value": "172228161107629982",
+                "link": "http://test.itsm.net/rest/v1/table/sys_rmc_model/172228161107629982"
+            },
+            "url_of_object": null,
+            "solved_by_changes": null,
+            "service_satisfaction": null,
+            "resolved_by": null,
+            "resolved_at": null,
+            "remedy_id": null,
+            "related_requests": null,
+            "related_problems": null,
+            "related_inquiry": {
+                "value": "111129831907249153",
+                "link": "http://test.itsm.net/rest/v1/table/itsm_inquiry/111129831907249153"
+            },
+            "related_incidents": null,
+            "related_cis": null,
+            "related_articles": null,
+            "reassign_reason": "2",
+            "reassign_count": 2,
+            "reaction_time": "2024-10-08 10:26:26",
+            "previous_state": null,
+            "planned_start_datetime": null,
+            "planned_end_datetime": null,
+            "pause_work_reason": null,
+            "out_of_sla": false,
+            "org_unit": {
+                "value": "169514533302672651",
+                "link": "http://test.itsm.net/rest/v1/table/org_unit/169514533302672651"
+            },
+            "org_location": null,
+            "level_of_dependency": null,
+            "known_error": null,
+            "job_title": null,
+            "is_sla_reaction_breached": true,
+            "is_sla_due_breached": false,
+            "hde_id": "",
+            "has_breached": true,
+            "first_call_resolution": false,
+            "external_task": null,
+            "external_system": null,
+            "external_company": null,
+            "decision_category": null,
+            "c_remedy_state": null,
+            "copy_cis_to_originators": false,
+            "contact_type": "30",
+            "complete_originators": false,
+            "closure_notes": null,
+            "closure_code": null,
+            "c_group_initiator_remedy": null,
+            "caused_by_changes": null,
+            "category_closure_code": null,
+            "aggregate_number": null,
+            "agent_satisfaction": null,
+            "actual_start_datetime": null,
+            "actual_end_datetime": null
+        },
+        {
+            "work_notes": null,
+            "wf_executing_activity": null,
+            "urgency": "2",
+            "sys_updated_by": {
+                "value": "172349757000627111",
+                "link": "http://test.itsm.net/rest/v1/table/user/172349757000627111"
+            },
+            "sys_updated_at": "2024-10-07 08:24:19",
+            "sys_id": "111103063101041914",
+            "sys_db_table_id": "156950616617772294",
+            "sys_created_by": {
+                "value": "172010521003917892",
+                "link": "http://test.itsm.net/rest/v1/table/employee/172010521003917892"
+            },
+            "sys_created_at": "2024-10-04 08:30:31",
+            "subject": "Subject door",
+            "state_changed_at": "2024-10-07 08:24:16",
+            "state": "2",
+            "sla_due": null,
+            "short_description": "test test test",
+            "service": {
+                "value": "172228156901776968",
+                "link": "http://test.itsm.net/rest/v1/table/sys_cmdb_ci_service/172228156901776968"
+            },
+            "screenshot": null,
+            "priority": "2",
+            "parent_id": null,
+            "opened_by": {
+                "value": "172010521003917892",
+                "link": "http://test.itsm.net/rest/v1/table/employee/172010521003917892"
+            },
+            "opened_at": "2024-10-04 08:30:29",
+            "number": "8-0134578",
+            "impact": "1",
+            "followers_list": null,
+            "due_date": "2024-10-11 09:24:17",
+            "display_name": "blas 8-222222",
+            "description": "test test test",
+            "c_store_number": "5659",
+            "contact": null,
+            "company": {
+                "value": "169514504802019680",
+                "link": "http://test.itsm.net/rest/v1/table/org_company/169514504802019680"
+            },
+            "comments": null,
+            "closed_by": null,
+            "closed_at": null,
+            "c_job_title": null,
+            "c_employee": {
+                "value": "172010521003917892",
+                "link": "http://test.itsm.net/rest/v1/table/employee/172010521003917892"
+            },
+            "caller": {
+                "value": "172010521003917892",
+                "link": "http://test.itsm.net/rest/v1/table/employee/172010521003917892"
+            },
+            "attention_required": false,
+            "assignment_group": {
+                "value": "1723495711111099309",
+                "link": "http://test.itsm.net/rest/v1/table/sys_group/1723495711111099309"
+            },
+            "assigned_user": {
+                "value": "172349757000627111",
+                "link": "http://test.itsm.net/rest/v1/table/user/172349757000627111"
+            },
+            "approval_state": "not_requested",
+            "additional_comments": null,
+            "active": true,
+            "work_type": {
+                "value": "172228161202467849",
+                "link": "http://test.itsm.net/rest/v1/table/sys_rmc_model/172228161202467849"
+            },
+            "url_of_object": null,
+            "solved_by_changes": null,
+            "service_satisfaction": null,
+            "resolved_by": null,
+            "resolved_at": null,
+            "remedy_id": null,
+            "related_requests": null,
+            "related_problems": null,
+            "related_inquiry": {
+                "value": "111103060904204835",
+                "link": "http://test.itsm.net/rest/v1/table/itsm_inquiry/111103060904204835"
+            },
+            "related_incidents": null,
+            "related_cis": null,
+            "related_articles": null,
+            "reassign_reason": "2",
+            "reassign_count": 2,
+            "reaction_time": "2024-10-04 15:04:22",
+            "previous_state": null,
+            "planned_start_datetime": null,
+            "planned_end_datetime": null,
+            "pause_work_reason": null,
+            "out_of_sla": false,
+            "org_unit": {
+                "value": "170959339702200722",
+                "link": "http://test.itsm.net/rest/v1/table/org_unit/170959339702200722"
+            },
+            "org_location": null,
+            "level_of_dependency": null,
+            "known_error": null,
+            "job_title": null,
+            "is_sla_reaction_breached": true,
+            "is_sla_due_breached": false,
+            "hde_id": "",
+            "has_breached": true,
+            "first_call_resolution": false,
+            "external_task": null,
+            "external_system": null,
+            "external_company": null,
+            "decision_category": null,
+            "c_remedy_state": null,
+            "copy_cis_to_originators": false,
+            "contact_type": "30",
+            "complete_originators": false,
+            "closure_notes": null,
+            "closure_code": null,
+            "c_group_initiator_remedy": null,
+            "caused_by_changes": null,
+            "category_closure_code": null,
+            "aggregate_number": null,
+            "agent_satisfaction": null,
+            "actual_start_datetime": null,
+            "actual_end_datetime": null
+        },
+        {
+            "work_notes": null,
+            "wf_executing_activity": null,
+            "urgency": "2",
+            "sys_updated_by": {
+                "value": "172349757000627111",
+                "link": "http://test.itsm.net/rest/v1/table/user/172349757000627111"
+            },
+            "sys_updated_at": "2024-10-07 08:26:10",
+            "sys_id": "111102004507264160",
+            "sys_db_table_id": "156950677111866258",
+            "sys_created_by": {
+                "value": "111115038302083206",
+                "link": "http://test.itsm.net/rest/v1/table/employee/111115038302083206"
+            },
+            "sys_created_at": "2024-10-04 05:34:05",
+            "subject": "Subject door",
+            "state_changed_at": "2024-10-07 08:26:09",
+            "state": "7",
+            "sla_due": null,
+            "short_description": "test test test",
+            "service": {
+                "value": "172228156901776968",
+                "link": "http://test.itsm.net/rest/v1/table/sys_cmdb_ci_service/172228156901776968"
+            },
+            "screenshot": null,
+            "priority": "2",
+            "parent_id": null,
+            "opened_by": {
+                "value": "111115038302083206",
+                "link": "http://test.itsm.net/rest/v1/table/employee/111115038302083206"
+            },
+            "opened_at": "2024-10-04 05:34:03",
+            "number": "7-0283067",
+            "impact": "1",
+            "followers_list": null,
+            "due_date": "2024-10-09 11:28:55",
+            "display_name": "blas 8-222222",
+            "description": "test test test",
+            "c_store_number": "5022",
+            "contact": null,
+            "company": {
+                "value": "169514504802019680",
+                "link": "http://test.itsm.net/rest/v1/table/org_company/169514504802019680"
+            },
+            "comments": null,
+            "closed_by": null,
+            "closed_at": null,
+            "c_job_title": null,
+            "c_employee": {
+                "value": "111115038302083206",
+                "link": "http://test.itsm.net/rest/v1/table/employee/111115038302083206"
+            },
+            "caller": {
+                "value": "111115038302083206",
+                "link": "http://test.itsm.net/rest/v1/table/employee/111115038302083206"
+            },
+            "attention_required": false,
+            "assignment_group": {
+                "value": "1723495711111099309",
+                "link": "http://test.itsm.net/rest/v1/table/sys_group/1723495711111099309"
+            },
+            "assigned_user": {
+                "value": "172349757000627111",
+                "link": "http://test.itsm.net/rest/v1/table/user/172349757000627111"
+            },
+            "approval_state": null,
+            "additional_comments": null,
+            "active": true,
+            "work_type": {
+                "value": "172228161107629982",
+                "link": "http://test.itsm.net/rest/v1/table/sys_rmc_model/172228161107629982"
+            },
+            "url_of_object": null,
+            "solved_by_changes": null,
+            "service_satisfaction": null,
+            "resolved_by": {
+                "value": "172349757000627111",
+                "link": "http://test.itsm.net/rest/v1/table/user/172349757000627111"
+            },
+            "resolved_at": "2024-10-07 08:26:09",
+            "remedy_id": null,
+            "related_requests": null,
+            "related_problems": null,
+            "related_inquiry": {
+                "value": "111102003501806285",
+                "link": "http://test.itsm.net/rest/v1/table/itsm_inquiry/111102003501806285"
+            },
+            "related_incidents": null,
+            "related_cis": null,
+            "related_articles": null,
+            "reassign_reason": "2",
+            "reassign_count": 2,
+            "reaction_time": "2024-10-04 14:52:37",
+            "previous_state": null,
+            "planned_start_datetime": null,
+            "planned_end_datetime": null,
+            "pause_work_reason": null,
+            "out_of_sla": false,
+            "org_unit": {
+                "value": "169514530807884515",
+                "link": "http://test.itsm.net/rest/v1/table/org_unit/169514530807884515"
+            },
+            "org_location": null,
+            "level_of_dependency": null,
+            "known_error": null,
+            "job_title": null,
+            "is_sla_reaction_breached": false,
+            "is_sla_due_breached": false,
+            "hde_id": "",
+            "has_breached": false,
+            "first_call_resolution": false,
+            "external_task": null,
+            "external_system": null,
+            "external_company": null,
+            "decision_category": null,
+            "c_remedy_state": null,
+            "copy_cis_to_originators": false,
+            "contact_type": "30",
+            "complete_originators": false,
+            "closure_notes": "ОТМЕНА! Накануне подачи заявки в маг. был скачек эл\\ва. Далее стояли 1 день выключенные,  а после включения, система работает штатно.",
+            "closure_code": "2",
+            "c_group_initiator_remedy": null,
+            "caused_by_changes": null,
+            "category_closure_code": null,
+            "aggregate_number": null,
+            "agent_satisfaction": null,
+            "actual_start_datetime": null,
+            "actual_end_datetime": null
+        }
+    ]
+}
