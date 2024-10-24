@@ -69,7 +69,7 @@
         </div>
       </div>
       {%endif%}
-      {% if ticket.source_ticket == Ticket.SourceTicket.ITSM %}
+      {% if ticket.source_ticket == ticket.SourceTicket.ITSM %}
       <div class="item">
         <i class="icon">
           <img width="16" height="16" src="{% static 'ticket/itsm.ico' %}"></img>
