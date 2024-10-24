@@ -25,7 +25,7 @@ TYPE_TASK = {
 
 
 def get_url():
-    return settings.ITSM_BASE_URL + settings.ITSM_TASK_URL
+    return f"{settings.ITSM_BASE_URL}{settings.ITSM_TASK_URL}"
 
 
 def get_url_with_assign_filter(url: str) -> str:
