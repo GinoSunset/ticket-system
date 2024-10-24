@@ -69,7 +69,7 @@
         </div>
       </div>
       {%endif%}
-      {% comment %} {% if ticket.source_ticket == Ticket.SourceTicket.ITSM %} {% endcomment %}
+      {% if ticket.source_ticket == Ticket.SourceTicket.ITSM %}
       <div class="item">
         <i class="icon">
           <img width="16" height="16" src="{% static 'ticket/itsm.ico' %}"></img>
@@ -78,7 +78,7 @@
           <a href="{{ticket.link_to_source}}">переход на s1.detmir.ru</a>
         </div>
       </div>
-      {% comment %} {% endif %} {% endcomment %}
+      {% endif %}
       {% if user.is_operator or user.is_contractor %}
       {% if ticket.act.file_doc_act %}
         <div class="item">
