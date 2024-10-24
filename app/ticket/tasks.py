@@ -1,6 +1,7 @@
 from ticsys import celery_app
 from ticket.handlers import save_tickets_from_emails
 from ticket.handlers_itsm import get_tasks_from_itsm, create_itsm_task
+from ticket.models import Ticket
 import logging
 
 
@@ -31,6 +32,11 @@ def add_new_tickets_in_email():
 def add_new_tickets_in_itsm():
     logging.debug("Start check itms")
     tasks = get_tasks_from_itsm()
+    tasks = [
+        task
+        for task in tasks
+        if Ticket.objects.filter(sap_id=task.get("number")).exists() is False
+    ]
     logging.info(f"Success check itsm. Count new tickets: {len(tasks)}")
     for task in tasks:
         create_one_itsm_ticket.delay(task)
@@ -38,5 +44,5 @@ def add_new_tickets_in_itsm():
 
 @celery_app.task
 def create_one_itsm_ticket(ticket: dict):
-    logging.debug(f"Start create itsm [{ticket.get('sys_id')}]")
+    logging.debug(f"Start create itsm [{ticket.get('number')}]")
     create_itsm_task(ticket)

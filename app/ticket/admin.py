@@ -12,10 +12,11 @@ class TicketAdmin(admin.ModelAdmin):
         "contractor",
         "status",
         "city",
-        "id_email_message",
+        "source_ticket",
         "date_update",
         "date_create",
     )
+    list_filter = ("source_ticket", "status", "date_create", "date_update")
     readonly_fields = ("date_update", "date_create")
     search_fields = (
         "pk",

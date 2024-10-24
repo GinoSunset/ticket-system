@@ -15,13 +15,21 @@ CustomerPersonInfo = namedtuple('Person', ['position','fullname', 'phone'])
 ShopInfo = namedtuple("Shop", ["shop_id", "address", "city"])
 
 OPERATOR_OR = "^"
-STATE_DONE = 10
+STATE_CANCEL = 10
+STATE_DONE = 7
+
+TYPE_TASK = {
+    "156950677111866258": "itsm_incident",
+    "156950616617772294": "itsm_request",
+}
+
+
 def get_url():
     return settings.ITSM_BASE_URL + settings.ITSM_TASK_URL
 
 
 def get_url_with_assign_filter(url: str) -> str:
-    return f"{url}?sysparm_query=assigned_user={settings.ITSM_USER_ID}{OPERATOR_OR}state!={STATE_DONE}"
+    return f"{url}?sysparm_query=assigned_user={settings.ITSM_USER_ID}{OPERATOR_OR}state!={STATE_DONE}{OPERATOR_OR}state!={STATE_CANCEL}"
 
 
 def get_headers():
@@ -107,11 +115,11 @@ def add_customer_and_shop_info(task, ticket):
         return
     personal_info = info_customer[0]
 
-    ticket.position = personal_info.get("display_name")
-    ticket.phone = personal_info.get("c_ldap_position")
-    ticket.full_name = personal_info.get("mobile_phone")
+    ticket.position = personal_info.get("c_ldap_position")
+    ticket.phone = personal_info.get("mobile_phone")
+    ticket.full_name = personal_info.get("display_name")
 
-    add_shop_info(personal_info.get("org_unit"), ticket)
+    add_shop_info(personal_info.get("unit"), ticket)
 
 def create_task_from_itsm():
     tasks = get_tasks_from_itsm()
@@ -130,11 +138,20 @@ def create_itsm_task(task:dict) -> bool:
     ticket.creator = User.objects.get(username=settings.TICKET_CREATOR_USERNAME)
     ticket.status = Dictionary.get_status_ticket("new")
     ticket.type_ticket = Dictionary.get_type_ticket(Ticket.default_type_code)
-    ticket.link_to_source = f"{get_url()}/{task['sys_id']}"
+    ticket.link_to_source = create_link_to_itsm_task(task)
     ticket.source_ticket = Ticket.SourceTicket.ITSM
     ticket.save()
     logging.info(f"Add new task {ticket} from itsm")
     return True
+
+def create_link_to_itsm_task(task):
+    table_task = task.get("sys_db_table_id")
+    if table_task is not None:
+        type_task = TYPE_TASK.get(table_task)
+        if type_task is not None:
+            return f"{settings.ITSM_BASE_URL}/record/{type_task}/{task['sys_id']}"
+    return f"{get_url()}/{task['sys_id']}"
+
 
 def get_tickets_for_update():
     tickets = Ticket.objects.filter(source_ticket=Ticket.SourceTicket.ITSM)
