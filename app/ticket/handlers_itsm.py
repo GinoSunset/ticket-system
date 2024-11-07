@@ -7,7 +7,7 @@ import logging
 import requests
 
 from additionally.models import Dictionary
-from ticket.models import Ticket
+from ticket.models import Ticket, Comment
 from users.models import Customer, User
 
 
@@ -159,3 +159,7 @@ def get_tickets_for_update():
 
 def updates_itsm_tickets():
     tickets_for_update = get_tickets_for_update()
+
+
+def send_comment_to_itsm(comment: Comment):
+    text = comment.text

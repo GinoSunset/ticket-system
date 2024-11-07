@@ -256,6 +256,10 @@ class Comment(models.Model):
     is_changed = models.BooleanField(default=False)
     is_system_message = models.BooleanField(default=False)
     is_for_report = models.BooleanField(default=False)
+    # ITSM
+    is_for_itsm_sent = models.BooleanField(default=False)
+    status_itsm_push = models.BooleanField(default=False)
+    id_itsm_comment = models.CharField(null=True, blank=True, max_length=100)
 
     def __str__(self) -> str:
         content = ""

@@ -26,8 +26,10 @@ env = environ.Env(
     TG_BOT_NOTIFICATION_URI=(str, ""),
     DATABASE_URL=(str, "sqlite:///db.sqlite3"),
     URL_INVOICE_API=(str, "http://microservice:8000"),
+    # ITSM
     ITSM_BASE_URL=(str, "https://s1.itsm.net"),
-    ITSM_TASK_URL=(str, "/rest/v1/table/itsm_task"),
+    ITSM_TASK_URL=(str, "rest/v1/table/itsm_task"),
+    ITSM_COMMENT_URL=(str, "v1/activity-feed/create-thread"),
     ITSM_USER_ID=(int, 111111111111117111),
     ITSM_USER=(str, "222"),
     ITSM_PASSWORD=(str, "1111"),
