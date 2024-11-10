@@ -1,0 +1,38 @@
+{
+  "messages": [],
+  "status": "OK",
+  "data": [
+    {
+      "sys_id": "123123123132",
+      "type_id": "16146803341450АААААА",
+      "date_group": "09.11.1999",
+      "content": {
+        "message": "test-message-1"
+      },
+      "parent_id": null,
+      "author": {
+        "name": "Компания Рога и Копыта",
+        "avatar": null
+      },
+      "timestamp": "1999-11-09 14:44:42"
+    },
+    {
+      "sys_id": "1731161421081123",
+      "type_id": "16146803341450АААААА",
+      "date_group": "09.11.1999",
+      "content": {
+        "message": "test-message"
+      },
+      "parent_id": null,
+      "author": {
+        "name": "Компания Рога и Копыта",
+        "avatar": null
+      },
+      "timestamp": "1999-11-09 14:10:21"
+    }
+  ],
+  "page_debug_id": "",
+  "timing": {
+    "before_echo": 1.7877578735351562
+  }
+}

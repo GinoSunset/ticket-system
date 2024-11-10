@@ -58,8 +58,6 @@ def create_one_itsm_ticket(ticket: dict):
 
 
 @celery_app.task
-def sent_task_to_itsm(comment_id: int) -> int:
+def sent_comment_to_itsm_task(comment_id: int) -> int:
     comment = Comment.objects.get(pk=comment_id)
-    result = send_comment_to_itsm(comment)
-    logging.info(f"Success send comment to itsm: {comment}")
-    return result
+    return send_comment_to_itsm(comment)

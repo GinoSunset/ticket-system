@@ -133,6 +133,19 @@ class Ticket(models.Model):
         help_text="Если задача создана через itsm, ссылка добавиться автоматически",
     )
 
+    itsm_task_id = models.CharField(
+        verbose_name="ID задачи в itsm",
+        null=True,
+        blank=True,
+        max_length=100,
+    )
+    itsm_type_task = models.CharField(
+        verbose_name="Тип задачи в itsm itsm_request или itsm_incident",
+        null=True,
+        blank=True,
+        max_length=100,
+    )
+
     source_ticket = models.IntegerField(
         verbose_name="Источник задачи",
         choices=SourceTicket.choices,
@@ -258,8 +271,10 @@ class Comment(models.Model):
     is_for_report = models.BooleanField(default=False)
     # ITSM
     is_for_itsm_sent = models.BooleanField(default=False)
-    status_itsm_push = models.BooleanField(default=False)
-    id_itsm_comment = models.CharField(null=True, blank=True, max_length=100)
+    status_itsm_push = models.BooleanField(default=False)  # TODO: for show in template
+    id_itsm_comment = models.CharField(
+        null=True, blank=True, max_length=100
+    )  # TODO: for edit
 
     def __str__(self) -> str:
         content = ""

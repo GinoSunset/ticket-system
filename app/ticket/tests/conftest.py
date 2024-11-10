@@ -276,6 +276,12 @@ def shop_info_fixture():
     with open(settings.BASE_DIR / "ticket/tests/itsm-shop.json") as f:
         return json.load(f)
 
+@pytest.fixture
+def get_json_fixture_comment():
+    with open(
+        settings.BASE_DIR / "ticket/tests/response_to_create_comment_itsm.json"
+    ) as f:
+        return json.load(f)
 
 @pytest.fixture
 def mock_itsm_request(
@@ -301,3 +307,15 @@ def mock_itsm_request(
         return response
 
     monkeypatch.setattr('requests.get', mocked_get)
+
+
+@pytest.fixture
+def mock_itsm_request_comment(monkeypatch, get_json_fixture_comment):
+    def mocked_post(url, *args, **kwargs):
+        response = mock.Mock()
+        response.status_code = 200
+        response.json.return_value = get_json_fixture_comment
+
+        return response
+
+    monkeypatch.setattr("requests.post", mocked_post)

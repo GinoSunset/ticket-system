@@ -2,6 +2,7 @@ from base64 import b64encode
 from collections import namedtuple
 from django.conf import settings
 from requests.models import Response
+from enum import Enum
 
 import logging
 import requests
@@ -9,6 +10,7 @@ import requests
 from additionally.models import Dictionary
 from ticket.models import Ticket, Comment
 from users.models import Customer, User
+
 
 
 CustomerPersonInfo = namedtuple('Person', ['position','fullname', 'phone'])
@@ -33,9 +35,9 @@ def get_url_with_assign_filter(url: str) -> str:
 
 
 def get_headers():
-    basic = f"{settings.ITSM_USER}:{settings.ITSM_PASSWORD}"
+    api_token = settings.ITSM_API_TOKEN
 
-    return {"Authorization": f"Basic {b64encode(basic.encode('utf-8')).decode()}"}
+    return {"Authorization": f"Bearer {api_token}"}
 
 
 def get_with_auth_header(url, headers=None, change_to_https=False):
@@ -138,18 +140,26 @@ def create_itsm_task(task:dict) -> bool:
     ticket.creator = User.objects.get(username=settings.TICKET_CREATOR_USERNAME)
     ticket.status = Dictionary.get_status_ticket("new")
     ticket.type_ticket = Dictionary.get_type_ticket(Ticket.default_type_code)
+    ticket.itsm_task_id = task.get("sys_id")
+    ticket.itsm_type_task = get_table_task(task)
     ticket.link_to_source = create_link_to_itsm_task(task)
     ticket.source_ticket = Ticket.SourceTicket.ITSM
     ticket.save()
     logging.info(f"Add new task {ticket} from itsm")
     return True
 
-def create_link_to_itsm_task(task):
+def get_table_task(task: dict) -> str | None:
     table_task = task.get("sys_db_table_id")
     if table_task is not None:
         type_task = TYPE_TASK.get(table_task)
         if type_task is not None:
-            return f"{settings.ITSM_BASE_URL}/record/{type_task}/{task['sys_id']}"
+            return type_task
+
+
+def create_link_to_itsm_task(task):
+    type_task = get_table_task(task)
+    if type_task is not None:
+        return f"{settings.ITSM_BASE_URL}/record/{type_task}/{task['sys_id']}"
     return f"{get_url()}/{task['sys_id']}"
 
 
@@ -158,8 +168,57 @@ def get_tickets_for_update():
     return tickets
 
 def updates_itsm_tickets():
+    # TODO: /v1/activity-feed/create-thread?table_name=itsm_request&record_id=1111&widget_instance_id=170169488606655843
     tickets_for_update = get_tickets_for_update()
+
+class ItsmService:
+    class CommentType(Enum):
+        work = "161468033414508229"
+
+    def __init__(self, token):
+        self.token = token
+        self.base_url = settings.ITSM_BASE_URL
+        self.headers = get_headers()
+
+        self.url_create_thread = "/v1/activity-feed/create-thread"
+
+    def get_url_create_thread(self) -> str:
+        url = f"{self.base_url}{self.url_create_thread}"
+        return url
+
+    def get_params_to_create_thread(
+        self,
+        record_id,
+        table_name,
+        widget_instance_id="170169488606655843",
+    ) -> dict:
+        return {
+            "table_name": table_name,
+            "record_id": record_id,
+            "widget_instance_id": widget_instance_id,
+        }
+
+    def send_comment(self, comment: Comment):
+        url = self.get_url_create_thread()
+        params = self.get_params_to_create_thread(
+            record_id=comment.ticket.itsm_task_id,
+            table_name=comment.ticket.itsm_type_task,
+        )
+        data = {"comment_type": self.CommentType.work.value, "text": comment.text}
+        res = requests.post(url, headers=self.headers, params=params, data=data)
+        if res.status_code != 200:
+            res.raise_for_status()
+        logging.info(f"Send comment {comment} to itsm")
+        return res.json()
 
 
 def send_comment_to_itsm(comment: Comment):
-    text = comment.text
+    itsm = ItsmService(token=settings.ITSM_API_TOKEN)
+    res = itsm.send_comment(comment)
+    if res.get("status") == "OK":
+        comment.status_itsm_push = True
+        comment.save()
+        return True
+    comment.status_itsm_push = False
+    comment.save()
+    return False
