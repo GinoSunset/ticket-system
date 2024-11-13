@@ -211,7 +211,7 @@ class Act(models.Model):
         date_start = self.ticket.date_to_work or self.ticket.date_create
         date_str = self.get_str_date(date_start)
         org = " "
-        if hasattr(self.ticket, "cutomer") and self.ticket.customer.profile.company:
+        if hasattr(self.ticket, "customer") and self.ticket.customer.profile.company:
             org = self.ticket.customer.profile.company
         context = {"ticket": self.ticket, "date": date_str, "org": org}
         return context
