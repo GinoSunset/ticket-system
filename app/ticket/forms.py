@@ -89,8 +89,19 @@ class CommentForm(forms.ModelForm):
 
     class Meta:
         model = Comment
-        fields = ["text", "is_for_report"]
+        fields = [
+            "text",
+            "is_for_report",
+            "is_for_itsm_sent",
+        ]
 
         widgets = {
             "is_for_report": forms.HiddenInput(),
+            "is_for_itsm_sent": forms.CheckboxInput(attrs={"class": "ui checkbox"}),
         }
+
+    def __init__(self, *args, **kwargs):
+        ticket = kwargs["initial"].pop("ticket", None)
+        super().__init__(*args, **kwargs)
+        if ticket and ticket.is_itsm is False:
+            self.fields["is_for_itsm_sent"].widget = forms.HiddenInput()

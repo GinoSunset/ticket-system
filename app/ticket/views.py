@@ -117,7 +117,10 @@ class TicketUpdateView(LoginRequiredMixin, AccessTicketMixin, UpdateView):
             kwargs.pop("form")
         if self.request.user.is_operator:
             kwargs["form_comment_to_report"] = CommentForm(
-                initial={"is_for_report": True}
+                initial={
+                    "is_for_report": True,
+                    "ticket": self.object,
+                }
             )
         return kwargs
 
@@ -160,6 +163,11 @@ class CommentCreateView(LoginRequiredMixin, CreateView):
     model = Comment
     form_class = CommentForm
     template_name = "ticket/comment_form.html"
+
+    def get_form_kwargs(self):
+        kwargs = super().get_form_kwargs()
+        kwargs["initial"]["ticket"] = Ticket.objects.get(pk=self.kwargs.get("ticket_pk"))
+        return kwargs
 
     def form_valid(self, form):
         ticket: Ticket = Ticket.objects.get(pk=self.kwargs.get("ticket_pk"))

@@ -238,6 +238,10 @@ class Ticket(models.Model):
             is_system_message=True,
         )
 
+    @property
+    def is_itsm(self):
+        return self.source_ticket == self.SourceTicket.ITSM
+
 
 class Comment(models.Model):
     TEMPLATE_DICT = {
@@ -270,8 +274,12 @@ class Comment(models.Model):
     is_system_message = models.BooleanField(default=False)
     is_for_report = models.BooleanField(default=False)
     # ITSM
-    is_for_itsm_sent = models.BooleanField(default=False)
-    status_itsm_push = models.BooleanField(default=False)  # TODO: for show in template
+    is_for_itsm_sent = models.BooleanField(
+        default=False,
+        verbose_name="Отправить в itsm",
+        help_text="Этот свойство позволяет системе понять, что комментарий должен быть отправлен в itsm",
+    )
+    status_itsm_push = models.BooleanField(default=False, help_text="Отправлено в itsm")  # TODO: for show in template
     id_itsm_comment = models.CharField(
         null=True, blank=True, max_length=100
     )  # TODO: for edit
