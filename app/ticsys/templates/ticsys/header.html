@@ -34,9 +34,12 @@
       <a class="item" href={{user.get_absolute_url}} >
         <span>{{user}} </span>
       </a>
-      <a class="ui item" href="{% url 'logout' %}">
-        Выход
-      </a>
+      <form method="post" action="{% url 'logout'%}">
+        {% csrf_token %}
+        <button class="ui item" href="{% url 'logout' %}">
+          Выход
+        </button>
+      </form>
     </div>
   </div>
 {% endwith %} 
