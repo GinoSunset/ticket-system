@@ -406,22 +406,34 @@ class UpdateComponentSerialNumber(AccessOperatorMixin, LoginRequiredMixin, Updat
     template_name = "storage/htmx/modal_add_serial_number.html"
     success_url = reverse_lazy("storage:component_list")
 
-    def get_object(self, queryset=None):
+    def get_queryset(self):
         self.component_type_pk = self.kwargs.get("pk")
         self.nomenclature_pk = self.kwargs.get("nomenclature_pk")
         return Component.objects.filter(
             nomenclature=self.nomenclature_pk, component_type=self.component_type_pk
         )
 
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
+    def get(self, request, *args, **kwargs):
+        queryset = self.get_queryset()
+        formset = ComponentSerialNumberFormSet(queryset=queryset)
+        context = self.get_context(formset)
+        return render(request, self.template_name, context)
+
+    def get_context(self, formset):
+        context = {}
         context["component_type"] = ComponentType.objects.get(pk=self.component_type_pk)
         context["nomenclature_pk"] = self.nomenclature_pk
+        context["formset"] = formset
         return context
 
-    def get_form(self, form_class=None):
-        return ComponentSerialNumberFormSet(queryset=self.object)
-
+    def post(self, request, *args, **kwargs):
+        queryset = self.get_queryset()
+        formset = ComponentSerialNumberFormSet(request.POST, queryset=queryset)
+        context = self.get_context(formset)
+        if formset.is_valid():
+            formset.save()
+            return render(request, self.template_name, context)
+        return HttpResponse(status=201)
 
 class WriteOff(AccessOperatorMixin, LoginRequiredMixin, FormView):
     form_class = WriteOffForm

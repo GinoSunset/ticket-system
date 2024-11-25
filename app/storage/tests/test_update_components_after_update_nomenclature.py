@@ -69,3 +69,22 @@ def test_phantom_component_remove_after_delete(
     nomenclature.delete()
 
     assert Component.objects.filter(id__in=components_id).exists() is False
+
+
+@pytest.mark.django_db
+def test_add_component_to_stock_when_nomenclature_in_status_completed(
+    nomenclature_factory, monkeypatch_delay_reserve_component_celery
+):
+    assert False
+
+
+@pytest.mark.django_db
+def tet_change_component_in_delivery_to_stock_and_free_this_component_in_delivery(
+    nomenclature_factory, monkeypatch_delay_reserve_component_celery
+):
+    assert False
+
+
+@pytest.mark.django_db
+def tet_change_status_in_stock_when_add_serial_number():
+    assert False
