@@ -10,6 +10,7 @@ from django.views.generic import (
     ListView,
     CreateView,
     FormView,
+    UpdateView,
 )
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.db.transaction import atomic
@@ -23,6 +24,7 @@ from ..forms import (
     ComponentForm,
     ParentFormSet,
     WriteOffForm,
+    ComponentSerialNumberFormSet,
 )
 from django.shortcuts import redirect
 
@@ -398,6 +400,27 @@ class NomenclatureComponents(AccessOperatorMixin, LoginRequiredMixin, ListView):
                 )
             ),
         )
+
+class UpdateComponentSerialNumber(AccessOperatorMixin, LoginRequiredMixin, UpdateView):
+    model = Component
+    template_name = "storage/htmx/modal_add_serial_number.html"
+    success_url = reverse_lazy("storage:component_list")
+
+    def get_object(self, queryset=None):
+        self.component_type_pk = self.kwargs.get("pk")
+        self.nomenclature_pk = self.kwargs.get("nomenclature_pk")
+        return Component.objects.filter(
+            nomenclature=self.nomenclature_pk, component_type=self.component_type_pk
+        )
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context["component_type"] = ComponentType.objects.get(pk=self.component_type_pk)
+        context["nomenclature_pk"] = self.nomenclature_pk
+        return context
+
+    def get_form(self, form_class=None):
+        return ComponentSerialNumberFormSet(queryset=self.object)
 
 
 class WriteOff(AccessOperatorMixin, LoginRequiredMixin, FormView):

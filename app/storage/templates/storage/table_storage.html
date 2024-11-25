@@ -1,14 +1,15 @@
 {% load static %}
 
 {% block header_style %}
-  <script type="text/javascript" src="{% static 'js/htmx.min.js' %}"></script>
+{% comment %} <script type="text/javascript" src="{% static 'js/htmx.min.js' %}"></script> {% endcomment %}
+<script type="text/javascript" src="https://unpkg.com/htmx.org@2.0.3/dist/htmx.js"></script>
 {% endblock %}
 <div id="filter_block" class="ui middle aligned three column centered grid" >
     <div class="column">  
       
       <div class="ui icon input">
         <input  type="search" 
-          id="seach_id"
+          id="search_id"
           hx-headers='{"X-CSRFToken": "{{ csrf_token }}"}'
           placeholder="Поиск..."
           name="search"
@@ -39,7 +40,7 @@
     </div>
     </div>
     <div class="column">
-      <select id="tags_filter" class="ui multiple search selection dropdown" name="tags"
+      <select id="tags_filter" class="ui multiple search selection dropdown" multiple name="tags"
       id="tags"
       hx-trigger="change from:body"
       hx-get='{% url "search" %}{% if nomenclature_pk %}?nomenclature_pk={{nomenclature_pk}}{% endif %}'
@@ -49,7 +50,7 @@
       hx-indicator="#indicator"
       
       >
-        <option value="">Выберети тег</option>
+        <option value="">Выберите тег</option>
         {% for tag in tags %}
         <option value="{{tag.id}}">{{tag.name}}</option>
         {% endfor %}
@@ -67,8 +68,8 @@
       <th>На доставке</th>
       <th class="seven wide">
         Диаграмма<div class="legent">
-          <a class="ui mini red label">отсутвует</a>
-          <a class="ui mini violet label">в резерве на доставе</a>
+          <a class="ui mini red label">отсутствует</a>
+          <a class="ui mini violet label">в резерве на доставке</a>
           <a class="ui mini blue label">в доставке</a>
           <a class="ui mini purple label">зарезервирован</a>
           <a class="ui mini green label">свободны</a>
@@ -82,8 +83,11 @@
   </tbody>
 </table>
 
+<div id="modal-add-serial-number" class="ui modal">
+</div>
 <script>
   run_progress();
+  $('#modal-add-serial-number').modal();
 
   
   $('#tags_filter').dropdown();
@@ -98,7 +102,7 @@
     }
 
   function getSearch(){
-    const searchEl = document.getElementById('seach_id')
+    const searchEl = document.getElementById('search_id')
     const searchInput = searchEl.value;
     if (searchEl){
       return searchInput

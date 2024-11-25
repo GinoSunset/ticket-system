@@ -218,3 +218,7 @@ class AliasInvoiceForm(ModelForm):
     )
     quantity = forms.IntegerField(min_value=1, initial=1, label="Количество в доставке")
     id_relation = forms.IntegerField(widget=forms.HiddenInput(), required=False)
+
+ComponentSerialNumberFormSet = modelformset_factory(
+    Component, fields=("serial_number",), extra=0
+)

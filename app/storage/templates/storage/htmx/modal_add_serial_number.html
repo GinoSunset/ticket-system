@@ -1,0 +1,35 @@
+<div class="ui modal" id="modal-add-serial-number">
+    <i class="close icon"></i>
+    <div class="header">
+      Добавить серийный номер для типа:{{component_type}}
+    </div>
+    <div class="content">
+      <form method="post" class="ui form" 
+        hx-post="{% url 'add-serial-number' nomenclature_pk component_type.pk  %}" 
+        hx-target="#update-modal .content" 
+        hx-swap="innerHTML">
+        {% csrf_token %}
+        {{ form.management_form }}
+        <div class="fields" style="flex-wrap: wrap;">
+          {% for component_form in form %}
+          <div class="field">   
+            <label>Серийный номер</label>
+            <div class="ui input">
+                {{ component_form.serial_number }}
+            </div>
+          </div>
+          {% endfor %}
+        </div>
+          
+        <div class="ui hidden divider"></div>
+        <div class="actions">
+            <button class="ui positive button" type="submit">Сохранить</button>
+            <button class="ui button cancel" type="button">Отмена</button>
+        </div>
+    </form>
+  </div>
+
+
+<script>
+    $('#modal-add-serial-number').modal('show');
+</script>
