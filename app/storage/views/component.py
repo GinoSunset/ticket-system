@@ -433,7 +433,7 @@ class UpdateComponentSerialNumber(AccessOperatorMixin, LoginRequiredMixin, Updat
         if formset.is_valid():
             formset.save()
             return render(request, self.template_name, context)
-        return HttpResponse(status=201)
+        return render(request, self.template_name, context, status=400)
 
 class WriteOff(AccessOperatorMixin, LoginRequiredMixin, FormView):
     form_class = WriteOffForm
