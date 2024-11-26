@@ -8,6 +8,7 @@
       <a class="ui button basic blue" href="{% url 'component-type-create' %}">Создать тип компонент</a>
       <a class="ui button basic green" href="{% url 'component-create' %}">Добавить компонент на склад</a>
       <a class="ui button basic green" href="{% url 'component-type-create' %}">Добавить доставку</a>
+      {% if not nomenclature_pk %}
       <div class="ui horizontal right aligned divider header legent">
         <a class="ui mini red label">отсутствует</a>
         <a class="ui mini violet label">в резерве на доставке</a>
@@ -15,6 +16,7 @@
         <a class="ui mini purple label">зарезервирован</a>
         <a class="ui mini green label">свободны</a>
       </div>
+      {% endif %}
       {% include 'storage/table_storage.html' %}
     </div>
   </div>
