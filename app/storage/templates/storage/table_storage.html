@@ -1,8 +1,8 @@
 {% load static %}
 
 {% block header_style %}
-{% comment %} <script type="text/javascript" src="{% static 'js/htmx.min.js' %}"></script> {% endcomment %}
-<script type="text/javascript" src="https://unpkg.com/htmx.org@2.0.3/dist/htmx.js"></script>
+<script type="text/javascript" src="{% static 'js/htmx.min.js' %}"></script>
+{% comment %} <script type="text/javascript" src="https://unpkg.com/htmx.org@2.0.3/dist/htmx.js"></script> {% endcomment %}
 {% endblock %}
 <div id="filter_block" class="ui middle aligned three column centered grid" >
     <div class="column">  
@@ -87,8 +87,30 @@
 </div>
 <script>
   run_progress();
-  {% comment %} $('#modal-add-serial-number').modal(); {% endcomment %}
+  $('#modal-add-serial-number').modal();
 
+  function showToast(message) {
+    $('body').toast({
+        message: message,
+        class: 'success', 
+        showProgress: 'top',
+        displayTime: 3000
+    });
+  }
+  function closeModal() {
+    $('.ui.modal').modal('hide');
+  }
+  
+  document.body.addEventListener('htmx:afterRequest', (event) => {
+    if (event.detail.target.id === 'response' && event.detail.successful) {
+      console.log(event);
+      closeModal();
+      showToast("Успешное добавление серийных номеров")
+    }  
+    if (event.detail.target.id === 'modal-add-serial-number') {
+      $('.ui.modal').modal('show');
+    }
+  });
   
   $('#tags_filter').dropdown();
   {% comment %} .dropdown('set selected', ['meteor', 'ember']) {% endcomment %}
