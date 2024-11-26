@@ -10,6 +10,7 @@ from django.views.generic import (
     ListView,
     CreateView,
     FormView,
+    UpdateView,
 )
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.db.transaction import atomic
@@ -23,6 +24,7 @@ from ..forms import (
     ComponentForm,
     ParentFormSet,
     WriteOffForm,
+    ComponentSerialNumberFormSet,
 )
 from django.shortcuts import redirect
 
@@ -399,6 +401,39 @@ class NomenclatureComponents(AccessOperatorMixin, LoginRequiredMixin, ListView):
             ),
         )
 
+class UpdateComponentSerialNumber(AccessOperatorMixin, LoginRequiredMixin, UpdateView):
+    model = Component
+    template_name = "storage/htmx/modal_add_serial_number.html"
+    success_url = reverse_lazy("storage:component_list")
+
+    def get_queryset(self):
+        self.component_type_pk = self.kwargs.get("pk")
+        self.nomenclature_pk = self.kwargs.get("nomenclature_pk")
+        return Component.objects.filter(
+            nomenclature=self.nomenclature_pk, component_type=self.component_type_pk
+        )
+
+    def get(self, request, *args, **kwargs):
+        queryset = self.get_queryset()
+        formset = ComponentSerialNumberFormSet(queryset=queryset)
+        context = self.get_context(formset)
+        return render(request, self.template_name, context)
+
+    def get_context(self, formset):
+        context = {}
+        context["component_type"] = ComponentType.objects.get(pk=self.component_type_pk)
+        context["nomenclature_pk"] = self.nomenclature_pk
+        context["formset"] = formset
+        return context
+
+    def post(self, request, *args, **kwargs):
+        queryset = self.get_queryset()
+        formset = ComponentSerialNumberFormSet(request.POST, queryset=queryset)
+        context = self.get_context(formset)
+        if formset.is_valid():
+            formset.save()
+            return render(request, self.template_name, context)
+        return render(request, self.template_name, context, status=400)
 
 class WriteOff(AccessOperatorMixin, LoginRequiredMixin, FormView):
     form_class = WriteOffForm

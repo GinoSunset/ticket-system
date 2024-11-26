@@ -44,5 +44,18 @@
         </div>
       </div>
     </td>
+    {% if nomenclature_pk %}
+    <td>
+      <button class="ui basic mini button"
+      hx-get="{% url 'add-serial-number' nomenclature_pk component.component_type %}"
+      hx-target="#modal-add-serial-number"
+      hx-trigger="click"
+      hx-swap="innerHTML">
+        <i class="barcode icon"></i>
+      </button>
+    </td>
+    {% endif %}
+
   </tr>
+
 {% endfor %}

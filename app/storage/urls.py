@@ -51,4 +51,9 @@ urlpatterns = [
         views.InvoiceAliasDeleteView.as_view(),
         name="invoice-alias-delete",
     ),
+    path(
+        "nomenclature/<int:nomenclature_pk>/add-serial-number/<int:pk>",
+        views.UpdateComponentSerialNumber.as_view(),
+        name="add-serial-number",
+    ),
 ]

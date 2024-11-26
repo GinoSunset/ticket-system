@@ -69,3 +69,4 @@ def test_phantom_component_remove_after_delete(
     nomenclature.delete()
 
     assert Component.objects.filter(id__in=components_id).exists() is False
+

@@ -1,0 +1,32 @@
+<i class="close icon"></i>
+<div class="header">
+  Добавить серийный номер для типа:{{component_type}}
+</div>
+<div class="content">
+  <form class="ui form" 
+  hx-post="{% url 'add-serial-number' nomenclature_pk component_type.pk  %}" 
+  hx-target="#response">
+    {% csrf_token %}
+    {{ formset.non_field_errors }}
+    {{ formset.management_form }}
+    <div class="fields" style="flex-wrap: wrap;">
+      {% for form in formset %}
+      <div class="field">   
+        {{ form.id }}
+        <label>Серийный номер</label>
+        <div class="ui input">
+            {{ form.serial_number }}
+            {{ form.serial_number.errors }}
+        </div>
+      </div>
+      {% endfor %}
+    </div>
+    <div id="response"></div>
+      
+    <div class="ui hidden divider"></div>
+    <div class="actions">
+        <button class="ui positive button" type="submit">Сохранить</button>
+        <button class="ui button cancel" type="button">Отмена</button>
+    </div>
+  </form>
+</div>
