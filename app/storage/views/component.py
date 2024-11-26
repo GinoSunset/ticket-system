@@ -364,7 +364,7 @@ class NomenclatureComponents(AccessOperatorMixin, LoginRequiredMixin, ListView):
     def get_queryset(self):
         self.internal = self.request.GET.get("internal", False)
         nomenclature_pk = self.kwargs.get("pk")
-        qs = Component.active_components.all()
+        qs = Component.objects.all()
         if nomenclature_pk:
             qs = qs.filter(nomenclature=nomenclature_pk)
         if not self.internal:
