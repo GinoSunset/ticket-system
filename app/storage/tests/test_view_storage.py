@@ -159,8 +159,10 @@ class TestWriteOffComponent:
 @pytest.mark.django_db
 def test_search_result(component_type, operator_client, component_factory):
     url = reverse("search")
-    component_factory(component_type=component_type)
-    res = operator_client.get(url, data={"search": component_type.name})
+    component_factory(component_type=component_type, is_stock=True)
+    res = operator_client.get(
+        url, data={"search": component_type.name, "internal": "1"}
+    )
     assert res.context_data["components"].count() == 1
     assert (
         res.context_data["components"][0]["component_type_name"] == component_type.name
