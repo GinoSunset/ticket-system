@@ -73,9 +73,9 @@ class Component(models.Model):
         blank=True,
         null=True,
     )
+    objects = models.Manager()
     active_components = ComponentManager()
     phantom_components = ComponentPhantomManager()
-    objects = models.Manager()
 
     @classmethod
     def generate_serial_number(cls, component_type):

@@ -11,6 +11,7 @@
     {{ formset.management_form }}
     <div class="fields" style="flex-wrap: wrap;">
       {% for form in formset %}
+      {{ form.non_field_errors }}
       <div class="field">   
         {{ form.id }}
         <label>Серийный номер</label>

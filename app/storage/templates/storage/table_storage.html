@@ -102,11 +102,22 @@
   }
   
   document.body.addEventListener('htmx:afterRequest', (event) => {
-    if (event.detail.target.id === 'response' && event.detail.successful) {
-      console.log(event);
-      closeModal();
-      showToast("Успешное добавление серийных номеров")
-    }  
+    if (event.detail.target.id === 'response') {
+      if (event.detail.successful){
+        closeModal();
+        showToast("Успешное добавление серийных номеров")
+      }
+      else{
+    $('#modal-add-serial-number').modal('show');
+
+        $('body').toast({
+          message: "Произошла ошибка",
+          class: 'error', 
+          showProgress: 'top',
+          displayTime: 3000
+      });
+      }
+    }
     if (event.detail.target.id === 'modal-add-serial-number') {
       $('.ui.modal').modal('show');
     }
