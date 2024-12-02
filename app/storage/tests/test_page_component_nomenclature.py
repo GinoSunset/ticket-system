@@ -21,6 +21,7 @@ def test_add_component_to_stock_when_added_serial_number_by_form(
     res = operator_client.post(url, form_data)
     assert res.status_code == 200
     component.refresh_from_db()
+    assert component.serial_number == "2"
     assert False
     assert component.is_phantom is False, "Компонент должен быть не на складе"
 

@@ -1,6 +1,14 @@
 from django.urls import path
 import manufactures.views as views
+from rest_framework.routers import DefaultRouter
+from .apiviews import ManufactureViewSet
 
+router = DefaultRouter()
+router.register(
+    r"api/manufactures",
+    ManufactureViewSet,
+    basename="manufactures",
+)
 
 urlpatterns = [
     path("", views.ManufacturesListView.as_view(), name="manufactures-list"),
@@ -37,4 +45,4 @@ urlpatterns = [
         views.ManufactureNomenclaturesPrintView.as_view(),
         name="manufacture-detail-nomenclatures-print",
     ),
-]
+] + router.urls
