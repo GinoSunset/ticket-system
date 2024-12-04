@@ -1,21 +1,54 @@
-from rest_framework.viewsets import ModelViewSet
-from rest_framework.pagination import PageNumberPagination
-from django_filters.rest_framework import DjangoFilterBackend
-from rest_framework.filters import OrderingFilter, SearchFilter
+from rest_framework.views import APIView
+from rest_framework.response import Response
 from .models import Manufacture
 from .serializers import ManufactureSerializer
-from .filters import ManufactureFilter
 
 
-class ManufacturePagination(PageNumberPagination):
-    page_size_query_param = "length"  # DataTables использует параметр `length`
+class ManufactureDataTableAPIView(APIView):
+    def get(self, request, *args, **kwargs):
+        draw = request.GET.get("draw", 1)
+        start = int(request.GET.get("start", 0))
+        length = int(request.GET.get("length", 10))
+        search_value = request.GET.get("search[value]", "")
 
+        # Базовый queryset
+        queryset = Manufacture.objects.all()
 
-class ManufactureViewSet(ModelViewSet):
-    queryset = Manufacture.objects.all()
-    serializer_class = ManufactureSerializer
-    pagination_class = ManufacturePagination
-    filter_backends = [DjangoFilterBackend, OrderingFilter, SearchFilter]
-    filterset_class = ManufactureFilter
-    ordering_fields = ["pk", "date_create", "date_shipment", "count"]
-    search_fields = ["client", "comment"]
+        # Фильтрация
+        if search_value:
+            queryset = queryset.filter(client__icontains=search_value)
+
+        # Сортировка
+        order_column_index = request.GET.get("order[0][column]")
+        order_direction = request.GET.get("order[0][dir]")
+        if order_column_index and order_direction:
+            column_name = [
+                "pk",
+                "date_create",
+                "client",
+                "date_shipment",
+                "count",
+                "branding",
+                "status",
+                "comment",
+            ][int(order_column_index)]
+            if order_direction == "desc":
+                column_name = f"-{column_name}"
+            queryset = queryset.order_by(column_name)
+
+        # Пагинация
+        total_count = queryset.count()
+        queryset = queryset[start : start + length]
+
+        # Сериализация
+        serializer = ManufactureSerializer(queryset, many=True)
+
+        # Формирование ответа
+        return Response(
+            {
+                "draw": int(draw),
+                "recordsTotal": total_count,
+                "recordsFiltered": total_count,
+                "data": serializer.data,
+            }
+        )

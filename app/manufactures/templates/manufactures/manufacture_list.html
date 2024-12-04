@@ -140,18 +140,20 @@
 <script>
 const reloadbtn = $('.reloadbtn');
 
-$(".showModal").on("click", function(e){
-  e.preventDefault();
+$('#tableManufactures').on('draw.dt', function () {
+  $(".showModal").off("click").on("click", function (e) {
+    e.preventDefault();
 
-  let id = $(this).closest('tr').find('td:first').text();
-  let url = "{% url 'manufacture-update-status' 0 %}".replace('0', id);
-  $.ajax({
-    url: url,
-    success: function ( res ) {
-      $('#ChangeStatusModal .content').html(res);
-      $('#ChangeStatusModal').modal('show');
-      $("#id_status").dropdown();
-    }
+    let id = $(this).closest('tr').find('td:first').text();
+    let url = "{% url 'manufacture-update-status' 0 %}".replace('0', id);
+    $.ajax({
+      url: url,
+      success: function ( res ) {
+        $('#ChangeStatusModal .content').html(res);
+        $('#ChangeStatusModal').modal('show');
+        $("#id_status").dropdown();
+      }
+    });
   });
 });
 
@@ -218,7 +220,7 @@ var table = $('#tableManufactures').DataTable({
     stateSave: true,
     serverSide: true,
     ajax: {
-     url: '/manufactures/api/manufactures', 
+     url: '{% url "api-manufactures" %}', 
      data: function (d) {
       d.search = d.search.value;
       d.length = d.length;
@@ -235,8 +237,33 @@ var table = $('#tableManufactures').DataTable({
                     return data ? '<i class="check circle outline green icon"></i>' : '<i class="times circle outline red icon"></i>';
                 }
             },
-            { data: "status", title: "Статус" },
-            { data: "comment", title: "Комментарий" }
+            { data: "status", title: "Статус", render: function (data, type, row) {
+                if (data) {
+                    return `
+                        <button class="ui button mini ${row.status_color} showModal">
+                            ${data}
+                        </button>`;
+                }
+                return '';
+            } },
+            { data: "comment", title: "Комментарий" },
+            {
+              data: "actions",
+              title: "Действия",
+              orderable: false,
+              render: function (data) {
+                  return `
+                      <div class="ui buttons">
+                          <a class="ui button info basic icon" href="${data.update_url}">
+                              <i class="ui icon pen"></i>
+                          </a>
+                          <button class="ui button basic icon" onclick="printDetails(${data.print_id})">
+                              <i class="ui icon print"></i>
+                          </button>
+                      </div>
+                  `;
+              }
+            }
         ],
     columnDefs: [
         { "orderable": false, "targets": [4,5,6,7,8] },
@@ -257,7 +284,7 @@ var table = $('#tableManufactures').DataTable({
   $('#tableManufactures tbody').on( 'click', 'tr', function () {
         var tr = $(this).closest('tr');
         var row = table.row( tr );
-        var id = row.data()[0];
+        var id = row.data()["pk"];
         if (row.child.isShown()) {
             row.child.hide();
             tr.removeClass('shown');
@@ -268,6 +295,7 @@ var table = $('#tableManufactures').DataTable({
         }
     } );
 
+    Вот это не работает
     $("#filterBtn").dropdown({
         onChange: function (value, text, $selectedItem) {
           localStorage.setItem('hidden_value_manuf', JSON.stringify(value));
