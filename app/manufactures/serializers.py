@@ -4,11 +4,10 @@ from .models import Manufacture
 
 
 class ManufactureSerializer(serializers.ModelSerializer):
-    progress_data = serializers.SerializerMethodField()
     actions = serializers.SerializerMethodField()
     client = serializers.SerializerMethodField()
-    status_color = serializers.SerializerMethodField()
     status = serializers.SerializerMethodField()
+    comment = serializers.SerializerMethodField()
 
     class Meta:
         model = Manufacture
@@ -20,9 +19,7 @@ class ManufactureSerializer(serializers.ModelSerializer):
             "count",
             "branding",
             "status",
-            "status_color",
             "comment",
-            "progress_data",
             "actions",
         ]
 
@@ -30,10 +27,11 @@ class ManufactureSerializer(serializers.ModelSerializer):
         return obj.get_color_status()
 
     def get_status(self, obj):
-        return obj.status.description
+        return {"status": obj.status.description, "color": obj.get_color_status()}
 
-    def get_progress_data(self, obj):
+    def get_comment(self, obj):
         return {
+            "comment": obj.comment,
             "total": obj.nomenclatures.count(),
             "value": obj.progress_str_as_list_nomenclatures,
         }

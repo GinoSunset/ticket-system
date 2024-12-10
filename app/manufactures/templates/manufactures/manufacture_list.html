@@ -75,49 +75,6 @@
         </tr>
     </thead>
     <tbody>
-    {% comment %} {% for manufacture in manufactures  %}
-    <tr>
-        <td>{{ manufacture.pk }}</td>
-        <td>{{ manufacture.date_create| date:"Y-m-d H:i:s" }}</td>
-        <td>{{ manufacture.client }}</td>
-
-        <td>{{ manufacture.date_shipment| date:"Y-m-d"}}</td>            
-        <td>{{ manufacture.count}}
-        <td><i class={% if manufacture.branding%}"check circle outline green icon"{% else %}"times circle outline red icon"{% endif %}></i></td>
-        <td>
-            {% if manufacture.status %}
-            <button class="ui button mini {{manufacture.get_color_status}} showModal">{{manufacture.status}}</button>
-            {% endif %}
-        </td>
-        <td>
-            {{ manufacture.comment }}
-            
-            <div class="ui multiple progress" style="margin-bottom:0px;" data-total="{{manufacture.nomenclatures.count}}" data-value="{{manufacture.progress_str_as_list_nomenclatures}}">
-                <div class="yellow bar">
-                  <div class="progress"></div>
-                </div>
-                <div class="green bar">
-                  <div class="progress"></div>
-                </div>
-              </div>
-        </td>
-        <td>
-          <div class="ui buttons">
-            <a class="ui button info basic icon"  href="{% url 'manufacture-update' manufacture.id %}"><i class="ui icon pen"></i></a>
-            <button class ="ui button basic icon" onclick='printDetails({{manufacture.id}})'><i class="ui icon print"></i></button>
-          </div>
-        </td>
-
-
-
-    </tr>
-
-    {% empty %}
-        <tr>
-          <td>Нет задач</td>
-        <tr>
-    {% endfor %} {% endcomment %}
-
     </tbody>
 </table>
 
@@ -129,7 +86,7 @@
   <i class="close icon"></i>
   <div class="header">Изменить статус</div>
   <div class="content">
-    bla
+    change status modal
   </div>
 
 </div>
@@ -201,26 +158,14 @@ var hidden_values = JSON.parse(localStorage.hidden_value_manuf || null) || false
       
     }
 
-    $.fn.dataTable.ext.search.push(function (settings, data, dataIndex) {
-      var status = data
-      to_hide = $("#filterBtn").dropdown('get value');
-      if (!to_hide){
-        return true;
-      }
-      to_hide = to_hide.split(",");
-      for (var i = 0; i < to_hide.length; i++) {
-        to_hide[i] = to_hide[i].trim();
-        if (status.indexOf(to_hide[i]) >= 0) {
-          return false;
-        }
-      }
-      return true;
-    });
 var table = $('#tableManufactures').DataTable({
     stateSave: true,
     serverSide: true,
+    initComplete: function () {
+      init_progress()
+    },
     ajax: {
-     url: '{% url "api-manufactures" %}', 
+     url: '{% url "api-manufactures" %}?format=datatables', 
      data: function (d) {
       d.search = d.search.value;
       d.length = d.length;
@@ -240,13 +185,28 @@ var table = $('#tableManufactures').DataTable({
             { data: "status", title: "Статус", render: function (data, type, row) {
                 if (data) {
                     return `
-                        <button class="ui button mini ${row.status_color} showModal">
-                            ${data}
+                        <button class="ui button mini ${data.color} showModal">
+                            ${data.status}
                         </button>`;
                 }
                 return '';
             } },
-            { data: "comment", title: "Комментарий" },
+            { data: "comment",
+              title: "Комментарий",
+              render: function (data) {
+                  return `
+                  ${data.comment}
+                  <div class="ui multiple progress" style="margin-bottom:0px;" data-total="${data.total}" data-value="${data.value}">
+                      <div class="yellow bar">
+                        <div class="progress"></div>
+                      </div>
+                      <div class="green bar">
+                        <div class="progress"></div>
+                      </div>
+                    </div>
+                  `
+              }
+            },
             {
               data: "actions",
               title: "Действия",
@@ -295,15 +255,25 @@ var table = $('#tableManufactures').DataTable({
         }
     } );
 
-    Вот это не работает
     $("#filterBtn").dropdown({
         onChange: function (value, text, $selectedItem) {
-          localStorage.setItem('hidden_value_manuf', JSON.stringify(value));
-          
-          table.draw();
+          hideStatus(value);
   
         }
       })
+
+
+    
+    function hideStatus(value){
+      localStorage.setItem('hidden_value_manuf', JSON.stringify(value));
+          if (!value || value.length===0){
+            table.columns(6).search('').draw();
+          } else {
+            let to_hide = value.replaceAll(",","|")
+            to_hide = `^(?!.*${to_hide})`
+            table.columns(6).search(to_hide, true,false,true).draw();
+          }
+      }
 {%endif%}
 {% if  user.is_operator  or user.is_staff %}
 {%endif%}
@@ -329,6 +299,16 @@ function getDetails(id){
 $("#onFull").click(function(){
     $('.ui.container').toggleClass('fluid');
 });
+
+function init_progress(){
+  console.log('init_progress');
+  $('.ui.multiple.progress').progress({
+    text: {
+      percent : '{bar} {percent}%',
+    }
+  });
+}
+
 $('.ui.multiple.progress').progress({
     text: {
       percent : '{bar} {percent}%',
