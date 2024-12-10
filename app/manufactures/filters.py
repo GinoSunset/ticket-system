@@ -4,7 +4,6 @@ from rest_framework_datatables.django_filters.filterset import DatatablesFilterS
 from rest_framework_datatables.django_filters.filters import GlobalFilter
 from .models import Manufacture
 
-
 class GlobalCharFilter(GlobalFilter, filters.CharFilter):
     pass
 
@@ -47,7 +46,7 @@ class GlobalFullNameAndCompanyFilter(GlobalFullNameFilter):
 
 
 class ManufactureGlobalFilter(DatatablesFilterSet):
-    id = GlobalCharFilter(lookup_expr="icontains")
+    pk = GlobalCharFilter(lookup_expr="icontains")
     status = GlobalCharFilter(field_name="status__description", lookup_expr="icontains")
     # client = GlobalFullNameAndCompanyFilter(lookup_expr="icontains")
     comment = GlobalCharFilter(lookup_expr="icontains")
@@ -56,7 +55,7 @@ class ManufactureGlobalFilter(DatatablesFilterSet):
     class Meta:
         model = Manufacture
         fields = (
-            "id",
+            "pk",
             "status",
             "client",
             "comment",

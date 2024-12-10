@@ -167,9 +167,7 @@ var table = $('#tableManufactures').DataTable({
     ajax: {
      url: '{% url "api-manufactures" %}?format=datatables', 
      data: function (d) {
-      d.search = d.search.value;
-      d.length = d.length;
-      d.start = d.start;
+      console.log("Отправляемые данные:", d); 
       }
     },
     columns: [
@@ -301,7 +299,6 @@ $("#onFull").click(function(){
 });
 
 function init_progress(){
-  console.log('init_progress');
   $('.ui.multiple.progress').progress({
     text: {
       percent : '{bar} {percent}%',
