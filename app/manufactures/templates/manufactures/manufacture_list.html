@@ -72,6 +72,7 @@
             <th>Статус</th>
             <th>Комментарий/Готовность</th>
             <th>Изменить</th>
+            <th>Серийные номера</th>
         </tr>
     </thead>
     <tbody>
@@ -221,6 +222,11 @@ var table = $('#tableManufactures').DataTable({
                       </div>
                   `;
               }
+            },
+            {
+              data: "serial_number",
+              title: "Серийный номер", 
+              name: "serial_number",
             }
         ],
     columnDefs: [

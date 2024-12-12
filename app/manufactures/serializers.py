@@ -8,6 +8,7 @@ class ManufactureSerializer(serializers.ModelSerializer):
     client = serializers.SerializerMethodField()
     status = serializers.SerializerMethodField()
     comment = serializers.SerializerMethodField()
+    serial_number = serializers.SerializerMethodField()
 
     class Meta:
         model = Manufacture
@@ -21,7 +22,14 @@ class ManufactureSerializer(serializers.ModelSerializer):
             "status",
             "comment",
             "actions",
+            "serial_number",
         ]
+
+    def get_serial_number(self, obj):
+        serial_numbers = obj.nomenclatures.values_list(
+            "component__serial_number", flat=True
+        ).distinct()
+        return ", ".join(filter(None, serial_numbers))
 
     def get_status_color(self, obj):
         return obj.get_color_status()

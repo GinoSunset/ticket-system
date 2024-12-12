@@ -8,38 +8,13 @@ class GlobalCharFilter(GlobalFilter, filters.CharFilter):
     pass
 
 
-class GlobalFullNameFilter(GlobalFilter, filters.CharFilter):
-    def global_q(self):
-        """Return a Q-Object for the global search for this column"""
-        ret = Q()
-        if self.global_search_value:
-            for term in self.global_search_value.split(" "):
-                ret |= (
-                    Q(
-                        **{
-                            f"{self.field_name}__first_name__{self.global_lookup_expr}": term
-                        }
-                    )
-                    | Q(
-                        **{
-                            f"{self.field_name}__last_name__{self.global_lookup_expr}": term
-                        }
-                    )
-                    | Q(
-                        **{
-                            f"{self.field_name}__username__{self.global_lookup_expr}": term
-                        }
-                    )
-                )
-        return ret
 
-
-class GlobalFullNameAndCompanyFilter(GlobalFullNameFilter):
+class GlobalComponentSerialNumber(GlobalFilter, filters.CharFilter):
     def global_q(self):
         ret = super().global_q()
         ret |= Q(
             **{
-                f"{self.field_name}__profile__company__{self.global_lookup_expr}": self.global_search_value
+                f"nomenclatures__components__serial_number__icontains": self.global_search_value
             }
         )
         return ret
@@ -48,9 +23,10 @@ class GlobalFullNameAndCompanyFilter(GlobalFullNameFilter):
 class ManufactureGlobalFilter(DatatablesFilterSet):
     pk = GlobalCharFilter(lookup_expr="icontains")
     status = GlobalCharFilter(field_name="status__description", lookup_expr="icontains")
-    # client = GlobalFullNameAndCompanyFilter(lookup_expr="icontains")
+    client = GlobalCharFilter(field_name="client__name", lookup_expr="icontains")
     comment = GlobalCharFilter(lookup_expr="icontains")
     ticket = GlobalCharFilter(field_name="ticket__pk", lookup_expr="icontains")
+    serial_number_component = GlobalComponentSerialNumber()
 
     class Meta:
         model = Manufacture
@@ -60,4 +36,11 @@ class ManufactureGlobalFilter(DatatablesFilterSet):
             "client",
             "comment",
             "ticket",
+            "serial_number_component",
         )
+
+    def filter_queryset(self, queryset):
+        print("Фильтруем данные:", self.data)
+        queryset = super().filter_queryset(queryset)
+        print("Отфильтрованный результат:", queryset.query)
+        return queryset
