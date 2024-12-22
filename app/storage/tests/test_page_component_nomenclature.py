@@ -7,7 +7,7 @@ def test_add_component_to_stock_when_added_serial_number_by_form(
     nomenclature_factory, monkeypatch_delay_reserve_component_celery, operator_client
 ):
     nomenclature = nomenclature_factory()
-    component = nomenclature.component_set.first()
+    component = nomenclature.components.first()
     form_data = {
         "form-0-id": component.id,
         "form-0-serial_number": "2",

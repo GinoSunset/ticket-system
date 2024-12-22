@@ -11,13 +11,11 @@ class GlobalCharFilter(GlobalFilter, filters.CharFilter):
 
 class GlobalComponentSerialNumber(GlobalFilter, filters.CharFilter):
     def global_q(self):
-        ret = super().global_q()
-        ret |= Q(
+        return Q(
             **{
                 f"nomenclatures__components__serial_number__icontains": self.global_search_value
             }
         )
-        return ret
 
 
 class ManufactureGlobalFilter(DatatablesFilterSet):
@@ -26,7 +24,7 @@ class ManufactureGlobalFilter(DatatablesFilterSet):
     client = GlobalCharFilter(field_name="client__name", lookup_expr="icontains")
     comment = GlobalCharFilter(lookup_expr="icontains")
     ticket = GlobalCharFilter(field_name="ticket__pk", lookup_expr="icontains")
-    serial_number_component = GlobalComponentSerialNumber()
+    serial_number = GlobalComponentSerialNumber()
 
     class Meta:
         model = Manufacture
@@ -36,11 +34,4 @@ class ManufactureGlobalFilter(DatatablesFilterSet):
             "client",
             "comment",
             "ticket",
-            "serial_number_component",
         )
-
-    def filter_queryset(self, queryset):
-        print("Фильтруем данные:", self.data)
-        queryset = super().filter_queryset(queryset)
-        print("Отфильтрованный результат:", queryset.query)
-        return queryset

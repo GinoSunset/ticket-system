@@ -27,7 +27,7 @@ class ManufactureSerializer(serializers.ModelSerializer):
 
     def get_serial_number(self, obj):
         serial_numbers = obj.nomenclatures.values_list(
-            "component__serial_number", flat=True
+            "components__serial_number", flat=True
         ).distinct()
         return ", ".join(filter(None, serial_numbers))
 
