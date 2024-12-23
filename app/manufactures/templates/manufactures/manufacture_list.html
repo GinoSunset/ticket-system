@@ -35,6 +35,11 @@
     }
   }
   
+  .full-screen {
+    width: 100% !important;
+    height: 100% !important;
+  }
+  
 </style>
 {% endblock %}
 {% block content %}
@@ -72,52 +77,10 @@
             <th>Статус</th>
             <th>Комментарий/Готовность</th>
             <th>Изменить</th>
+            <th>Серийные номера</th>
         </tr>
     </thead>
     <tbody>
-    {% for manufacture in manufactures  %}
-    <tr>
-        <td>{{ manufacture.pk }}</td>
-        <td>{{ manufacture.date_create| date:"Y-m-d H:i:s" }}</td>
-        <td>{{ manufacture.client }}</td>
-
-        <td>{{ manufacture.date_shipment| date:"Y-m-d"}}</td>            
-        <td>{{ manufacture.count}}
-        <td><i class={% if manufacture.branding%}"check circle outline green icon"{% else %}"times circle outline red icon"{% endif %}></i></td>
-        <td>
-            {% if manufacture.status %}
-            <button class="ui button mini {{manufacture.get_color_status}} showModal">{{manufacture.status}}</button>
-            {% endif %}
-        </td>
-        <td>
-            {{ manufacture.comment }}
-            
-            <div class="ui multiple progress" style="margin-bottom:0px;" data-total="{{manufacture.nomenclatures.count}}" data-value="{{manufacture.progress_str_as_list_nomenclatures}}">
-                <div class="yellow bar">
-                  <div class="progress"></div>
-                </div>
-                <div class="green bar">
-                  <div class="progress"></div>
-                </div>
-              </div>
-        </td>
-        <td>
-          <div class="ui buttons">
-            <a class="ui button info basic icon"  href="{% url 'manufacture-update' manufacture.id %}"><i class="ui icon pen"></i></a>
-            <button class ="ui button basic icon" onclick='printDetails({{manufacture.id}})'><i class="ui icon print"></i></button>
-          </div>
-        </td>
-
-
-
-    </tr>
-
-    {% empty %}
-        <tr>
-          <td>Нет задач</td>
-        <tr>
-    {% endfor %}
-
     </tbody>
 </table>
 
@@ -129,7 +92,7 @@
   <i class="close icon"></i>
   <div class="header">Изменить статус</div>
   <div class="content">
-    bla
+    change status modal
   </div>
 
 </div>
@@ -140,18 +103,20 @@
 <script>
 const reloadbtn = $('.reloadbtn');
 
-$(".showModal").on("click", function(e){
-  e.preventDefault();
+$('#tableManufactures').on('draw.dt', function () {
+  $(".showModal").off("click").on("click", function (e) {
+    e.preventDefault();
 
-  let id = $(this).closest('tr').find('td:first').text();
-  let url = "{% url 'manufacture-update-status' 0 %}".replace('0', id);
-  $.ajax({
-    url: url,
-    success: function ( res ) {
-      $('#ChangeStatusModal .content').html(res);
-      $('#ChangeStatusModal').modal('show');
-      $("#id_status").dropdown();
-    }
+    let id = $(this).closest('tr').find('td:first').text();
+    let url = "{% url 'manufacture-update-status' 0 %}".replace('0', id);
+    $.ajax({
+      url: url,
+      success: function ( res ) {
+        $('#ChangeStatusModal .content').html(res);
+        $('#ChangeStatusModal').modal('show');
+        $("#id_status").dropdown();
+      }
+    });
   });
 });
 
@@ -199,24 +164,89 @@ var hidden_values = JSON.parse(localStorage.hidden_value_manuf || null) || false
       
     }
 
-    $.fn.dataTable.ext.search.push(function (settings, data, dataIndex) {
-      var status = data
-      to_hide = $("#filterBtn").dropdown('get value');
-      if (!to_hide){
-        return true;
-      }
-      to_hide = to_hide.split(",");
-      for (var i = 0; i < to_hide.length; i++) {
-        to_hide[i] = to_hide[i].trim();
-        if (status.indexOf(to_hide[i]) >= 0) {
-          return false;
-        }
-      }
-      return true;
-    });
 var table = $('#tableManufactures').DataTable({
     stateSave: true,
-    
+    serverSide: true,
+    drawCallback: function() {
+      init_progress();
+      initPopup();
+    },
+    ajax: {
+     url: '{% url "api-manufactures" %}?format=datatables', 
+     data: function (d) {
+      
+      }
+    },
+    columns: [
+            { data: "pk", title: "Номер" },
+            { data: "date_create", title: "Дата создания" },
+            { data: "client", title: "Клиент" },
+            { data: "date_shipment", title: "Планируемая дата отгрузки" },
+            { data: "count", title: "Количество" },
+            { data: "branding", title: "Брендирование", render: function (data) {
+                    return data ? '<i class="check circle outline green icon"></i>' : '<i class="times circle outline red icon"></i>';
+                }
+            },
+            { data: "status", title: "Статус", render: function (data, type, row) {
+                if (data) {
+                    return `
+                        <button class="ui button mini ${data.color} showModal">
+                            ${data.status}
+                        </button>`;
+                }
+                return '';
+            } },
+            { data: "comment",
+              title: "Комментарий",
+              render: function (data) {
+                  return `
+                  ${data.comment}
+                  <div class="ui multiple progress" style="margin-bottom:0px;" data-total="${data.total}" data-value="${data.value}">
+                      <div class="yellow bar">
+                        <div class="progress"></div>
+                      </div>
+                      <div class="green bar">
+                        <div class="progress"></div>
+                      </div>
+                    </div>
+                  `
+              }
+            },
+            {
+              data: "actions",
+              title: "Действия",
+              orderable: false,
+              render: function (data) {
+                  return `
+                      <div class="ui buttons">
+                          <a class="ui button info basic icon" href="${data.update_url}">
+                              <i class="ui icon pen"></i>
+                          </a>
+                          <button class="ui button basic icon" onclick="printDetails(${data.print_id})">
+                              <i class="ui icon print"></i>
+                          </button>
+                      </div>
+                  `;
+              }
+            },
+            {
+              data: "serial_number",
+              title: "Серийные номера", 
+              name: "serial_number",
+              render: function (data) {
+                console.log(data);
+                if (!data) {
+                  return "";
+                }
+                let serial_numbers = data.split(",").map(function(item){
+                  return `<div class='ui label'>${item}</div>`;
+                });
+                let labels = `<div class='ui basic labels'>${serial_numbers.join('')}</div>`;
+                let displayText = data.indexOf(',') < 10 ? data.split(',')[0] : data.substring(0, 10);
+                return `<div class="ui basic label serial_number" data-html="${labels}">${displayText}...</div>`;
+              }
+            }
+        ],
     columnDefs: [
         { "orderable": false, "targets": [4,5,6,7,8] },
         {
@@ -236,7 +266,7 @@ var table = $('#tableManufactures').DataTable({
   $('#tableManufactures tbody').on( 'click', 'tr', function () {
         var tr = $(this).closest('tr');
         var row = table.row( tr );
-        var id = row.data()[0];
+        var id = row.data()["pk"];
         if (row.child.isShown()) {
             row.child.hide();
             tr.removeClass('shown');
@@ -249,12 +279,23 @@ var table = $('#tableManufactures').DataTable({
 
     $("#filterBtn").dropdown({
         onChange: function (value, text, $selectedItem) {
-          localStorage.setItem('hidden_value_manuf', JSON.stringify(value));
-          
-          table.draw();
+          hideStatus(value);
   
         }
       })
+
+
+    
+    function hideStatus(value){
+      localStorage.setItem('hidden_value_manuf', JSON.stringify(value));
+          if (!value || value.length===0){
+            table.columns(6).search('').draw();
+          } else {
+            let to_hide = value.replaceAll(",","|")
+            to_hide = `^(?!.*${to_hide})`
+            table.columns(6).search(to_hide, true,false,true).draw();
+          }
+      }
 {%endif%}
 {% if  user.is_operator  or user.is_staff %}
 {%endif%}
@@ -279,7 +320,21 @@ function getDetails(id){
     };
 $("#onFull").click(function(){
     $('.ui.container').toggleClass('fluid');
+    $('#tableManufactures').toggleClass('full-screen');
 });
+
+$(document).ready(function() {
+  $('.ui.popup').popup();
+});
+
+function init_progress(){
+  $('.ui.multiple.progress').progress({
+    text: {
+      percent : '{bar} {percent}%',
+    }
+  });
+}
+
 $('.ui.multiple.progress').progress({
     text: {
       percent : '{bar} {percent}%',
@@ -312,6 +367,10 @@ function prettyComment(){
     $(this).html(new_text);
   });
 }
+
+function initPopup(){
+  $('.ui.serial_number').popup();
+};
 
 </script>
 {% endblock script %}
