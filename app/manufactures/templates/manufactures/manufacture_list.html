@@ -35,6 +35,11 @@
     }
   }
   
+  .full-screen {
+    width: 100% !important;
+    height: 100% !important;
+  }
+  
 </style>
 {% endblock %}
 {% block content %}
@@ -162,13 +167,14 @@ var hidden_values = JSON.parse(localStorage.hidden_value_manuf || null) || false
 var table = $('#tableManufactures').DataTable({
     stateSave: true,
     serverSide: true,
-    initComplete: function () {
-      init_progress()
+    drawCallback: function() {
+      init_progress();
+      initPopup();
     },
     ajax: {
      url: '{% url "api-manufactures" %}?format=datatables', 
      data: function (d) {
-      console.log("Отправляемые данные:", d); 
+      
       }
     },
     columns: [
@@ -225,8 +231,20 @@ var table = $('#tableManufactures').DataTable({
             },
             {
               data: "serial_number",
-              title: "Серийный номер", 
+              title: "Серийные номера", 
               name: "serial_number",
+              render: function (data) {
+                console.log(data);
+                if (!data) {
+                  return "";
+                }
+                let serial_numbers = data.split(",").map(function(item){
+                  return `<div class='ui label'>${item}</div>`;
+                });
+                let labels = `<div class='ui basic labels'>${serial_numbers.join('')}</div>`;
+                let displayText = data.indexOf(',') < 10 ? data.split(',')[0] : data.substring(0, 10);
+                return `<div class="ui basic label serial_number" data-html="${labels}">${displayText}...</div>`;
+              }
             }
         ],
     columnDefs: [
@@ -302,6 +320,11 @@ function getDetails(id){
     };
 $("#onFull").click(function(){
     $('.ui.container').toggleClass('fluid');
+    $('#tableManufactures').toggleClass('full-screen');
+});
+
+$(document).ready(function() {
+  $('.ui.popup').popup();
 });
 
 function init_progress(){
@@ -344,6 +367,10 @@ function prettyComment(){
     $(this).html(new_text);
   });
 }
+
+function initPopup(){
+  $('.ui.serial_number').popup();
+};
 
 </script>
 {% endblock script %}

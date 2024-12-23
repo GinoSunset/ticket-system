@@ -8,13 +8,12 @@ class GlobalCharFilter(GlobalFilter, filters.CharFilter):
     pass
 
 
-
 class GlobalComponentSerialNumber(GlobalFilter, filters.CharFilter):
     def global_q(self):
+        if not self.global_search_value:
+            return Q()
         return Q(
-            **{
-                f"nomenclatures__components__serial_number__icontains": self.global_search_value
-            }
+            nomenclatures__components__serial_number__icontains=self.global_search_value
         )
 
 
