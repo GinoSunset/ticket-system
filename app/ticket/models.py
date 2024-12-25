@@ -83,7 +83,7 @@ class Ticket(models.Model):
     )
 
     shop_id = models.CharField(
-        null=True, blank=True, max_length=50, verbose_name="ID магазина"
+        null=True, blank=True, max_length=150, verbose_name="ID магазина"
     )
     position = models.CharField(
         null=True, blank=True, max_length=50, verbose_name="Должность заказчика"
