@@ -272,7 +272,7 @@
   $(document).ready(function() {
     $('body').toast({
       class: 'error',
-      message: '{% for field in form %}{% for error in field.errors %}{{ error|escapejs }}<br>{% endfor %}{% endfor %}'
+      message: '{% for field in form %}{% for error in field.errors %}{{ field.label }}: {{ error|escapejs }}<br>{% endfor %}{% endfor %}'
     });
   });
 </script>
