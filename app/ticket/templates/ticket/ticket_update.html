@@ -257,6 +257,26 @@
     </form>
   </div>
 </div>
+{% if form.non_field_errors %}
+<script>
+  $(document).ready(function() {
+    $('body').toast({
+      class: 'error',
+      message: '{{ form.non_field_errors|escapejs }}'
+    });
+  });
+</script>
+{% endif %}
+{% if form.errors %}
+<script>
+  $(document).ready(function() {
+    $('body').toast({
+      class: 'error',
+      message: '{% for field in form %}{% for error in field.errors %}{{ error|escapejs }}<br>{% endfor %}{% endfor %}'
+    });
+  });
+</script>
+{% endif %}
 {% if not ticket.contractor %}
 {% include "ticket/contractor_modal.html" %}
 {% endif %}
