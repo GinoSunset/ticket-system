@@ -4,6 +4,7 @@ import sentry_sdk
 
 env = environ.Env(
     DEBUG=(bool, False),
+    USE_DEBUG_TOOLBAR=(bool, "False"),
     PROTOCOL=(str, "https"),
     EMAIL_HOST=(str, "localhost"),
     EMAIL_PORT=(int, 465),
@@ -38,7 +39,7 @@ environ.Env.read_env(BASE_DIR / ".env")
 
 DEBUG = env("DEBUG")
 SECRET_KEY = env("SECRET_KEY")
-
+USE_DEBUG_TOOLBAR = env("USE_DEBUG_TOOLBAR")
 ALLOWED_HOSTS = env("DJANGO_ALLOWED_HOSTS").split(" ")
 CSRF_TRUSTED_ORIGINS = env("CSRF_TRUSTED_ORIGINS").split(" ")
 INSTALLED_APPS = [
@@ -212,3 +213,9 @@ ITSM_TASK_URL = env("ITSM_TASK_URL")
 ITSM_USER_ID = env("ITSM_USER_ID")
 ITSM_USER = env("ITSM_USER")
 ITSM_PASSWORD = env("ITSM_PASSWORD")
+
+# Enable debug toolbar
+if USE_DEBUG_TOOLBAR:
+    INSTALLED_APPS.append("debug_toolbar")
+    MIDDLEWARE = ["debug_toolbar.middleware.DebugToolbarMiddleware"] + MIDDLEWARE
+    INTERNAL_IPS = ["127.0.0.1"]
