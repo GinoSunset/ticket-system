@@ -1,8 +1,9 @@
 from django_filters import filters
-from django.db.models import Q
+from django.db.models import Q, Subquery
 from rest_framework_datatables.django_filters.filterset import DatatablesFilterSet
 from rest_framework_datatables.django_filters.filters import GlobalFilter
 from .models import Manufacture
+from storage.models import Component
 
 class GlobalCharFilter(GlobalFilter, filters.CharFilter):
     pass
@@ -12,9 +13,10 @@ class GlobalComponentSerialNumber(GlobalFilter, filters.CharFilter):
     def global_q(self):
         if not self.global_search_value:
             return Q()
-        return Q(
-            nomenclatures__components__serial_number__icontains=self.global_search_value
-        )
+        subquery = Component.objects.filter(
+            serial_number__icontains=self.global_search_value,
+        ).values("nomenclature_id")
+        return Q(nomenclatures__in=Subquery(subquery))
 
 
 class ManufactureGlobalFilter(DatatablesFilterSet):
