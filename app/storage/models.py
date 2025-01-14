@@ -56,7 +56,11 @@ class Component(models.Model):
     is_archive = models.BooleanField(default=False, verbose_name="В архиве")
 
     serial_number = models.CharField(
-        max_length=255, verbose_name="Серийный номер", null=True, blank=True
+        max_length=255,
+        verbose_name="Серийный номер",
+        null=True,
+        blank=True,
+        db_index=True,
     )
     is_stock = models.BooleanField(default=False, verbose_name="В наличии")
     date_delivery = models.DateField(
