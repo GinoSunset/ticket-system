@@ -20,3 +20,4 @@ requests==2.30.0
 sentry-sdk[django]==2.13.0
 psycopg2-binary
 django-viewflow==2.2.7
+django-debug-toolbar==4.4.6
