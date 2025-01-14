@@ -432,6 +432,14 @@ class UpdateComponentSerialNumber(AccessOperatorMixin, LoginRequiredMixin, Updat
         context = self.get_context(formset)
         if formset.is_valid():
             formset.save()
+            for form in formset:
+                if form.has_changed():
+                    component = form.instance
+                    if form.has_changed():
+                        component = form.instance
+                        logging.info(
+                            f"Updated serial number for component {component.id} to {component.serial_number}, manufacture id {component.nomenclature.manufacture.id}"
+                        )
             return render(request, self.template_name, context)
         return render(request, self.template_name, context, status=400)
 
