@@ -155,14 +155,15 @@ function startLoopReload(){
 }
 
 {% if  object_list%}
-var hidden_values = JSON.parse(localStorage.hidden_value_manuf || null) || false;
-    if (hidden_values){
-      let hidden_value_list = hidden_values.split(",");
-      for (var i = 0; i < hidden_value_list.length; i++) {
-        $("#filterBtn").dropdown('set selected', hidden_value_list[i]);
-      }
-      
+function loadHideStatus(){
+  var hidden_values = JSON.parse(localStorage.hidden_value_manuf || null) || false;
+  if (hidden_values){
+    let hidden_value_list = hidden_values.split(",");
+    for (var i = 0; i < hidden_value_list.length; i++) {
+      $("#filterBtn").dropdown('set selected', hidden_value_list[i]);
     }
+  }
+}
 
 var table = $('#tableManufactures').DataTable({
     stateSave: true,
@@ -170,6 +171,9 @@ var table = $('#tableManufactures').DataTable({
     drawCallback: function() {
       init_progress();
       initPopup();
+    },
+    initComplete: function (settings, json) {
+      loadHideStatus();
     },
     ajax: {
      url: '{% url "api-manufactures" %}?format=datatables', 
