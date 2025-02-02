@@ -435,8 +435,12 @@ class UpdateComponentSerialNumber(AccessOperatorMixin, LoginRequiredMixin, Updat
             for form in formset:
                 if form.has_changed():
                     component = form.instance
+                    if not component.is_stock:
+                        component.is_stock = True
+                        logging.info(f"Component {component} is stock")
+                    component.save()
                     logging.info(
-                        f"Updated serial number for component {component.id} to {component.serial_number}, manufacture id {component.nomenclature.manufacture.id}"
+                        f"Updated serial number for component {component.id}-{component.component_type} to {component.serial_number}, manufacture id {component.nomenclature.manufacture.id}"
                     )
             return render(request, self.template_name, context)
         return render(request, self.template_name, context, status=400)

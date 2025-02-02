@@ -66,15 +66,16 @@ class TestComponentTypeModel:
 
 
 @pytest.mark.parametrize(
-    "is_stock, date_delivery, delivery, is_archive ,expected",
+    "is_stock, date_delivery, delivery, is_archive ,serial_number, expected",
     [
-        (False, None, None, False, True),
-        (True, None, None, False, False),
-        (False, datetime.now(), None, False, False),
-        (False, None, True, False, False),
-        (False, None, None, True, False),
-        (True, None, None, True, False),
-        (True, datetime.now(), None, True, False),
+        (False, None, None, False, None, True),
+        (False, None, None, False, "test_serial", False),
+        (True, None, None, False, None, False),
+        (False, datetime.now(), None, False, None, False),
+        (False, None, True, False, None, False),
+        (False, None, None, True, None, False),
+        (True, None, None, True, None, False),
+        (True, datetime.now(), None, True, None, False),
     ],
 )
 @pytest.mark.django_db
@@ -85,6 +86,7 @@ def test_is_phantom_component(
     date_delivery,
     delivery,
     is_archive,
+    serial_number,
     expected,
 ):
     if delivery is not None:
@@ -94,6 +96,45 @@ def test_is_phantom_component(
         date_delivery=date_delivery,
         is_archive=is_archive,
         delivery=delivery,
+        serial_number=serial_number,
     )
 
     assert component.is_phantom is expected
+
+
+@pytest.mark.parametrize(
+    "is_stock, date_delivery, delivery, is_archive ,serial_number, expected",
+    [
+        (False, None, None, False, None, True),
+        (False, None, None, False, "test_serial", False),
+        (True, None, None, False, None, False),
+        (False, datetime.now(), None, False, None, False),
+        (False, None, True, False, None, False),
+        (False, None, None, True, None, False),
+        (True, None, None, True, None, False),
+        (True, datetime.now(), None, True, None, False),
+    ],
+)
+@pytest.mark.django_db
+def test_phantom_manager_component(
+    component_factory,
+    delivery_factory,
+    is_stock,
+    date_delivery,
+    delivery,
+    is_archive,
+    serial_number,
+    expected,
+):
+    if delivery is not None:
+        delivery = delivery_factory()
+    component_factory(
+        is_stock=is_stock,
+        date_delivery=date_delivery,
+        is_archive=is_archive,
+        delivery=delivery,
+        serial_number=serial_number,
+    )
+    c = Component.phantom_components.filter(phantom=True)
+    count = 1 if expected else 0
+    assert c.count() == count

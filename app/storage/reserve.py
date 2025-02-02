@@ -19,12 +19,28 @@ def get_components_type_from_nomenclature(
 ) -> list[ComponentType] | None:
     components = nomenclature.get_components()
     list_components_type = []
+    reserved_components = Component.objects.filter(
+        nomenclature=nomenclature, is_reserve=True
+    )
+    reserved_component_count = {}
+
+    for component in reserved_components:
+        reserved_component_count[component.component_type] = (
+            reserved_component_count.get(component.component_type, 0) + 1
+        )
+
     for component in components:
         try:
             type_component = ComponentType.objects.get(name__iexact=component)
         except ComponentType.DoesNotExist:
             continue
-        list_components_type.extend(get_sub_component_from_component(type_component))
+        sub_components = get_sub_component_from_component(type_component)
+        for sub_component in sub_components:
+            if reserved_component_count.get(sub_component, 0) > 0:
+                reserved_component_count[sub_component] -= 1
+            else:
+                list_components_type.append(sub_component)
+
     return list_components_type
 
 
@@ -88,19 +104,20 @@ def components_from_nomenclature_to_archive(nomenclature: Nomenclature):
     )
 
 
+def remove_phantom_component_on_nomenclature(
+    nomenclature: Nomenclature,
+) -> tuple[int, dict[str, int]]:
+    count_remove = Component.phantom_components.filter(phantom=True).delete()
+    logging.info(f"Remove {count_remove} phantom component nomenclature {nomenclature}")
+    return count_remove
+
+
 def unreserve_components(nomenclature: Nomenclature):
-    count_remove = Component.objects.filter(
-        nomenclature=nomenclature,
-        is_stock=False,
-        is_reserve=True,
-        date_delivery__isnull=True,
-    ).delete()
+    remove_phantom_component_on_nomenclature(nomenclature)
     count_update = Component.objects.filter(
         nomenclature=nomenclature, is_reserve=True
     ).update(is_reserve=False, nomenclature=None)
-    logging.info(
-        f"Remove {count_remove} component. Unreserve {count_update} component for Nomenclature {nomenclature} "
-    )
+    logging.info(f"Unreserve {count_update} component for Nomenclature {nomenclature} ")
 
 
 def re_reserved_component_delivery(component: Component):

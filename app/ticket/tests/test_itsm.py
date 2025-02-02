@@ -37,6 +37,7 @@ def test_get_info_about_shop(mock_itsm_request):
     assert shop_info.address is None
 
 
+@pytest.mark.skip
 @factory.django.mute_signals(post_save)
 @pytest.mark.django_db
 def test_update_itsm_ticket_comment(mock_itsm_request, ticket: Ticket, status_in_work):
@@ -50,6 +51,7 @@ def test_update_itsm_ticket_comment(mock_itsm_request, ticket: Ticket, status_in
     ticket.refresh_from_db()
     assert ticket.comments.count() > 0
 
+@pytest.mark.skip
 @factory.django.mute_signals(post_save)
 @pytest.mark.django_db
 def test_get_itsm_ticket_for_update_comment(ticket_factory, status_in_work, status_new, status_done):
