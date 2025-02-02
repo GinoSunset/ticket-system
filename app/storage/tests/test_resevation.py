@@ -11,6 +11,7 @@ from storage.reserve import (
     unreserve_components,
     re_reserver_components_in_stock_to_phantoms,
     get_component_type_in_stock_and_has_phantoms,
+    get_components_type_from_nomenclature,
 )
 
 
@@ -154,6 +155,49 @@ class TestUnreserveComponents:
 
         assert Component.objects.filter(nomenclature=nomenclature).count() == 0
 
+    def test_unreserve_component_not_remove_component_with_serial_number(
+        self,
+        nomenclature_factory,
+        component_factory,
+        monkeypatch_delay_reserve_component_celery,
+    ):
+        nomenclature = nomenclature_factory()
+        component1 = component_factory(
+            nomenclature=nomenclature,
+            is_stock=False,
+            is_reserve=True,
+            date_delivery=None,
+            serial_number="test_sr",
+        )
+        component2 = component_factory(
+            nomenclature=nomenclature,
+            is_stock=False,
+            is_reserve=True,
+            date_delivery=datetime.now(),
+        )
+        component3 = component_factory(
+            nomenclature=nomenclature,
+            is_stock=True,
+            is_reserve=True,
+            date_delivery=None,
+        )
+        component_with_serial_number = component_factory(
+            nomenclature=nomenclature,
+            is_stock=True,
+            is_reserve=True,
+            date_delivery=None,
+            serial_number="test_sr_2",
+        )
+
+        unreserve_components(nomenclature)
+        component2.refresh_from_db()
+        component3.refresh_from_db()
+        component_with_serial_number.refresh_from_db()
+
+        assert Component.objects.filter(pk=component1.pk).exists() is True
+        assert component2.is_reserve is False
+        assert component3.is_reserve is False
+        assert component_with_serial_number.is_reserve is True
 
 @pytest.mark.django_db
 class TestSignalReservation:
@@ -402,3 +446,65 @@ class TestReReserveStockComponent:
         ).first().nomenclature == Nomenclature.objects.get(
             manufacture__date_shipment=date(2024, 1, 26)
         )
+
+
+@pytest.mark.django_db
+def test_rereservation_component_with_component_in_stock_and_has_serial_number(
+    component_type_factory,
+    nomenclature_factory,
+    manufacture_factory,
+    operator_client,
+    monkeypatch_delay_reserve_component_celery,
+):
+    ComponentType.objects.all().delete()
+    component = ComponentFactory(
+        component_type=get_components_rs_type(), is_reserve=False, is_stock=True
+    )
+
+    nomenclature = nomenclature_factory(
+        frame_type=FrameTypeOption.objects.get(name="РЧ"),
+    )
+
+    another_component = ComponentFactory(
+        component_type=get_components_rs_type(), is_reserve=False, is_stock=True
+    )
+
+    nomenclature.status = Nomenclature.Status.READY
+    nomenclature.save()
+    nomenclature.refresh_from_db()
+    component.refresh_from_db()
+    another_component.refresh_from_db()
+
+    assert Component.objects.count() == 2
+    assert Component.objects.filter(is_reserve=True).count() == 1
+    assert another_component.is_reserve is False
+    assert component.is_reserve is True
+
+
+@factory.django.mute_signals(signals.post_save)
+@pytest.mark.django_db
+def test_get_components_type_from_nomenclature(
+    nomenclature_factory, component_type_factory, component_factory
+):
+    nomenclature = nomenclature_factory()
+    component_type1 = component_type_factory(name="ComponentType1")
+    component_type2 = component_type_factory(name="ComponentType2")
+    component_type3 = component_type_factory(name="ComponentType3")
+
+    nomenclature.get_components = lambda: [
+        "ComponentType1",
+        "ComponentType2",
+        "ComponentType3",
+    ]
+
+    component_factory(
+        component_type=component_type1, nomenclature=nomenclature, is_reserve=True
+    )
+    component_factory(
+        component_type=component_type2, nomenclature=nomenclature, is_reserve=True
+    )
+
+    components_type = get_components_type_from_nomenclature(nomenclature)
+    assert component_type3 in components_type
+    assert component_type1 not in components_type
+    assert component_type2 not in components_type

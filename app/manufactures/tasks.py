@@ -3,6 +3,7 @@ import logging
 from manufactures.models import Nomenclature
 from storage.reserve import (
     processing_reserved_component,
+    remove_phantom_component_on_nomenclature,
     unreserve_components,
     components_from_nomenclature_to_archive,
 )
@@ -20,10 +21,10 @@ def reserve_components(id_nomenclature, created):
         processing_reserved_component(nomenclature)
         return
     if not created and nomenclature.manufacture:
-        unreserve_components(nomenclature)
         if nomenclature.status == Nomenclature.Status.CANCELED:
-            # если номенклатура перешла в отмененную то только освобождаем компоненты
+            unreserve_components(nomenclature)
             return
+        remove_phantom_component_on_nomenclature(nomenclature)
         processing_reserved_component(nomenclature)
         if nomenclature.status == Nomenclature.Status.SHIPPED:
             components_from_nomenclature_to_archive(nomenclature)
