@@ -33,7 +33,9 @@ class ComponentPhantomManager(models.Manager):
                     When(
                         is_archive=False,
                         is_stock=False,
+                        serial_number=None,
                         date_delivery=None,
+                        delivery=None,
                         then=Value(True),
                     ),
                     default=Value(False),
@@ -112,6 +114,7 @@ class Component(models.Model):
                 self.is_stock is False,
                 self.delivery is None,
                 self.date_delivery is None,
+                self.serial_number is None,
             ]
         )
 
