@@ -221,6 +221,8 @@ class Nomenclature(models.Model):
         blank=True,
     )
 
+    is_reserving = models.BooleanField(default=False)
+
     def __str__(self):
         options = []
         if self.mdg:

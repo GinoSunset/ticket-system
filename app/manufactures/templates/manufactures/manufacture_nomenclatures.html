@@ -2,7 +2,7 @@
 {% for nomenclature in manufacture.nomenclatures.all %}
 
 <div class="item">
-    <div class="ui  image">
+    <div class="ui image">
 
         {% if nomenclature.illumination %}
         <i class="lightbulb yellow icon big"></i>
@@ -12,23 +12,30 @@
         <br>
         <span class="ui small text grey">#{{nomenclature.pk}}</span>
         <br>
-        <a href="{% url 'nomenclature-components' nomenclature.pk %}" class="ui  label mini">компоненты</a>
-
+        {% if nomenclature.is_reserving %}
+            <button class="ui button mini disabled">
+                <div class="ui active inline loader"></div>
+                <span class="ui small text red">Резервирование компонентов в процессе...</span>
+            </button>
+        {% else %}
+            <a href="{% url 'nomenclature-components' nomenclature.pk %}" class="ui label mini">Компоненты</a>
+        {% endif %}
         
     </div>
     <div class="content">
        
         <div class="header"> 
-            <span class="ui {% if nomenclature.status == 3  %}green  {% elif  nomenclature.status == 2  %} yellow {% endif %} text">Тип: {{ nomenclature.frame_type}}. Корпус: {{ nomenclature.body}}</span>  <div class="ui {% if nomenclature.status == 3  %}green  {% elif  nomenclature.status == 2  %} yellow {% endif %}  horizontal label">{{ nomenclature.get_status_display}}</div>
+            <span class="ui {% if nomenclature.status == 3 %}green {% elif nomenclature.status == 2 %} yellow {% endif %} text">Тип: {{ nomenclature.frame_type }}. Корпус: {{ nomenclature.body }}</span>
+            <div class="ui {% if nomenclature.status == 3 %}green {% elif nomenclature.status == 2 %} yellow {% endif %} horizontal label">{{ nomenclature.get_status_display }}</div>
         </div>
 
         <div class="meta">
-            <span class="">TX: {{nomenclature.tx_count}}</span>
-            <span class="">RX: {{nomenclature.rx_count}}</span>
+            <span class="">TX: {{ nomenclature.tx_count }}</span>
+            <span class="">RX: {{ nomenclature.rx_count }}</span>
         </div>
         <div class="description">
-            <p>Тип БП: <b>{{ nomenclature.get_bp_type_display}}</b> ({{ nomenclature.bp_count}} шт.) 
-                {% if nomenclature.amperage_3_2%}
+            <p>Тип БП: <b>{{ nomenclature.get_bp_type_display }}</b> ({{ nomenclature.bp_count }} шт.) 
+                {% if nomenclature.amperage_3_2 %}
                     <i class="bolt yellow icon"></i>3.2А
                 {% endif %}
                 {% if nomenclature.amperage_6 %}
@@ -41,13 +48,13 @@
                     <i class="bolt yellow icon"></i>2А
                 {% endif %}
             {% if nomenclature.comment %}
-            <p class="componentsComment">Комментарий: {{ nomenclature.comment}}</p>
+            <p class="componentsComment">Комментарий: {{ nomenclature.comment }}</p>
             {% endif %}
         </div>
         <div class="extra">
-            {% if nomenclature.mdg %} <div class="ui label  green">MDG</div>{% endif %}
-            {% if nomenclature.md %} <div class="ui label  green">MD</div>{% endif %}
-            {% if nomenclature.wifi %} <div class="ui label  green">Wi-Fi</div>{% endif %}
+            {% if nomenclature.mdg %} <div class="ui label green">MDG</div>{% endif %}
+            {% if nomenclature.md %} <div class="ui label green">MD</div>{% endif %}
+            {% if nomenclature.wifi %} <div class="ui label green">Wi-Fi</div>{% endif %}
         </div>
     </div>
 </div>

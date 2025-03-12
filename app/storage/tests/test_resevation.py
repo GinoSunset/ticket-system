@@ -131,6 +131,7 @@ class TestUnreserveComponents:
             is_stock=False,
             is_reserve=True,
             date_delivery=None,
+            serial_number=None,
         )
         component2 = component_factory(
             nomenclature=nomenclature,
@@ -144,14 +145,23 @@ class TestUnreserveComponents:
             is_reserve=True,
             date_delivery=None,
         )
+        component_with_serial_number = component_factory(
+            nomenclature=nomenclature,
+            is_stock=False,
+            is_reserve=True,
+            date_delivery=None,
+            serial_number="test_sr",
+        )
 
         unreserve_components(nomenclature)
         component2.refresh_from_db()
         component3.refresh_from_db()
+        component_with_serial_number.refresh_from_db()
 
         assert Component.objects.filter(pk=component1.pk).exists() is False
         assert component2.is_reserve is False
         assert component3.is_reserve is False
+        assert component_with_serial_number.is_reserve is False
 
         assert Component.objects.filter(nomenclature=nomenclature).count() == 0
 
