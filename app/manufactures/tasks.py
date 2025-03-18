@@ -12,14 +12,12 @@ from storage.reserve import (
 @celery_app.task
 def reservation_component_from_nomenclature(id_nomenclature, created):
     logging.debug("Start reservation")
-    nomenclature: Nomenclature = Nomenclature.objects.get(pk=id_nomenclature)
-    nomenclature.is_reserving = True
-    nomenclature.save()
+    Nomenclature.objects.filter(pk=id_nomenclature).update(is_reserving=True)
     try:
         result = reserve_components(id_nomenclature, created)
     finally:
-        nomenclature.is_reserving = False
-        nomenclature.save()
+        Nomenclature.objects.filter(pk=id_nomenclature).update(is_reserving=False)
+    logging.debug(f"Stop reservation for {id_nomenclature}")
     return result
 
 
