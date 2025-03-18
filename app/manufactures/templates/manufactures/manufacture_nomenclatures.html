@@ -12,7 +12,7 @@
         <br>
         <span class="ui small text grey">#{{nomenclature.pk}}</span>
         <br>
-        {% if not nomenclature.is_reserving %}
+        {% if nomenclature.is_reserving %}
             <button class="ui loading button mini disabled">
                 <span class="ui small text red">Резервирование компонентов</span>
             </button>
