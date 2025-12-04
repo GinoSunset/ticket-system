@@ -29,7 +29,7 @@ env = environ.Env(
     URL_INVOICE_API=(str, "http://microservice:8000"),
     ITSM_BASE_URL=(str, "https://s1.itsm.net"),
     ITSM_TASK_URL=(str, "/rest/v1/table/itsm_task"),
-    ITSM_USER_ID=(int, 111111111111117111),
+    ITSM_USER_ID=(str, "111111111111117111"),
     ITSM_USER=(str, "222"),
     ITSM_PASSWORD=(str, "1111"),
 )
