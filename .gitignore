@@ -137,3 +137,5 @@ media/
 celerybeat-schedule.db
 app/static/
 .dev.env
+.devcontainer/
+pgbackups/
