@@ -27,6 +27,9 @@ TYPE_TASK = {
 def get_url():
     return f"{settings.ITSM_BASE_URL}{settings.ITSM_TASK_URL}"
 
+def get_url_one_task(sys_id: str) -> str:
+    return f"{settings.ITSM_BASE_URL}/rest/v1/table/task/{sys_id}"
+
 
 def get_url_with_assign_filter(url: str) -> str:
     return f"{url}?sysparm_query=assigned_user={settings.ITSM_USER_ID}{OPERATOR_OR}state!={STATE_DONE}{OPERATOR_OR}state!={STATE_CANCEL}"
